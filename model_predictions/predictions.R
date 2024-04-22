@@ -136,30 +136,33 @@ dataset.referral_type2 <- formatting(
   drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M"))
 
 
+#### remove downloaded folder
+unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
+
 # load posteriors
 
 ## New calculator
 rcs_parms <- readRDS("model_development/rcs_parms.rds")
-posterior_samples_T1D <- readRDS("model_development/type_1_model_posteriors_old.rds")   ### remove _old
+posterior_samples_T1D <- readRDS("model_development/type_1_model_posteriors.rds")
 
 # ### create object to use for prediction
 posterior_samples_T1D_obj <- list(post = posterior_samples_T1D$samples)
 class(posterior_samples_T1D_obj) <- "T1D"
 
-posterior_samples_T2D <- readRDS("model_development/type_2_model_posteriors_old.rds")   ### remove _old
+posterior_samples_T2D <- readRDS("model_development/type_2_model_posteriors.rds")
 
 posterior_samples_T2D_obj <- list(post = posterior_samples_T2D$samples)
 class(posterior_samples_T2D_obj) <- "T2D"
 
 ## Old calculator
-posteriors_samples_old_T1D <- readRDS("model_development/type_1_old_model_posteriors_old.rds")   ### remove _old
+posteriors_samples_old_T1D <- readRDS("model_development/type_1_old_model_posteriors.rds")
 
 ### create object to use for prediction
 posteriors_samples_old_T1D <- list(post = posteriors_samples_old_T1D$samples)
 class(posteriors_samples_old_T1D) <- "old_calculator_T1D"
 
 
-posteriors_samples_old_T2D <- readRDS("model_development/type_2_old_model_posteriors_old.rds")   ### remove _old
+posteriors_samples_old_T2D <- readRDS("model_development/type_2_old_model_posteriors.rds")
 
 ### create object to use for prediction
 posteriors_samples_old_T2D <- list(post = posteriors_samples_old_T2D$samples)
