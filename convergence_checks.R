@@ -8,6 +8,7 @@
 library(tidyverse)
 library(nimble)
 library(patchwork)
+library(posterior)
 
 # load files required
 type_1_model_posteriors <- readRDS("model_development/type_1_model_posteriors.rds")
@@ -65,6 +66,89 @@ long_list <- function(data) {
 
 #:---------------------------------------------------------------------------------------------------
 #:---------------------------------------------------------------------------------------------------
+#:---------- Model convergence R_hat
+
+calc_rhat <- function(data, thinning = 1) {
+  
+  ## start output
+  output <- NULL
+  
+  ## iterate through chains
+  for (i in 1:length(data)) {
+    
+    output <- output %>%
+      
+      ## Append other chains
+      rbind(
+        data[[i]] %>%
+          
+          ## turn file into data.frame
+          as.data.frame() %>%
+          
+          ## thinning iterations
+          slice(seq(1, nrow(data[[i]]), thinning))
+        
+      )
+    
+    
+    
+    
+  }
+  
+  output <- output %>%
+    
+    ## gather all values into a long list
+    gather() %>%
+    
+    ## group by model parameter
+    group_by(key) %>%
+    
+    ## calculate R_hat value
+    mutate(rhat = posterior::rhat(value)) %>%
+    
+    ## ungroup
+    ungroup() %>%
+    
+    ## drop parameter values, keep R_hat values
+    select(-value) %>%
+    
+    ## keep the unique values
+    unique()
+  
+  return(output)
+  
+}
+
+
+# Type 1 old model
+## all parameters R=1
+r_hat_type_1_old_model_posteriors <- calc_rhat(type_1_old_model_posteriors$samples, thinning = 1)
+## all parameters R=1
+r_hat_type_1_old_model_posteriors_thin_100 <- calc_rhat(type_1_old_model_posteriors$samples, thinning = 100)
+
+# Type 1 new model
+## all parameters R=1
+r_hat_type_1_model_posteriors <- calc_rhat(type_1_model_posteriors$samples, thinning = 1)
+## all parameters R=1
+r_hat_type_1_model_posteriors_thin_100 <- calc_rhat(type_1_model_posteriors$samples, thinning = 100)
+
+## Type 2 old model
+## all parameters R=1
+r_hat_type_2_old_model_posteriors <- calc_rhat(type_2_old_model_posteriors$samples, thinning = 1)
+## all parameters R=1
+r_hat_type_2_old_model_posteriors_thin_100 <- calc_rhat(type_2_old_model_posteriors$samples, thinning = 100)
+
+## Type 2 new model
+## all parameters R=1
+r_hat_type_2_model_posteriors <- calc_rhat(type_2_model_posteriors$samples, thinning = 1)
+## all parameters R=1
+r_hat_type_2_model_posteriors_thin_100 <- calc_rhat(type_2_model_posteriors$samples, thinning = 100)
+
+
+
+#:---------------------------------------------------------------------------------------------------
+#:---------------------------------------------------------------------------------------------------
+#:---------- Model convergence plots
 
 # trace plot for old model type 1
 plot_old_type_1_values <- long_list(type_1_old_model_posteriors$samples) %>%
