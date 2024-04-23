@@ -11,7 +11,7 @@ library(tidyverse)
 
 # load functions needed for generating data
 source("data/create_data.R")
-source("https://raw.github.com/Exeter-Diabetes/CPRD-Pedro-MODY/master/00.prediction_functions.R")
+source("new_data_predictions/prediction_functions.R")
 
 ### predict method for 'post' objects
 predict.old_calculator_T1D <- function(object, newdata, ...) {
@@ -110,14 +110,14 @@ dataset.referral_type1 <- formatting(
   ethnicity_groups_genetics = read_excel("data/Julieanne-Pedro-MODY-Referrals-main/ancestry_ngs_kp.xlsx", na = "null"), 
   ethnicity_labels_stated = read_excel("data/Julieanne-Pedro-MODY-Referrals-main/ethnicity_labels_stated.xlsx", na = "null"), 
   ethnicity_labels_genetics = read_excel("data/Julieanne-Pedro-MODY-Referrals-main/ethnicity_labels_genetics.xlsx", na = "null"), 
-  biomarkers = "All", 
+  biomarkers = "any", 
   diagnosis = FALSE, 
   type = "Type 1", 
   ethnicity = "White", 
   proband = "Proband", 
   gene_variable = FALSE
 ) %>%
-  drop_na(c("sex", "bmi", "agedx", "hba1c", "pardm", "agerec", "bmi")) %>%
+  drop_na(c("sex", "bmi", "agedx", "hba1c", "pardm", "agerec", "bmi")) %>%   # what should be done about missing MODY testing?
   mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
 
 dataset.referral_type2 <- formatting(
@@ -133,7 +133,7 @@ dataset.referral_type2 <- formatting(
   proband = "Proband", 
   gene_variable = FALSE
 ) %>%
-  drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M"))
+  drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec"))    # what should be done about missing MODY testing?
 
 
 #### remove downloaded folder
@@ -191,7 +191,12 @@ interim <- as_tibble(as.matrix(select(dataset.case_control_type1 %>%
                                         mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
 
 
-predictions_dataset.case_control_type1_no_T <- predict(posterior_samples_T1D_obj, interim, rcs_parms) %>%
+predictions_dataset.case_control_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.case_control_type1_no_T_full, "model_predictions/predictions_dataset.case_control_type1_no_T_full.rds")
+
+predictions_dataset.case_control_type1_no_T <- predictions_dataset.case_control_type1_no_T_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -201,10 +206,19 @@ predictions_dataset.case_control_type1_no_T <- predict(posterior_samples_T1D_obj
 saveRDS(predictions_dataset.case_control_type1_no_T, "model_predictions/predictions_dataset.case_control_type1_no_T.rds")
 
 
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.referral_type1 %>%
                                         mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
 
-predictions_dataset.referral_type1_no_T <- predict(posterior_samples_T1D_obj, interim, rcs_parms) %>%
+predictions_dataset.referral_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.referral_type1_no_T_full, "model_predictions/predictions_dataset.referral_type1_no_T_full.rds")
+
+predictions_dataset.referral_type1_no_T <- predictions_dataset.referral_type1_no_T_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -214,10 +228,20 @@ predictions_dataset.referral_type1_no_T <- predict(posterior_samples_T1D_obj, in
 saveRDS(predictions_dataset.referral_type1_no_T, "model_predictions/predictions_dataset.referral_type1_no_T.rds")
 
 
+
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type1 %>%
                                         mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
 
-predictions_dataset.UNITED_type1_no_T <- predict(posterior_samples_T1D_obj, interim, rcs_parms) %>%
+predictions_dataset.UNITED_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_no_T_full, "model_predictions/predictions_dataset.UNITED_type1_no_T_full.rds")
+
+predictions_dataset.UNITED_type1_no_T <- predictions_dataset.UNITED_type1_no_T_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -226,11 +250,22 @@ predictions_dataset.UNITED_type1_no_T <- predict(posterior_samples_T1D_obj, inte
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type1_no_T, "model_predictions/predictions_dataset.UNITED_type1_no_T.rds")
 
+
+
+#:-------------
+
+
+
 ### Predictions from new model with T
 
 interim <- as_tibble(as.matrix(select(dataset.referral_type1, pardm, agerec, hba1c, agedx, sex, bmi, T)))
 
-predictions_dataset.referral_type1_with_T <- predict(posterior_samples_T1D_obj, interim, rcs_parms) %>%
+predictions_dataset.referral_type1_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.referral_type1_with_T_full, "model_predictions/predictions_dataset.referral_type1_with_T_full.rds")
+
+predictions_dataset.referral_type1_with_T <- predictions_dataset.referral_type1_with_T_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -240,9 +275,20 @@ predictions_dataset.referral_type1_with_T <- predict(posterior_samples_T1D_obj, 
 saveRDS(predictions_dataset.referral_type1_with_T, "model_predictions/predictions_dataset.referral_type1_with_T.rds")
 
 
+
+
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type1, pardm, agerec, hba1c, agedx, sex, bmi, T)))
 
-predictions_dataset.UNITED_type1_with_T <- predict(posterior_samples_T1D_obj, interim, rcs_parms) %>%
+predictions_dataset.UNITED_type1_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -252,11 +298,20 @@ predictions_dataset.UNITED_type1_with_T <- predict(posterior_samples_T1D_obj, in
 saveRDS(predictions_dataset.UNITED_type1_with_T, "model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
 
 
+
+#:-------------
+
+
 ### Predictions from old model
 
 interim <- as_tibble(as.matrix(select(dataset.case_control_type1, pardm, agerec, hba1c, agedx, sex)))
 
-predictions_dataset.case_control_type1_old <- predict(posteriors_samples_old_T1D, interim) %>%
+predictions_dataset.case_control_type1_old_full <- predict(posteriors_samples_old_T1D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.case_control_type1_old_full, "model_predictions/predictions_dataset.case_control_type1_old_full.rds")
+
+predictions_dataset.case_control_type1_old <- predictions_dataset.case_control_type1_old_full%>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
@@ -276,9 +331,20 @@ for (i in 1:nrow(predictions_dataset.case_control_type1_old)) {
 saveRDS(predictions_dataset.case_control_type1_old, "model_predictions/predictions_dataset.case_control_type1_old.rds")
 
 
+
+#:-------------
+
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.referral_type1, pardm, agerec, hba1c, agedx, sex)))
 
-predictions_dataset.referral_type1_old <- predict(posteriors_samples_old_T1D, interim) %>%
+predictions_dataset.referral_type1_old_full <- predict(posteriors_samples_old_T1D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.referral_type1_old_full, "model_predictions/predictions_dataset.referral_type1_old_full.rds")
+
+predictions_dataset.referral_type1_old <- predictions_dataset.referral_type1_old_full%>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
@@ -299,9 +365,19 @@ saveRDS(predictions_dataset.referral_type1_old, "model_predictions/predictions_d
 
 
 
+
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type1, pardm, agerec, hba1c, agedx, sex)))
 
-predictions_dataset.UNITED_type1_old <- predict(posteriors_samples_old_T1D, interim) %>%
+predictions_dataset.UNITED_type1_old_full <- predict(posteriors_samples_old_T1D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_old_full, "model_predictions/predictions_dataset.UNITED_type1_old_full.rds")
+
+predictions_dataset.UNITED_type1_old <- predictions_dataset.UNITED_type1_old_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
@@ -322,6 +398,10 @@ saveRDS(predictions_dataset.UNITED_type1_old, "model_predictions/predictions_dat
 
 
 
+#:-------------
+
+
+
 
 # Type 2 model
 
@@ -329,7 +409,12 @@ saveRDS(predictions_dataset.UNITED_type1_old, "model_predictions/predictions_dat
 
 interim <- as_tibble(as.matrix(select(dataset.case_control_type2, pardm, agerec, hba1c, agedx, sex, bmi, insoroha)))
 
-predictions_dataset.case_control_type2_new <- predict(posterior_samples_T2D_obj, interim) %>%
+predictions_dataset.case_control_type2_new_full <- predict(posterior_samples_T2D_obj, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.case_control_type2_new_full, "model_predictions/predictions_dataset.case_control_type2_new_full.rds")
+
+predictions_dataset.case_control_type2_new <- predictions_dataset.case_control_type2_new_full%>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -339,9 +424,20 @@ predictions_dataset.case_control_type2_new <- predict(posterior_samples_T2D_obj,
 saveRDS(predictions_dataset.case_control_type2_new, "model_predictions/predictions_dataset.case_control_type2_new.rds")
 
 
+
+#:-------------
+
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.referral_type2, pardm, agerec, hba1c, agedx, sex, bmi, insoroha)))
 
-predictions_dataset.referral_type2_new <- predict(posterior_samples_T2D_obj, interim) %>%
+predictions_dataset.referral_type2_new_full <- predict(posterior_samples_T2D_obj, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.referral_type2_new_full, "model_predictions/predictions_dataset.referral_type2_new_full.rds")
+
+predictions_dataset.referral_type2_new <- predictions_dataset.referral_type2_new_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -351,9 +447,19 @@ predictions_dataset.referral_type2_new <- predict(posterior_samples_T2D_obj, int
 saveRDS(predictions_dataset.referral_type2_new, "model_predictions/predictions_dataset.referral_type2_new.rds")
 
 
+
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type2, pardm, agerec, hba1c, agedx, sex, bmi, insoroha)))
 
-predictions_dataset.UNITED_type2_new <- predict(posterior_samples_T2D_obj, interim) %>%
+predictions_dataset.UNITED_type2_new_full <- predict(posterior_samples_T2D_obj, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_new_full, "model_predictions/predictions_dataset.UNITED_type2_new_full.rds")
+
+predictions_dataset.UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
   }) %>%
@@ -362,11 +468,22 @@ predictions_dataset.UNITED_type2_new <- predict(posterior_samples_T2D_obj, inter
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type2_new, "model_predictions/predictions_dataset.UNITED_type2_new.rds")
 
+
+
+#:-------------
+
+
+
 ### Predictions from old model
 
 interim <- as_tibble(as.matrix(select(dataset.case_control_type2, agedx, bmi, hba1c, pardm, agerec, insoroha, sex)))
 
-predictions_dataset.case_control_type2_old <- predict(posteriors_samples_old_T2D, interim) %>%
+predictions_dataset.case_control_type2_old_full <- predict(posteriors_samples_old_T2D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.case_control_type2_old_full, "model_predictions/predictions_dataset.case_control_type2_old_full.rds")
+
+predictions_dataset.case_control_type2_old <- predictions_dataset.case_control_type2_old_full %>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
@@ -387,9 +504,20 @@ saveRDS(predictions_dataset.case_control_type2_old, "model_predictions/predictio
 
 
 
+#:-------------
+
+
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.referral_type2, agedx, bmi, hba1c, pardm, agerec, insoroha, sex)))
 
-predictions_dataset.referral_type2_old <- predict(posteriors_samples_old_T2D, interim) %>%
+predictions_dataset.referral_type2_old_full <- predict(posteriors_samples_old_T2D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.referral_type2_old_full, "model_predictions/predictions_dataset.referral_type2_old_full.rds")
+
+predictions_dataset.referral_type2_old <- predictions_dataset.referral_type2_old_full%>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
@@ -409,9 +537,20 @@ for (i in 1:nrow(predictions_dataset.referral_type2_old)) {
 saveRDS(predictions_dataset.referral_type2_old, "model_predictions/predictions_dataset.referral_type2_old.rds")
 
 
+
+
+#:-------------
+
+
+
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type2, agedx, bmi, hba1c, pardm, agerec, insoroha, sex)))
 
-predictions_dataset.UNITED_type2_old <- predict(posteriors_samples_old_T2D, interim) %>%
+predictions_dataset.UNITED_type2_old_full <- predict(posteriors_samples_old_T2D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_old_full, "model_predictions/predictions_dataset.UNITED_type2_old_full.rds")
+
+predictions_dataset.UNITED_type2_old <- predictions_dataset.UNITED_type2_old_full%>%
   apply(., 2, function(x) {
     data.frame(prob = mean(x))
   }) %>%
