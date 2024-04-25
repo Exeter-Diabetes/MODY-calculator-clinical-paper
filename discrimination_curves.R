@@ -69,7 +69,7 @@ dataset.referral_type1 <- formatting(
   proband = "Proband", 
   gene_variable = FALSE
 ) %>%
-  drop_na(c("sex", "bmi", "agedx", "hba1c", "pardm", "agerec", "bmi")) %>%   # what should be done about missing MODY testing?
+  drop_na(c("sex", "bmi", "agedx", "hba1c", "pardm", "agerec")) %>%   # what should be done about missing MODY testing?
   mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
 
 dataset.referral_type2 <- formatting(
