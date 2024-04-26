@@ -36,13 +36,14 @@ probabilities <- probabilities_under_30 %>%
   mutate(value = value/100)
 
 
-
+##
+# Need to add violin plot for outliers
+# Need to break axis, below 12.5% and above 12.5%
 
 plot_cprd_probabilities <- patchwork::wrap_plots(
   
   probabilities %>%
     ggplot() +
-    geom_vline(xintercept = 0.036, colour = "black") +
     geom_boxplot(aes(x = value, y = key, colour = key)) +
     geom_point(
       data = probabilities %>%
@@ -51,27 +52,27 @@ plot_cprd_probabilities <- patchwork::wrap_plots(
         ungroup() %>%
         select(-value) %>%
         unique(),
-      aes(x = mean, y = key), shape = 18, size = 4
+      aes(x = mean, y = key, colour = key), shape = "circle", size = 5
     ) +
+    geom_vline(xintercept = 0.036, colour = "black") +
     scale_colour_manual(values = c("#1B9E77", "#D95F02")) +
-    coord_cartesian(xlim = c(0, 1)) +
-    scale_x_continuous(labels = scales::percent, breaks = c(0, 0.01, 0.025, 0.05, 0.1, 0.2, 0.4, 1)) +
-    coord_trans(x = "log2") +
+    coord_cartesian(xlim = c(0, 0.115), expand = TRUE) +
+    scale_x_continuous(labels = scales::percent, breaks = c(0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12)) +
     theme_bw() +
     theme(
       axis.text.x = element_text(size = 22),
       axis.title = element_blank(),
-      axis.text = element_text(size = 22),
+      axis.text.y = element_text(size = 22),
       legend.position = "none",
       axis.line = element_line(colour = "black"),
       panel.border = element_blank(),
       panel.background = element_blank(),
-      axis.ticks.y = element_blank()
+      axis.ticks.y = element_blank(),
+      plot.margin = unit(c(0,1.5,0,0), "cm")
     ),
   
   probabilities %>%
     ggplot() +
-    geom_vline(xintercept = 0.036, colour = "black") +
     geom_boxplot(aes(x = value, y = key, colour = key)) +
     geom_point(
       data = probabilities %>%
@@ -80,23 +81,29 @@ plot_cprd_probabilities <- patchwork::wrap_plots(
         ungroup() %>%
         select(-value) %>%
         unique(),
-      aes(x = mean, y = key), shape = 18, size = 4
+      aes(x = mean, y = key, colour = key), shape = "circle", size = 5
     ) +
+    geom_vline(xintercept = 0.036, colour = "black") +
     scale_colour_manual(values = c("#1B9E77", "#D95F02")) +
-    coord_cartesian(xlim = c(0, 1)) +
-    scale_x_continuous(labels = scales::percent) +
+    coord_cartesian(xlim = c(0.16, 1), expand = TRUE) +
+    scale_x_continuous(labels = scales::percent, breaks = c(0.125, 0.25, 0.5, 0.75, 1)) +
     theme_bw() +
     theme(
       axis.text.x = element_text(size = 22),
       axis.title = element_blank(),
-      axis.text = element_text(size = 22),
+      axis.text.y = element_blank(),
       legend.position = "none",
       axis.line = element_line(colour = "black"),
       panel.border = element_blank(),
       panel.background = element_blank(),
-      axis.ticks.y = element_blank()
+      axis.ticks.y = element_blank(),
+      axis.line.y = element_blank(),
+      plot.margin = unit(c(0,0.5,0,0), "cm")
     ),
-  ncol = 1
+  
+  nrow = 1
 )
+
+
 
 
