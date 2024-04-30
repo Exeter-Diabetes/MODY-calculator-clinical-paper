@@ -135,6 +135,7 @@ unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
 
 #:--------------------------------------------
 
+##: All patients in referrals
 
 thresholds <- calculate_thresholds_diagnostics(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T$prob)
 
@@ -167,10 +168,11 @@ plot_probabilities_referral <- cbind(
   geom_pointrange(aes(x = rank, y = prob, ymin = LCI, ymax = UCI), colour = "grey") +
   geom_point(aes(x = rank, y = prob)) +
   geom_hline(yintercept = 0.63, colour = "#E69F00") + ## optimal cut-off
+  geom_hline(yintercept = 0.1, colour = "#D55E00") +
   geom_hline(yintercept = 0.25, colour = "#56B4E9") +
   geom_hline(yintercept = 0.5, colour = "#009E73") +
   geom_hline(yintercept = 0.75, colour = "#0072B2") +
-  scale_y_continuous("MODY Probability", labels = scales::percent) +
+  scale_y_continuous("MODY Probability", labels = scales::percent, breaks = seq(0, 1, 0.1)) +
   scale_x_continuous("Ranked patients") +
   theme_bw() +
   theme(
@@ -186,7 +188,7 @@ plot_probabilities_referral <- cbind(
 #   prob = predictions_dataset.referral_type1_with_T$prob
 # ) %>%
 #   as.data.frame() %>%
-#   filter(prob > 0.75) %>%
+#   filter(prob > 0.1) %>%
 #   # filter(prob > 0.63) %>%
 #   select(mody) %>%
 #   unlist() %>%
@@ -203,20 +205,22 @@ plot_probabilities_referral_ppv <- cbind(
     "Optimal: 63%\nn = 45 MODY = 13", "Optimal: 63%\nn = 45 MODY = 13",
     "50%\nn = 81 MODY = 21", "50%\nn = 81 MODY = 21", 
     "25%\nn = 213 MODY = 56", "25%\nn = 213 MODY = 56", 
+    "10%\nn = 492 MODY = 118", "10%\nn = 492 MODY = 118",
     "0%\nn = 1754 MODY = 229", "0%\nn = 1754 MODY = 229"
   ),
-  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
+  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
   count = c(
     3, 1,
     32, 13,
     63, 21,
     157, 56,
+    374, 118,
     1525, 229
   )
 ) %>%
   as.data.frame() %>%
   mutate(
-    Threshold = factor(Threshold, levels = c("0%\nn = 1754 MODY = 229", "25%\nn = 213 MODY = 56", "50%\nn = 81 MODY = 21", "Optimal: 63%\nn = 45 MODY = 13", "75%\nn = 4 MODY = 1")),
+    Threshold = factor(Threshold, levels = c("0%\nn = 1754 MODY = 229", "10%\nn = 492 MODY = 118", "25%\nn = 213 MODY = 56", "50%\nn = 81 MODY = 21", "Optimal: 63%\nn = 45 MODY = 13", "75%\nn = 4 MODY = 1")),
     count = as.numeric(count),
     mody = factor(mody, levels = c("Non-MODY", "MODY"))
   ) %>%
@@ -225,13 +229,13 @@ plot_probabilities_referral_ppv <- cbind(
     aes(fill = mody, y = Threshold, x = count), colour = "black", position = "fill", stat = "identity"
   ) +
   scale_fill_manual(values = c("black", "white"), breaks=c("MODY", "Non-MODY")) +
-  scale_x_continuous(labels = scales::percent, "Positive Predictive Value") +
+  scale_x_continuous(labels = scales::percent, "Positive Predictive Value", breaks = seq(0, 1, 0.1)) +
   theme_bw() +
   theme(
     legend.position = "bottom",
     legend.title=element_blank(),
     axis.title = element_text(size = 18),
-    axis.text.y = element_text(size = 15, colour = c("black", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
+    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
     axis.text.x = element_text(size = 15),
     axis.title.x = element_text(size = 18)
   )
@@ -246,6 +250,138 @@ plot_probabilities_combined <- patchwork::wrap_plots(
   ncol = 1
   
 ) + patchwork::plot_annotation(tag_levels = 'A')
+
+
+
+
+#:--------------------------------------------------------
+
+# Referrals with biomarker info
+
+
+# calculate PPV for thresholds in those with biomarker info
+biomarker_available <- dataset.referral_type1 %>%
+  cbind(prob = predictions_dataset.referral_type1_with_T$prob) %>%
+  filter(!is.na(T))
+
+thresholds <- calculate_thresholds_diagnostics(biomarker_available$M, biomarker_available$prob)
+
+
+# combine all the necessary columns
+plot_probabilities_referral_biomarker_info <- data.frame(mody = dataset.referral_type1$M) %>%
+  
+  cbind(
+    T = dataset.referral_type1$T,
+    prob = predictions_dataset.referral_type1_with_T$prob,
+    LCI = predictions_dataset.referral_type1_with_T$LCI,
+    UCI = predictions_dataset.referral_type1_with_T$UCI
+  ) %>%
+  
+  # keep only those with biomarker info
+  filter(!is.na(T)) %>%
+  
+  # turn columns into a data.frame
+  as.data.frame() %>%
+  
+  # change mody column to factor
+  mutate(
+    mody = factor(mody, levels = c(1, 0), labels = c("MODY", "Non-MODY"))
+  ) %>%
+  
+  # sort patients based on the mean prob (per MODY status)
+  arrange(desc(prob)) %>%
+  
+  # add a ranking variable
+  mutate(rank = 1:n()) %>%
+  
+  # plot probabilities
+  ggplot() +
+  geom_hline(yintercept = 0, colour = "black") +
+  geom_pointrange(aes(x = rank, y = prob, ymin = LCI, ymax = UCI), colour = "grey") +
+  geom_point(aes(x = rank, y = prob)) +
+  geom_hline(yintercept = 0.63, colour = "#E69F00") + ## optimal cut-off
+  geom_hline(yintercept = 0.1, colour = "#D55E00") +
+  geom_hline(yintercept = 0.25, colour = "#56B4E9") +
+  geom_hline(yintercept = 0.5, colour = "#009E73") +
+  geom_hline(yintercept = 0.75, colour = "#0072B2") +
+  scale_y_continuous("MODY Probability", labels = scales::percent, breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous("Ranked patients") +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title.y = element_text(size = 18),
+    axis.title.x = element_text(size = 18)
+  )
+
+
+
+dataset.referral_type1 %>%
+  cbind(prob = predictions_dataset.referral_type1_with_T$prob) %>%
+  filter(!is.na(T)) %>%
+  as.data.frame() %>%
+  filter(prob > 0.10) %>%
+  # filter(prob > 0.6308) %>%
+  select(M) %>%
+  unlist() %>%
+  table()
+
+
+
+
+
+# combine all the necessary columns
+plot_probabilities_referral_ppv_biomarker_info <- cbind(
+  Threshold = c(
+    "75%\nn = 4 MODY = 1", "75%\nn = 4 MODY = 1",
+    "PPV Optimal: 63%\nn = 44 MODY = 13", "PPV Optimal: 63%\nn = 44 MODY = 13",
+    "50%\nn = 84 MODY = 21", "50%\nn = 84 MODY = 21", 
+    "25%\nn = 192 MODY = 49", "25%\nn = 192 MODY = 49", 
+    "10%\nn = 307 MODY = 69", "10%\nn = 307 MODY = 69", 
+    "0%\nn = 992 MODY = 111", "0%\nn = 992 MODY = 111"
+  ),
+  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
+  count = c(
+    3, 1,
+    31, 13,
+    63, 21,
+    143, 49,
+    238, 69,
+    881, 111
+  )
+) %>%
+  as.data.frame() %>%
+  mutate(
+    Threshold = factor(Threshold, levels = c("0%\nn = 992 MODY = 111", "10%\nn = 307 MODY = 69", "25%\nn = 192 MODY = 49", "50%\nn = 84 MODY = 21", "PPV Optimal: 63%\nn = 44 MODY = 13", "75%\nn = 4 MODY = 1")),
+    count = as.numeric(count),
+    mody = factor(mody, levels = c("Non-MODY", "MODY"))
+  ) %>%
+  ggplot() +
+  geom_bar(
+    aes(fill = mody, y = Threshold, x = count), colour = "black", position = "fill", stat = "identity"
+  ) +
+  scale_fill_manual(values = c("black", "white"), breaks=c("MODY", "Non-MODY")) +
+  scale_x_continuous(labels = scales::percent, "Positive Predictive Value", breaks = seq(0, 1, 0.1)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    legend.title=element_blank(),
+    axis.title = element_text(size = 18),
+    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 18)
+  )
+
+
+
+
+plot_probabilities_combined_biomarker_info <- patchwork::wrap_plots(
+  
+  plot_probabilities_referral_biomarker_info,
+  plot_probabilities_referral_ppv_biomarker_info,
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = 'A')
+
 
 
 
