@@ -122,21 +122,24 @@ calc_auroc <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-auc_T1D_no_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 100)
+auc_T1D_no_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
 
 ### Biomarker models
-auc_T1D_with_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 100)
+auc_T1D_with_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
 
 ## Type 2 UNITED
-auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 100)
+auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
 
 ## Type 1 referrals
 
 ### No biomarker models
-auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 100)
+auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
 
 ### Biomarker models
-auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 100)
+auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+
+## Type 2 referrals
+auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
 
 
 #:------------------------------------------------------------
@@ -408,6 +411,331 @@ plot_prec_recal_T2D_new_referral <- ggplot() +
       as.data.frame(),
     aes(x = recall, y= precision), colour = "black"
   )
+
+
+
+
+#:--------------------------------------------------
+
+# Boxplot and roc curves
+
+roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T)) %>%
+  cbind(Mody = dataset.UNITED_type1$M) %>%
+  pROC::roc(response = Mody, predictor = prob) %>%
+  magrittr::extract(2:3) %>%
+  as.data.frame() %>%
+  mutate(
+    ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T)) %>%
+      cbind(Mody = dataset.UNITED_type1$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(c(9)) %>%
+      as.data.frame(),
+    mean = mean(colMeans(predictions_dataset.UNITED_type1_with_T), na.rm = TRUE)
+  ) %>%
+  mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
+  rbind(
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_no_T)) %>%
+      cbind(Mody = dataset.UNITED_type1$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(2:3) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type1_no_T)) %>%
+          cbind(Mody = dataset.UNITED_type1$M) %>%
+          pROC::roc(response = Mody, predictor = prob) %>%
+          magrittr::extract(c(9)) %>%
+          as.data.frame(),
+        mean = mean(colMeans(predictions_dataset.UNITED_type1_no_T), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"),
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_new)) %>%
+      cbind(Mody = dataset.UNITED_type2$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(2:3) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type2_new)) %>%
+          cbind(Mody = dataset.UNITED_type2$M) %>%
+          pROC::roc(response = Mody, predictor = prob) %>%
+          magrittr::extract(c(9)) %>%
+          as.data.frame(),
+        mean = mean(colMeans(predictions_dataset.UNITED_type2_new), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " "),
+    data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
+      cbind(Mody = dataset.referral_type1$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(2:3) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
+          cbind(Mody = dataset.referral_type1$M) %>%
+          pROC::roc(response = Mody, predictor = prob) %>%
+          magrittr::extract(c(9)) %>%
+          as.data.frame(),
+        mean = mean(colMeans(predictions_dataset.referral_type1_with_T), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "Referral", Model = "Type 1", Calculator = "Biomarkers"),
+    data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
+      cbind(Mody = dataset.referral_type1$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(2:3) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
+          cbind(Mody = dataset.referral_type1$M) %>%
+          pROC::roc(response = Mody, predictor = prob) %>%
+          magrittr::extract(c(9)) %>%
+          as.data.frame(),
+        mean = mean(colMeans(predictions_dataset.referral_type1_no_T), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "Referral", Model = "Type 1", Calculator = "No Biomarkers"),
+    data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
+      cbind(Mody = dataset.referral_type2$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      magrittr::extract(2:3) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
+          cbind(Mody = dataset.referral_type2$M) %>%
+          pROC::roc(response = Mody, predictor = prob) %>%
+          magrittr::extract(c(9)) %>%
+          as.data.frame(),
+        mean = mean(colMeans(predictions_dataset.referral_type2_new), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "Referral", Model = "Type 2", Calculator = " ")
+  )
+
+
+dat_text <- roc_curves %>%
+  select(-sensitivities, -specificities) %>%
+  distinct()
+
+dat_text$ROCAUC <- unlist(dat_text$ROCAUC)
+
+dat_text <- dat_text %>%
+  mutate(
+    ROCAUC = paste0(" AUC:", signif(ROCAUC, 2), " "),
+    mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+  )
+
+
+
+plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
+  
+  # Panel A - UNITED insulin-treated
+  
+  patchwork::wrap_plots(
+    
+    # Boxplots
+    dataset.UNITED_type1 %>%
+      select(M) %>%
+      rename("Mody" = "M") %>%
+      cbind(
+        prob_with = colMeans(predictions_dataset.UNITED_type1_with_T),
+        prob_without = colMeans(predictions_dataset.UNITED_type1_no_T)
+      ) %>%
+      gather("key", "Probability", -Mody) %>% 
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
+        key = factor(key, levels = c("prob_without", "prob_with"), labels = c("No Biomarkers", "Biomarkers"))
+      ) %>%
+      ggplot() +
+      geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white")) +
+      geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
+      scale_y_continuous(labels = scales::percent) +
+      scale_colour_manual(values = c("white", "black")) +
+      scale_alpha_manual(values = c(0, 1)) +
+      facet_wrap(~key) +
+      theme_bw() +
+      theme(
+        legend.position = "none"
+      ),
+    roc_curves %>%
+      filter(Dataset == "UNITED" & Model == "Type 1") %>%
+      mutate(
+        Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"))
+      ) %>%
+      ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path() +
+      theme_bw() +
+      facet_grid(~Calculator, scales = "free") +
+      scale_y_continuous("Sensitivity", labels = scales::percent) +
+      scale_x_continuous("1- Specificity", labels = scales::percent) +
+      theme_bw() +
+      geom_label(
+        data = dat_text %>%
+          filter(Dataset == "UNITED" & Model == "Type 1"),
+        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        size = 7,
+        label.size = NA,
+        hjust = -0.4,
+        vjust = -0.5
+      ), 
+    
+    ncol = 2, nrow = 1
+  ),
+  
+  
+  # Panel B - UNITED non-insulin-treated
+  
+  patchwork::wrap_plots(
+    
+    # Boxplots
+    dataset.UNITED_type2 %>%
+      select(M) %>%
+      rename("Mody" = "M") %>%
+      cbind(
+        Probability = colMeans(predictions_dataset.UNITED_type2_new),
+        key = ""
+      ) %>%
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
+      ) %>%
+      ggplot() +
+      geom_boxplot(aes(y = Probability, x = Mody)) +
+      scale_y_continuous(labels = scales::percent) +
+      facet_wrap(~key) +
+      theme_bw(),
+    
+    roc_curves %>%
+      filter(Dataset == "UNITED" & Model == "Type 2") %>%
+      ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path() +
+      theme_bw() +
+      facet_grid(~Calculator, scales = "free") +
+      scale_y_continuous("Sensitivity", labels = scales::percent) +
+      scale_x_continuous("1- Specificity", labels = scales::percent) +
+      theme_bw() +
+      geom_label(
+        data = dat_text %>%
+          filter(Dataset == "UNITED" & Model == "Type 2"),
+        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        size = 7,
+        label.size = NA,
+        hjust = -0.4,
+        vjust = -0.5
+      ),
+    
+    
+    ncol = 2, nrow = 1
+    
+    ),
+  
+  
+  ncol = 1
+    
+    
+) + patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2")))
+  
+
+
+
+plot_prob_boxplot_rocs_referral <- patchwork::wrap_plots(
+  
+  # Panel A - Referral insulin-treated
+  
+  patchwork::wrap_plots(
+    
+    # Boxplots
+    dataset.referral_type1 %>%
+      select(M) %>%
+      rename("Mody" = "M") %>%
+      cbind(
+        prob_with = colMeans(predictions_dataset.referral_type1_with_T),
+        prob_without = colMeans(predictions_dataset.referral_type1_no_T)
+      ) %>%
+      gather("key", "Probability", -Mody) %>% 
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
+        key = factor(key, levels = c("prob_without", "prob_with"), labels = c("No Biomarkers", "Biomarkers"))
+      ) %>%
+      ggplot() +
+      geom_boxplot(aes(y = Probability, x = Mody)) +
+      scale_y_continuous(labels = scales::percent) +
+      facet_wrap(~key) +
+      theme_bw() +
+      theme(
+        legend.position = "none"
+      ),
+    roc_curves %>%
+      filter(Dataset == "Referral" & Model == "Type 1") %>%
+      mutate(
+        Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"))
+      ) %>%
+      ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path() +
+      theme_bw() +
+      facet_grid(~Calculator, scales = "free") +
+      scale_y_continuous("Sensitivity", labels = scales::percent) +
+      scale_x_continuous("1- Specificity", labels = scales::percent) +
+      theme_bw() +
+      geom_label(
+        data = dat_text %>%
+          filter(Dataset == "Referral" & Model == "Type 1"),
+        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        size = 7,
+        label.size = NA,
+        hjust = -0.4,
+        vjust = -0.5
+      ), 
+    
+    ncol = 2, nrow = 1
+  ),
+  
+  
+  # Panel B - Referral non-insulin-treated
+  
+  patchwork::wrap_plots(
+    
+    # Boxplots
+    dataset.referral_type2 %>%
+      select(M) %>%
+      rename("Mody" = "M") %>%
+      cbind(
+        Probability = colMeans(predictions_dataset.referral_type2_new),
+        key = ""
+      ) %>%
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
+      ) %>%
+      ggplot() +
+      geom_boxplot(aes(y = Probability, x = Mody)) +
+      scale_y_continuous(labels = scales::percent) +
+      facet_wrap(~key) +
+      theme_bw(),
+    
+    roc_curves %>%
+      filter(Dataset == "Referral" & Model == "Type 2") %>%
+      ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path() +
+      theme_bw() +
+      facet_grid(~Calculator, scales = "free") +
+      scale_y_continuous("Sensitivity", labels = scales::percent) +
+      scale_x_continuous("1- Specificity", labels = scales::percent) +
+      theme_bw() +
+      geom_label(
+        data = dat_text %>%
+          filter(Dataset == "Referral" & Model == "Type 2"),
+        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        size = 7,
+        label.size = NA,
+        hjust = -0.4,
+        vjust = -0.5
+      ),
+    
+    
+    ncol = 2, nrow = 1
+    
+  ),
+  
+  
+  ncol = 1
+  
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2")))
+
+  
 
 
 
