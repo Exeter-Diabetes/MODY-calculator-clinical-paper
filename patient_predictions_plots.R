@@ -12,10 +12,12 @@ library(ggforce)
 library(pROC)
 
 # load files required
+predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
 predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T.rds")
 
 
 # load functions needed
+source("data/create_data.R")
 calculate_thresholds_diagnostics <- function(response, prediction) {
   
   ### threshold number to test
@@ -50,7 +52,7 @@ calculate_thresholds_diagnostics <- function(response, prediction) {
       matrix_thresholds[i, 3] <- ceiling(nrow(interim_above)/length(which(interim_above$response == 1)))
     } else {matrix_thresholds[i, 3] <- as.numeric(NA)}
     
-    # PPV
+    # Pick-up rate
     matrix_thresholds[i, 4] <- length(which(interim_above$response == 1))/nrow(interim_above) * 100
     
     # calculating specificity
@@ -75,7 +77,7 @@ calculate_thresholds_diagnostics <- function(response, prediction) {
   ## making the matrix a data.frame()
   matrix_thresholds <- matrix_thresholds %>% 
     as.data.frame() %>%
-    set_names(c("Thresholds", "Sensitivity", "NTT", "PPV", "Specificity", "N-Tested", "Cases Missed", "Patients Tested")) %>%
+    set_names(c("Thresholds", "Sensitivity", "NTT", "Pick-up rate", "Specificity", "N-Tested", "Cases Missed", "Patients Tested")) %>%
     arrange(desc(Sensitivity), desc(NTT), desc(PPV))
   
   ## select unique combinations of sensitivity and NTT (only the first occurance)
@@ -87,6 +89,12 @@ calculate_thresholds_diagnostics <- function(response, prediction) {
 }
 
 
+
+## Load population representative dataset
+dataset.UNITED_type1 <- create_data(dataset = "united t1d") %>%
+  
+  ## if MODY testing missing, change to 0
+  mutate(M = ifelse(is.na(M), 0, M))
 
 
 ## Load referrals dataset
@@ -135,6 +143,117 @@ unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
 
 #:--------------------------------------------
 
+
+##: All patients in UNITED
+
+thresholds_UNITED_t1d <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T$prob)
+
+
+# combine all the necessary columns
+plot_probabilities_united <- cbind(
+  mody = dataset.UNITED_type1$M,
+  prob = predictions_dataset.UNITED_type1_with_T$prob,
+  LCI = predictions_dataset.UNITED_type1_with_T$LCI,
+  UCI = predictions_dataset.UNITED_type1_with_T$UCI
+) %>%
+  
+  # turn columns into a data.frame
+  as.data.frame() %>%
+  
+  # change mody column to factor
+  mutate(
+    mody = factor(mody, levels = c(1, 0), labels = c("MODY", "Non-MODY"))
+  ) %>%
+  
+  # sort patients based on the mean prob (per MODY status)
+  arrange(desc(prob)) %>%
+  
+  # add a ranking variable
+  mutate(rank = 1:n()) %>%
+  
+  # plot probabilities
+  ggplot() +
+  geom_hline(yintercept = 0, colour = "black") +
+  geom_pointrange(aes(x = rank, y = prob, ymin = LCI, ymax = UCI), colour = "grey") +
+  geom_point(aes(x = rank, y = prob)) +
+  geom_hline(yintercept = 0.1468, colour = "#E69F00") + ## optimal cut-off
+  geom_hline(yintercept = 0.1, colour = "#D55E00") +
+  geom_hline(yintercept = 0.25, colour = "#56B4E9") +
+  scale_y_continuous("MODY Probability", labels = scales::percent, breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous("Ranked patients") +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title.y = element_text(size = 18),
+    axis.title.x = element_text(size = 18)
+  )
+
+
+
+cbind(
+  mody = dataset.UNITED_type1$M,
+  prob = predictions_dataset.UNITED_type1_with_T$prob
+) %>%
+  as.data.frame() %>%
+  filter(prob > 0.25) %>%
+  # filter(prob > 0.1468) %>%
+  select(mody) %>%
+  unlist() %>%
+  table()
+
+
+# combine all the necessary columns
+plot_probabilities_united_ppv <- cbind(
+  Threshold = c(
+    "25%\nn = 6 MODY = 1", "25%\nn = 6 MODY = 1", 
+    "Optimal: 14.7%\nn = 15 MODY = 5", "Optimal: 14.7%\nn = 15 MODY = 5",
+    "10%\nn = 23 MODY = 6", "10%\nn = 23 MODY = 6",
+    "0%\nn = 1171 MODY = 7", "0%\nn = 1171 MODY = 7"
+  ),
+  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
+  count = c(
+    5, 1,
+    10, 5,
+    17, 6,
+    1164, 7 
+  )
+) %>%
+  as.data.frame() %>%
+  mutate(
+    Threshold = factor(Threshold, levels = c("0%\nn = 1171 MODY = 7", "10%\nn = 23 MODY = 6", "Optimal: 14.7%\nn = 15 MODY = 5", "25%\nn = 6 MODY = 1")),
+    count = as.numeric(count),
+    mody = factor(mody, levels = c("Non-MODY", "MODY"))
+  ) %>%
+  ggplot() +
+  geom_bar(
+    aes(fill = mody, y = Threshold, x = count), colour = "black", position = "fill", stat = "identity"
+  ) +
+  scale_fill_manual(values = c("black", "white"), breaks=c("MODY", "Non-MODY")) +
+  scale_x_continuous(labels = scales::percent, "Positive Predictive Value", breaks = seq(0, 1, 0.1)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    legend.title=element_blank(),
+    axis.title = element_text(size = 18),
+    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#E69F00", "#56B4E9")),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 18)
+  )
+
+
+
+
+plot_probabilities_combined_united <- patchwork::wrap_plots(
+  
+  plot_probabilities_united,
+  plot_probabilities_united_ppv,
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = 'A')
+
+
+
+
 ##: All patients in referrals
 
 thresholds <- calculate_thresholds_diagnostics(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T$prob)
@@ -167,7 +286,8 @@ plot_probabilities_referral <- cbind(
   geom_hline(yintercept = 0, colour = "black") +
   geom_pointrange(aes(x = rank, y = prob, ymin = LCI, ymax = UCI), colour = "grey") +
   geom_point(aes(x = rank, y = prob)) +
-  geom_hline(yintercept = 0.63, colour = "#E69F00") + ## optimal cut-off
+  geom_hline(yintercept = 0.63, colour = "#E69F00") + ## optimal cut-off referral
+  geom_hline(yintercept = 0.1468, colour = "#CC79A7") +  ## optimal cut-off UNITED
   geom_hline(yintercept = 0.1, colour = "#D55E00") +
   geom_hline(yintercept = 0.25, colour = "#56B4E9") +
   geom_hline(yintercept = 0.5, colour = "#009E73") +
@@ -188,8 +308,8 @@ plot_probabilities_referral <- cbind(
 #   prob = predictions_dataset.referral_type1_with_T$prob
 # ) %>%
 #   as.data.frame() %>%
-#   filter(prob > 0.1) %>%
-#   # filter(prob > 0.63) %>%
+#   # filter(prob > 0.1) %>%
+#   filter(prob > 0.1468) %>%
 #   select(mody) %>%
 #   unlist() %>%
 #   table()
@@ -202,25 +322,27 @@ plot_probabilities_referral <- cbind(
 plot_probabilities_referral_ppv <- cbind(
   Threshold = c(
     "75%\nn = 4 MODY = 1", "75%\nn = 4 MODY = 1",
-    "Optimal: 63%\nn = 45 MODY = 13", "Optimal: 63%\nn = 45 MODY = 13",
+    "Ref Optimal: 63%\nn = 45 MODY = 13", "Ref Optimal: 63%\nn = 45 MODY = 13",
     "50%\nn = 81 MODY = 21", "50%\nn = 81 MODY = 21", 
     "25%\nn = 213 MODY = 56", "25%\nn = 213 MODY = 56", 
+    "UNITED Optimal: 14.7%\nn = 384 MODY = 96", "UNITED Optimal: 14.7%\nn = 384 MODY = 96",
     "10%\nn = 492 MODY = 118", "10%\nn = 492 MODY = 118",
     "0%\nn = 1754 MODY = 229", "0%\nn = 1754 MODY = 229"
   ),
-  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
+  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
   count = c(
     3, 1,
     32, 13,
     63, 21,
     157, 56,
+    288, 96,
     374, 118,
     1525, 229
   )
 ) %>%
   as.data.frame() %>%
   mutate(
-    Threshold = factor(Threshold, levels = c("0%\nn = 1754 MODY = 229", "10%\nn = 492 MODY = 118", "25%\nn = 213 MODY = 56", "50%\nn = 81 MODY = 21", "Optimal: 63%\nn = 45 MODY = 13", "75%\nn = 4 MODY = 1")),
+    Threshold = factor(Threshold, levels = c("0%\nn = 1754 MODY = 229", "10%\nn = 492 MODY = 118", "UNITED Optimal: 14.7%\nn = 384 MODY = 96", "25%\nn = 213 MODY = 56", "50%\nn = 81 MODY = 21", "Ref Optimal: 63%\nn = 45 MODY = 13", "75%\nn = 4 MODY = 1")),
     count = as.numeric(count),
     mody = factor(mody, levels = c("Non-MODY", "MODY"))
   ) %>%
@@ -235,7 +357,7 @@ plot_probabilities_referral_ppv <- cbind(
     legend.position = "bottom",
     legend.title=element_blank(),
     axis.title = element_text(size = 18),
-    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
+    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#CC79A7", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
     axis.text.x = element_text(size = 15),
     axis.title.x = element_text(size = 18)
   )
@@ -243,7 +365,7 @@ plot_probabilities_referral_ppv <- cbind(
 
 
 
-plot_probabilities_combined <- patchwork::wrap_plots(
+plot_probabilities_combined_referral <- patchwork::wrap_plots(
   
   plot_probabilities_referral,
   plot_probabilities_referral_ppv,
@@ -300,6 +422,7 @@ plot_probabilities_referral_biomarker_info <- data.frame(mody = dataset.referral
   geom_pointrange(aes(x = rank, y = prob, ymin = LCI, ymax = UCI), colour = "grey") +
   geom_point(aes(x = rank, y = prob)) +
   geom_hline(yintercept = 0.63, colour = "#E69F00") + ## optimal cut-off
+  geom_hline(yintercept = 0.1468, colour = "#CC79A7") +  ## optimal cut-off UNITED
   geom_hline(yintercept = 0.1, colour = "#D55E00") +
   geom_hline(yintercept = 0.25, colour = "#56B4E9") +
   geom_hline(yintercept = 0.5, colour = "#009E73") +
@@ -315,15 +438,15 @@ plot_probabilities_referral_biomarker_info <- data.frame(mody = dataset.referral
 
 
 
-dataset.referral_type1 %>%
-  cbind(prob = predictions_dataset.referral_type1_with_T$prob) %>%
-  filter(!is.na(T)) %>%
-  as.data.frame() %>%
-  filter(prob > 0.10) %>%
-  # filter(prob > 0.6308) %>%
-  select(M) %>%
-  unlist() %>%
-  table()
+# dataset.referral_type1 %>%
+#   cbind(prob = predictions_dataset.referral_type1_with_T$prob) %>%
+#   filter(!is.na(T)) %>%
+#   as.data.frame() %>%
+#   # filter(prob > 0.10) %>%
+#   filter(prob > 0.1468) %>%
+#   select(M) %>%
+#   unlist() %>%
+#   table()
 
 
 
@@ -333,25 +456,27 @@ dataset.referral_type1 %>%
 plot_probabilities_referral_ppv_biomarker_info <- cbind(
   Threshold = c(
     "75%\nn = 4 MODY = 1", "75%\nn = 4 MODY = 1",
-    "PPV Optimal: 63%\nn = 44 MODY = 13", "PPV Optimal: 63%\nn = 44 MODY = 13",
+    "Ref Optimal: 63%\nn = 44 MODY = 13", "Ref Optimal: 63%\nn = 44 MODY = 13",
     "50%\nn = 84 MODY = 21", "50%\nn = 84 MODY = 21", 
     "25%\nn = 192 MODY = 49", "25%\nn = 192 MODY = 49", 
+    "UNITED Optimal: 14.7%\nn = 264 MODY = 61", "UNITED Optimal: 14.7%\nn = 264 MODY = 61",
     "10%\nn = 307 MODY = 69", "10%\nn = 307 MODY = 69", 
     "0%\nn = 992 MODY = 111", "0%\nn = 992 MODY = 111"
   ),
-  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
+  mody = c("Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY", "Non-MODY", "MODY"),
   count = c(
     3, 1,
     31, 13,
     63, 21,
     143, 49,
+    203, 61,
     238, 69,
     881, 111
   )
 ) %>%
   as.data.frame() %>%
   mutate(
-    Threshold = factor(Threshold, levels = c("0%\nn = 992 MODY = 111", "10%\nn = 307 MODY = 69", "25%\nn = 192 MODY = 49", "50%\nn = 84 MODY = 21", "PPV Optimal: 63%\nn = 44 MODY = 13", "75%\nn = 4 MODY = 1")),
+    Threshold = factor(Threshold, levels = c("0%\nn = 992 MODY = 111", "10%\nn = 307 MODY = 69", "UNITED Optimal: 14.7%\nn = 264 MODY = 61", "25%\nn = 192 MODY = 49", "50%\nn = 84 MODY = 21", "Ref Optimal: 63%\nn = 44 MODY = 13", "75%\nn = 4 MODY = 1")),
     count = as.numeric(count),
     mody = factor(mody, levels = c("Non-MODY", "MODY"))
   ) %>%
@@ -366,7 +491,7 @@ plot_probabilities_referral_ppv_biomarker_info <- cbind(
     legend.position = "bottom",
     legend.title=element_blank(),
     axis.title = element_text(size = 18),
-    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
+    axis.text.y = element_text(size = 15, colour = c("black", "#D55E00", "#CC79A7", "#56B4E9", "#009E73", "#E69F00", "#0072B2")),
     axis.text.x = element_text(size = 15),
     axis.title.x = element_text(size = 18)
   )
