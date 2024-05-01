@@ -6,16 +6,20 @@ The MODY calculator use a combination of two models to workout the probability o
 
 ## Patients insulin-treated with 6-months of diagnosis
 
-1.  To make predictions, you need to load the functions used for prediction.
+<details>
+<summary>How to make predictions:</summary>
+<br> 
 
-``` R  
+1. To make predictions, you need to load the functions used for prediction.
+
+``` r
 # load functions
 source("prediction_functions.R")
 ```
 
 2.  Next, load the data containing the patient information.
 
-``` R   
+``` r
 # load dataset  
 data <- ...
 ```
@@ -28,7 +32,7 @@ The data should be formatted in the following way:
 
 3.  Load the necessary model parameters.
 
-``` R
+``` r
 # ## load posteriors
 # rcs_parms <- readRDS("rcs_parms.rds")
 # posterior_samples_T1D <- readRDS("type_1_model_posteriors_thin_100.rds")
@@ -40,7 +44,7 @@ The data should be formatted in the following way:
 
 4.  Make predictions for new patients
 
-``` R
+``` r
 ## make predictions
 posterior_predictions_T1D <- predict(posterior_samples_T1D_obj, dataset, rcs_parms) %>%
   apply(., 2, function(x) {
@@ -51,18 +55,25 @@ posterior_predictions_T1D <- predict(posterior_samples_T1D_obj, dataset, rcs_par
 
 This code will produce a point prediction (`prob`), alongside a 95% credible interval (`LCI`-`UCI`).
 
+<br>
+</details>
+
 ## Patients non-/insulin-treated after 6-months of diagnosis
+
+<details>
+<summary>How to make predictions:</summary>
+<br> 
 
 1.  To make predictions, you need to load the functions used for prediction.
 
-``` R   
+``` r
 # load functions
 source("prediction_functions.R")
 ```
 
 2.  Next, load the data containing the patient information.
 
-``` R
+``` r
 # load dataset
 data <- ...
 ```
@@ -75,7 +86,7 @@ The data should be formatted in the following way:
 
 3.  Load the necessary model parameters.
 
-``` R
+``` r
 # ## load posteriors# 
 # posterior_samples_T2D <- readRDS("type_2_model_posteriors_thin_100.rds")
 # 
@@ -85,7 +96,7 @@ The data should be formatted in the following way:
 
 4.  Make predictions for new patients
 
-``` R
+``` r
 ## make predictions
 posterior_predictions_T2D <- predict(posterior_samples_T2D_obj, dataset) %>%
   apply(., 2, function(x) {
@@ -95,3 +106,6 @@ posterior_predictions_T2D <- predict(posterior_samples_T2D_obj, dataset) %>%
 ```
 
 This code will produce a point prediction (`prob`), alongside a 95% credible interval (`LCI`-`UCI`).
+
+<br>
+</details>
