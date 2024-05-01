@@ -78,11 +78,11 @@ calculate_thresholds_diagnostics <- function(response, prediction) {
   matrix_thresholds <- matrix_thresholds %>% 
     as.data.frame() %>%
     set_names(c("Thresholds", "Sensitivity", "NTT", "Pick-up rate", "Specificity", "N-Tested", "Cases Missed", "Patients Tested")) %>%
-    arrange(desc(Sensitivity), desc(NTT), desc(PPV))
+    arrange(desc(Sensitivity), desc(NTT), desc(`Pick-up rate`))
   
   ## select unique combinations of sensitivity and NTT (only the first occurance)
   matrix_thresholds <- matrix_thresholds %>%
-    slice(which(duplicated(matrix_thresholds %>% select(-Thresholds, -PPV)) == FALSE))
+    slice(which(duplicated(matrix_thresholds %>% select(-Thresholds, -`Pick-up rate`)) == FALSE))
   
   return(matrix_thresholds)
   
