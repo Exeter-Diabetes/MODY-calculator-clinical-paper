@@ -4,13 +4,17 @@
 
 The MODY calculator use a combination of two models to workout the probability of MODY.
 
+An explanation on how to do predictions can be found below or in the file `prediction_functions.R`
+
 ## Patients insulin-treated with 6-months of diagnosis
 
 <details>
 <summary>How to make predictions:</summary>
 <br> 
 
-1. To make predictions, you need to load the functions used for prediction.
+To make predictions, you will need all of the files present on this folder [here](https://github.com/Exeter-Diabetes/MODY-calculator-clinical-paper/tree/main/new_data_predictions).
+
+1.  Load the functions used for prediction.
 
 ``` r
 # load functions
@@ -26,9 +30,9 @@ data <- ...
 
 The data should be formatted in the following way:
 
-| pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric         | bmi<br>numeric | C<br>numeric | A<br>numeric |
+| pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | C<br>numeric | A<br>numeric |
 |---------|---------|---------|---------|---------|---------|---------|---------|
-| 1 or 0           | \>1 or \<35       | \>3% or \< 15%   | \>1 or \<120     | 1 - male<br>2 - female | \>14 or \<70   | 1 or 0       | 1 or 0       |
+| 1 or 0 | \>1 or \<35 | \>3% or \< 15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70 | 1 or 0 | 1 or 0 |
 
 3.  Load the necessary model parameters.
 
@@ -64,7 +68,9 @@ This code will produce a point prediction (`prob`), alongside a 95% credible int
 <summary>How to make predictions:</summary>
 <br> 
 
-1.  To make predictions, you need to load the functions used for prediction.
+To make predictions, you will need all of the files present on this folder [here](https://github.com/Exeter-Diabetes/MODY-calculator-clinical-paper/tree/main/new_data_predictions).
+
+1.  Load the functions used for prediction.
 
 ``` r
 # load functions
@@ -80,9 +86,9 @@ data <- ...
 
 The data should be formatted in the following way:
 
-| pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric         | bmi<br>numeric | insoroha<br>numeric |
+| pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | insoroha<br>numeric |
 |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| 1 or 0           | \>1 or \<35       | \>3% or \<15%    | \>1 or \<120     | 1 - male<br>2 - female | \>14 or \<70   | 1 or 0              |
+| 1 or 0 | \>1 or \<35 | \>3% or \<15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70   | 1 or 0 |
 
 3.  Load the necessary model parameters.
 
