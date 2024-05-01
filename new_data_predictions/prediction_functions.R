@@ -8,11 +8,41 @@
 ############################################################################
 ############################################################################
 # 
-# # How to make predictions for a new dataset
+# How to make predictions for a new dataset
 # 
 # source("prediction_functions.R")
 # 
 # ## load dataset
+# ## Format of the dataset - insulin-treated within 6 months
+# # #  |  pardm  |  agerec |  hba1c  |  agedx  |    sex     |   bmi   |    C    |    A    |
+# # #  |---------|---------|---------|---------|------------|---------|---------|---------|
+# # #  | numeric | numeric | numeric | numeric |  numeric   | numeric | numeric | numeric |
+# # #  | 1 or 0  |         |         |         | 1 - male   |         | 1 or 0  | 1 or 0  |
+# # #  |         |         |         |         | 2 - female |         |         |         |
+# # #  |         |         |         |         |            |         |         |         |
+# # dataset <- data.frame(cbind(pardm = 1, agerec = 30, hba1c = 7, agedx = 25, sex = 2, bmi = 30, C = 1, A = 0))
+# 
+# # pardm - parent history of diabetes
+# # agerec - age at recruitment
+# # hba1c - HbA1c (%)
+# # agedx - age at diagnosis
+# # sex - sex
+# # bmi - BMI
+# # insoroha - current treatment on insulin or OHA
+# # C - C-peptide positivity or negativity
+# # A - Antibody positivity or negativity
+# 
+# ## Format of the dataset - non-/insulin-treated after 6 months
+# # #  |  pardm  |  agerec |  hba1c  |  agedx  |    sex     |   bmi   | insoroha |
+# # #  |---------|---------|---------|---------|------------|---------|----------|
+# # #  | numeric | numeric | numeric | numeric |  numeric   | numeric | numeric  |
+# # #  | 1 or 0  |         |         |         | 1 - male   |         | 1 or 0   |
+# # #  |         |         |         |         | 2 - female |         |          |
+# # #  |         |         |         |         |            |         |          |
+# # dataset <- data.frame(cbind(pardm = 1, agerec = 30, hba1c = 7, agedx = 25, sex = 2, bmi = 30, insoroha = 1))
+# 
+# 
+# ## load data
 # # dataset <- ...
 # 
 # ## load posteriors
@@ -46,7 +76,6 @@
 
 # load libraries
 require(tidyverse)
-require(nimble)
 
 ## Prediction function for MODY T1D
 
@@ -56,7 +85,10 @@ predict.T1D <- function(object, newdata, parms, ...) {
   ## check input objects
   stopifnot(class(object) == "T1D")
   stopifnot(is.data.frame(newdata))
-  stopifnot(c("pardm", "agerec", "hba1c", "agedx", "sex", "bmi", "T") %in% colnames(newdata))
+  stopifnot(c("pardm", "agerec", "hba1c", "agedx", "sex", "bmi", "C", "A") %in% colnames(newdata))
+  # generate variable T
+  newdata <- newdata %>%
+    mutate(T = ifelse(C == 0 | A == 1, 1, 0))
   x <- select(newdata, one_of(c("pardm", "agerec", "hba1c", "agedx", "sex")))
   xT <- as.matrix(select(newdata, bmi, agedx, pardm, agerec))
   x_spline <- newdata %>%
@@ -71,7 +103,7 @@ predict.T1D <- function(object, newdata, parms, ...) {
   stopifnot(is.numeric(newdata$T) | all(is.na(newdata$T)))
   
   ## convert posterior samples to matrix
-  post <- as.matrix(object$post)
+  post <- as.matrix(do.call(rbind, object$post))
   
   # ## set up data## set up data
   x <- as.matrix(x)
@@ -145,6 +177,8 @@ predict.T1D <- function(object, newdata, parms, ...) {
 ### predict method for 'post' objects
 predict.T2D <- function(object, newdata, ...) {
   
+  browser()
+  
   ## check input objects
   stopifnot(class(object) == "T2D")
   stopifnot(is.data.frame(newdata))
@@ -153,7 +187,7 @@ predict.T2D <- function(object, newdata, ...) {
   stopifnot(all(map_chr(x, class) == "numeric"))
   
   ## convert posterior samples to matrix
-  post <- as.matrix(object$post)
+  post <- as.matrix(do.call(rbind, object$post))
   
   ## set up data
   x <- as.matrix(x)
