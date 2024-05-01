@@ -8,8 +8,9 @@
 ############################################################################
 ############################################################################
 # 
-# How to make predictions for a new dataset
+# # How to make predictions for a new dataset
 # 
+# # load functions
 # source("prediction_functions.R")
 # 
 # ## load dataset
@@ -61,10 +62,18 @@
 # 
 # ## make predictions
 # ### For T1D model
-# posterior_predictions_T1D <- predict(posterior_samples_T1D_obj, dataset, rcs_parms)
-# 
-# ### For T2D model
-# posterior_predictions_T2D <- predict(posterior_samples_T2D_obj, dataset)
+# posterior_predictions_T1D <- predict(posterior_samples_T1D_obj, dataset, rcs_parms) %>%
+#   apply(., 2, function(x) {
+#     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+#   }) %>%
+#   bind_rows() 
+# # 
+# # ### For T2D model
+# posterior_predictions_T2D <- predict(posterior_samples_T2D_obj, dataset) %>%
+#   apply(., 2, function(x) {
+#     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+#   }) %>%
+#   bind_rows() 
 # 
 # 
 #
