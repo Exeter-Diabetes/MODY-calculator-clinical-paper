@@ -9,7 +9,7 @@ An explanation on how to do predictions can be found below or in the file `predi
 ## Patients insulin-treated with 6-months of diagnosis
 
 <details>
-<summary>How to make predictions:</summary>
+<summary>How to make predictions using R-software:</summary>
 <br> 
 
 To make predictions, you will need all of the files present on this folder [here](https://github.com/Exeter-Diabetes/MODY-calculator-clinical-paper/tree/main/new_data_predictions).
@@ -65,7 +65,7 @@ This code will produce a point prediction (`prob`), alongside a 95% credible int
 ## Patients non-/insulin-treated after 6-months of diagnosis
 
 <details>
-<summary>How to make predictions:</summary>
+<summary>How to make predictions using R-software:</summary>
 <br> 
 
 To make predictions, you will need all of the files present on this folder [here](https://github.com/Exeter-Diabetes/MODY-calculator-clinical-paper/tree/main/new_data_predictions).
