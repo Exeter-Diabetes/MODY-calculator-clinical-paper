@@ -14,7 +14,10 @@ library(pROC)
 # load files required
 predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
 predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T.rds")
+predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new.rds")
 
+
+probabilities_under_30 <- read.delim("data/mody_probabilities_under_30s.txt")
 
 # load functions needed
 source("data/create_data.R")
@@ -96,6 +99,11 @@ dataset.UNITED_type1 <- create_data(dataset = "united t1d") %>%
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
+dataset.UNITED_type2 <- create_data(dataset = "united t2d") %>%
+  
+  ## if MODY testing missing, change to 0
+  mutate(M = ifelse(is.na(M), 0, M))
+
 
 ## Load referrals dataset
 ### load in Referral repository
@@ -139,6 +147,90 @@ dataset.referral_type1 <- formatting(
 #### remove downloaded folder
 unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
 
+
+
+#:--------------------------------------------
+
+# Table information
+
+## Insulin treated
+thresholds_UNITED_t1d <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T$prob)
+
+### 5%
+thresholds_UNITED_t1d %>%
+  filter(Thresholds > 0.05) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t1" & pedro_prob > 0.05) %>%
+  nrow()
+
+### 10%
+thresholds_UNITED_t1d %>%
+  filter(Thresholds > 0.1) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t1" & pedro_prob > 0.1) %>%
+  nrow()
+
+### 20%
+thresholds_UNITED_t1d %>%
+  filter(Thresholds > 0.2) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t1" & pedro_prob > 0.2) %>%
+  nrow()
+
+### 30%
+thresholds_UNITED_t1d %>%
+  filter(Thresholds > 0.3) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t1" & pedro_prob > 0.3) %>%
+  nrow()
+
+
+## Non-insulin treated
+thresholds_UNITED_t2d <- calculate_thresholds_diagnostics(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new$prob)
+
+### 5%
+thresholds_UNITED_t2d %>%
+  filter(Thresholds > 0.05) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t2" & pedro_prob > 0.05) %>%
+  nrow()
+
+### 10%
+thresholds_UNITED_t2d %>%
+  filter(Thresholds > 0.1) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t2" & pedro_prob > 0.1) %>%
+  nrow()
+
+### 20%
+thresholds_UNITED_t2d %>%
+  filter(Thresholds > 0.2) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t2" & pedro_prob > 0.2) %>%
+  nrow()
+
+### 25%
+thresholds_UNITED_t2d %>%
+  filter(Thresholds > 0.25) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t2" & pedro_prob > 0.25) %>%
+  nrow()
+
+### 30%
+thresholds_UNITED_t2d %>%
+  filter(Thresholds > 0.3) %>% head()
+
+probabilities_under_30 %>%
+  filter(which_equation == "t2" & pedro_prob > 0.3) %>%
+  nrow()
 
 
 #:--------------------------------------------
