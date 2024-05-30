@@ -111,13 +111,15 @@ plot_UNITED_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.UNITED_type1_no_T))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -132,15 +134,18 @@ plot_UNITED_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    rbind(cbind(M = 1, n = 0)) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%   #, limits = c("Non-MODY\nn=8", "MODY\nn=0")
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("Non-MODY\nn=8" = "deepskyblue4", "MODY\nn=0" = "#00BFC4"), limits = c("Non-MODY\nn=8", "MODY\nn=0")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -155,20 +160,22 @@ plot_UNITED_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) + 
   patchwork::plot_annotation(
     title = "UNITED: insulin - clinical features (10% threshold)"
   ) &
@@ -190,13 +197,15 @@ plot_UNITED_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.UNITED_type1_with_T))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -211,15 +220,17 @@ plot_UNITED_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -234,20 +245,22 @@ plot_UNITED_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "UNITED: insulin - biomarkers (10% threshold)"
   ) &
@@ -269,13 +282,15 @@ plot_UNITED_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.UNITED_type1_old))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -290,15 +305,17 @@ plot_UNITED_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type1 %>%
@@ -313,20 +330,22 @@ plot_UNITED_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "UNITED: insulin - old (10% threshold)"
   ) &
@@ -349,13 +368,15 @@ plot_UNITED_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<25%\nn=", n), paste0(">25%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Non-insulin treated patients\nn=", nrow(predictions_dataset.UNITED_type2_new))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type2 %>%
@@ -370,15 +391,17 @@ plot_UNITED_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Non-insulin treated patients\nwith MODY probability >25%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.UNITED_type2 %>%
@@ -393,20 +416,22 @@ plot_UNITED_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Non-insulin treated patients\nwith MODY probability <25%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "UNITED: non-insulin - clinical features (25% threshold)"
   ) &
@@ -428,13 +453,15 @@ plot_referral_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.referral_type1_no_T))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -449,15 +476,17 @@ plot_referral_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -472,20 +501,22 @@ plot_referral_type1_no_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "Referrals: insulin - clinical features (10% threshold)"
   ) &
@@ -507,13 +538,15 @@ plot_referral_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.referral_type1_with_T))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -528,15 +561,17 @@ plot_referral_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -551,20 +586,22 @@ plot_referral_type1_with_T <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "Referrals: insulin - biomarkers (10% threshold)"
   ) &
@@ -586,13 +623,15 @@ plot_referral_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<10%\nn=", n), paste0(">10%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Insulin treated patients\nn=", nrow(predictions_dataset.referral_type1_old))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -607,15 +646,17 @@ plot_referral_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type1 %>%
@@ -630,20 +671,22 @@ plot_referral_type1_old <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability <10%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "Referrals: insulin - old (10% threshold)"
   ) &
@@ -666,13 +709,15 @@ plot_referral_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(threshold = factor(threshold, levels = c("Under", "Over"))) %>%
+    mutate(threshold = ifelse(threshold == "Under", paste0("<25%\nn=", n), paste0(">25%\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = threshold, values = n), colour = "white") +
     theme_void() +
-    ggtitle("People over threshold") +
+    ggtitle(paste0("Non-insulin treated patients\nn=", nrow(predictions_dataset.referral_type2_new))) +
     theme(
-      legend.position = "bottom"
+      legend.position = "top",
+      legend.title = element_blank(),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type2 %>%
@@ -687,15 +732,17 @@ plot_referral_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
-    geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    geom_waffle(aes(fill = M, values = n), colour = "white", show.legend = TRUE) +
+    scale_fill_manual(values = c("#00BFC4", "deepskyblue4")) +
     theme_void() +
-    ggtitle("Over threshold with MODY") +
+    ggtitle(paste0("Insulin treated patients\nwith MODY probability >25%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#00BFC4")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   dataset.referral_type2 %>%
@@ -710,20 +757,22 @@ plot_referral_type2 <- patchwork::wrap_plots(
     mutate(n = n()) %>%
     ungroup() %>%
     unique() %>%
-    mutate(M = factor(M, levels = c(0, 1), labels = c("Non-MODY", "MODY"))) %>%
+    mutate(M = ifelse(M == 0, paste0("Non-MODY\nn=", n), paste0("MODY\nn=", n))) %>%
     ggplot() +
     geom_waffle(aes(fill = M, values = n), colour = "white") +
-    scale_fill_manual(breaks = c("Non-MODY", "MODY"), values = c("grey", "black")) +
+    scale_fill_manual(values = c("red", "red4")) +
     theme_void() +
-    ggtitle("Under threshold with MODY") +
+    ggtitle(paste0("Non-insulin treated patients\nwith MODY probability <25%")) +
     theme(
-      legend.position = "bottom",
-      plot.title = element_text(colour = "#F8766D")
+      legend.position = "top",
+      legend.title = element_blank(),
+      legend.text = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
     ),
   
   nrow = 1
   
-) + plot_layout(guides = "collect")  +
+) +
   patchwork::plot_annotation(
     title = "Referrals: non-insulin - clinical features (25% threshold)"
   ) &
@@ -734,7 +783,7 @@ plot_referral_type2 <- patchwork::wrap_plots(
 
 
 
-pdf("threshold_investigation.pdf", width = 12, height = 8)
+pdf("threshold_investigation.pdf", width = 12, height = 5)
 plot_UNITED_type1_no_T
 plot_UNITED_type1_with_T
 plot_UNITED_type1_old
