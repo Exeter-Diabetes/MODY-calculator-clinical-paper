@@ -156,12 +156,6 @@ create_data <- function(dataset = NULL, biomarkers = "reduced") {
           "IA2" = "IA2Result",
         ) %>%
         
-        mutate(
-          ZnT8 = factor(ZnT8, levels = c(0, 1)),
-          GAD = factor(GAD, levels = c(0, 1)),
-          IA2 = factor(IA2, levels = c(0, 1))
-        ) %>%
-        
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
         
