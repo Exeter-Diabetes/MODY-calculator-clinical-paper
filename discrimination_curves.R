@@ -169,7 +169,7 @@ calc_roc <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 100)
+roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_no_T_united <- ggplot() +
@@ -187,7 +187,7 @@ plot_roc_T1D_no_T_united <- ggplot() +
   )
 
 ### Biomarker models
-roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 100)
+roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T_united <- ggplot() +
@@ -205,7 +205,7 @@ plot_roc_T1D_with_T_united <- ggplot() +
   )
 
 ## Type 2 UNITED
-roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 100)
+roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D_new_united <- ggplot() +
@@ -510,14 +510,11 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T
 
 dat_text <- roc_curves %>%
   select(-sensitivities, -specificities) %>%
-  distinct()
-
-dat_text$ROCAUC <- unlist(dat_text$ROCAUC)
-
-dat_text <- dat_text %>%
+  distinct() %>%
   mutate(
-    ROCAUC = paste0(" AUC:", signif(ROCAUC, 2), " "),
-    mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+    auc = paste0(" AUC:", signif(auc, 2), " "),
+    mean = paste0("Mean prob:", signif(mean, 2)*100, "%"),
+    Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
   )
 
 
@@ -539,7 +536,7 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
       gather("key", "Probability", -Mody) %>% 
       mutate(
         Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
-        key = factor(key, levels = c("prob_without", "prob_with"), labels = c("No Biomarkers", "Biomarkers"))
+        key = factor(key, levels = c("prob_without", "prob_with"), labels = c("Clinical features", "Clinical features and biomarkers"))
       ) %>%
       ggplot() +
       geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
@@ -555,34 +552,43 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
     roc_curves %>%
       filter(Dataset == "UNITED" & Model == "Type 1") %>%
       mutate(
-        Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers")),
+        Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
         iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path(
         data = roc_T1D_no_T_united %>%
           mutate(
-            Calculator = "No Biomarkers"
+            Calculator = "Clinical features"
           ) %>%
           rbind(
             roc_T1D_with_T_united %>%
-              mutate(Calculator = "Biomarkers")
+              mutate(Calculator = "Clinical features and biomarkers")
           ),
         aes(group = iteration), colour = "grey"
       ) + 
       geom_path() +
       theme_bw() +
-      facet_grid(~factor(Calculator, levels = c("No Biomarkers", "Biomarkers")), scales = "free",) +
+      facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
       geom_label(
-        data = dat_text %>%
-          filter(Dataset == "UNITED" & Model == "Type 1"),
-        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        data = roc_curves %>%
+          select(-sensitivities, -specificities) %>%
+          distinct() %>%
+          mutate(
+            auc = paste0(" AUC:", signif(auc, 2), " "),
+            mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+          ) %>%
+          filter(Dataset == "UNITED" & Model == "Type 1") %>%
+          mutate(
+            Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+          ),
+        mapping = aes(x = -Inf, y = -Inf, label = auc),
         size = 7,
         label.size = NA,
-        hjust = -0.3,
+        hjust = -0.4,
         vjust = -0.5
       ) +
       theme(
@@ -631,7 +637,7 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
       geom_label(
         data = dat_text %>%
           filter(Dataset == "UNITED" & Model == "Type 2"),
-        mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
+        mapping = aes(x = -Inf, y = -Inf, label = auc),
         size = 7,
         label.size = NA,
         hjust = -0.4,
@@ -651,13 +657,13 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
   theme(
     axis.text = element_text(size = 14),
     axis.title = element_text(size = 16),
-    strip.text = element_text(size = 15)
+    strip.text = element_text(size = 11)
   )
 
 
 #:-------------------------------------------------------------
 # Making plots
-pdf("figures/united_boxplot_roc_thin_100.pdf", width = 11, height = 9)
+pdf("figures/united_boxplot_roc_thin_1000.pdf", width = 13, height = 9)
 plot_prob_boxplot_rocs_united
 dev.off()
 
