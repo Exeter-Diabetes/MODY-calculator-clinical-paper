@@ -156,6 +156,9 @@ create_data <- function(dataset = NULL, biomarkers = "reduced") {
           "IA2" = "IA2Result",
         ) %>%
         
+        ### change type of column
+        mutate(ZnT8 = as.numeric(ZnT8)) %>%
+        
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
         
