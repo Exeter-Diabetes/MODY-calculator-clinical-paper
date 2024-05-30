@@ -71,7 +71,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced") {
     
   } else if (tolower(dataset) == "united t1d") {
     
-    if (tolover(biomarkers) == "reduced") {
+    if (tolower(biomarkers) == "reduced") {
       
       ## load libraries
       library(readr)
