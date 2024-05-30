@@ -95,7 +95,14 @@ dataset.UNITED_type1_gad <- create_data(dataset = "united t1d", biomarkers = "fu
 dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers = "full") %>%
   
   # check if the antibody variable in question is recorded
-  mutate(A = ifelse(is.na(GAD) & is.na(IA2), NA, ifelse(is.na(GAD) & IA2 == 1, 1, ifelse(GAD == 1 & is.na(IA2), 1, 0)))) %>%
+  mutate(
+    A = ifelse(is.na(GAD) & is.na(IA2), NA,
+               ifelse(!is.na(GAD) & (GAD == 1 & is.na(IA2)), 1,
+                      ifelse(!is.na(GAD) & (GAD == 0 & is.na(IA2)), 0,
+                             ifelse(!is.na(IA2) & (IA2 == 1 & is.na(GAD)), 1,
+                                    ifelse(!is.na(IA2) & (IA2 == 0 & is.na(GAD)), 0,
+                                           ifelse(IA2 == 1 | GAD == 1, 1, 0))))))
+  ) %>%
   
   # add biomarker latent variable
   mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
