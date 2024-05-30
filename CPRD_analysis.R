@@ -36,11 +36,79 @@ probabilities <- probabilities_under_30 %>%
   mutate(value = value/100)
 
 
-##
-# Need to add violin plot for outliers
-# Need to break axis, below 12.5% and above 12.5%
+plot_cprd_probabilities_density <- patchwork::wrap_plots(
+  
+  # the first part of the plot
+  probabilities %>%
+    filter(key == "New Calculator") %>%
+    ggplot() +
+    geom_density(aes(x = value), fill = "grey") +
+    geom_vline(
+      data = probabilities %>%
+        filter(key == "New Calculator") %>%
+        group_by(key) %>%
+        mutate(mean = mean(value)) %>%
+        ungroup() %>%
+        select(-value) %>%
+        unique(),
+      aes(xintercept = mean), linetype = "dashed"
+    ) +
+    geom_vline(xintercept = 0.036, colour = "black") +
+    coord_cartesian(xlim = c(0, 0.115), expand = TRUE) +
+    scale_x_continuous(labels = scales::percent, breaks = c(0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12)) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(size = 22),
+      axis.title = element_blank(),
+      axis.text.y = element_blank(),
+      legend.position = "none",
+      axis.line = element_line(colour = "black"),
+      panel.border = element_blank(),
+      panel.background = element_blank(),
+      axis.ticks.y = element_blank(),
+      plot.margin = unit(c(0,0,0,0), "cm")
+    ),
+  
+  # spacing
+  plot_spacer(),
+  
+  # the second part of the plot
+  probabilities %>%
+    filter(key == "New Calculator") %>%
+    ggplot() +
+    geom_density(aes(x = value), fill = "grey") +
+    geom_vline(
+      data = probabilities %>%
+        filter(key == "New Calculator") %>%
+        group_by(key) %>%
+        mutate(mean = mean(value)) %>%
+        ungroup() %>%
+        select(-value) %>%
+        unique(),
+      aes(xintercept = mean), linetype = "dashed"
+    ) +
+    geom_vline(xintercept = 0.036, colour = "black") +
+    coord_cartesian(xlim = c(0.16, 1), expand = TRUE) +
+    scale_x_continuous(labels = scales::percent, breaks = c(0.12, 0.25, 0.5, 0.75, 1)) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(size = 22),
+      axis.title = element_blank(),
+      axis.text.y = element_blank(),
+      legend.position = "none",
+      axis.line = element_line(colour = "black"),
+      panel.border = element_blank(),
+      panel.background = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.line.y = element_blank(),
+      plot.margin = unit(c(0,0.2,0,0), "cm")
+    )
+  
+) + plot_layout(widths = c(4, -0.17, 4))
 
-plot_cprd_probabilities <- patchwork::wrap_plots(
+
+
+plot_cprd_probabilities_boxplot <- patchwork::wrap_plots(
   
   probabilities %>%
     ggplot() +
@@ -104,6 +172,13 @@ plot_cprd_probabilities <- patchwork::wrap_plots(
   nrow = 1
 )
 
+
+
+#:-------------------------------------------------------------
+# Making plots
+pdf("figures/cprd_analysis_density.pdf", width = 11, height = 3)
+plot_cprd_probabilities_density
+dev.off()
 
 
 
