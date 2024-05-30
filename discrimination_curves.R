@@ -16,11 +16,11 @@ source("new_data_predictions/prediction_functions.R")
 # load files required
 predictions_dataset.UNITED_type1_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_no_T_full.rds")
 predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
-predictions_dataset.referral_type1_no_T <- readRDS("model_predictions/predictions_dataset.referral_type1_no_T_full.rds")
-predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T_full.rds")
+# predictions_dataset.referral_type1_no_T <- readRDS("model_predictions/predictions_dataset.referral_type1_no_T_full.rds")
+# predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T_full.rds")
 
 predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new_full.rds")
-predictions_dataset.referral_type2_new <- readRDS("model_predictions/predictions_dataset.referral_type2_new_full.rds")
+# predictions_dataset.referral_type2_new <- readRDS("model_predictions/predictions_dataset.referral_type2_new_full.rds")
 
 
 # load datasets
@@ -30,7 +30,7 @@ dataset.UNITED_type1 <- create_data(dataset = "united t1d") %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
-  
+
 dataset.UNITED_type2 <- create_data(dataset = "united t2d")
 
 ## Load referrals dataset
@@ -130,16 +130,16 @@ auc_T1D_with_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.
 ## Type 2 UNITED
 auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
 
-## Type 1 referrals
-
-### No biomarker models
-auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
-
-### Biomarker models
-auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
-
-## Type 2 referrals
-auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# ## Type 1 referrals
+# 
+# ### No biomarker models
+# auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# 
+# ### Biomarker models
+# auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# 
+# ## Type 2 referrals
+# auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
 
 
 #:------------------------------------------------------------
@@ -169,7 +169,7 @@ calc_roc <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
+roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_no_T_united <- ggplot() +
@@ -187,7 +187,7 @@ plot_roc_T1D_no_T_united <- ggplot() +
   )
 
 ### Biomarker models
-roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
+roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T_united <- ggplot() +
@@ -205,7 +205,7 @@ plot_roc_T1D_with_T_united <- ggplot() +
   )
 
 ## Type 2 UNITED
-roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
+roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D_new_united <- ggplot() +
@@ -223,61 +223,61 @@ plot_roc_T2D_new_united <- ggplot() +
   )
 
 
-## Type 1 referrals
-
-### No biomarker models
-roc_T1D_no_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_roc_T1D_no_T_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = roc_T1D_no_T_referral,
-    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_no_T)) %>%
-      magrittr::extract(c(2:3)) %>%
-      as.data.frame(),
-    aes(x = 1-specificities, y= sensitivities), colour = "black"
-  )
-
-### Biomarker models
-roc_T1D_with_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_roc_T1D_with_T_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = roc_T1D_with_T_referral,
-    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_with_T)) %>%
-      magrittr::extract(c(2:3)) %>%
-      as.data.frame(),
-    aes(x = 1-specificities, y= sensitivities), colour = "black"
-  )
-
-## Type 2 referral
-roc_T2D_new_referral <- calc_roc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_roc_T2D_new_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = roc_T2D_new_referral,
-    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::roc(response = dataset.referral_type2$M, predictor = colMeans(predictions_dataset.referral_type2_new)) %>%
-      magrittr::extract(c(2:3)) %>%
-      as.data.frame(),
-    aes(x = 1-specificities, y= sensitivities), colour = "black"
-  )
+# ## Type 1 referrals
+# 
+# ### No biomarker models
+# roc_T1D_no_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_roc_T1D_no_T_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = roc_T1D_no_T_referral,
+#     aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_no_T)) %>%
+#       magrittr::extract(c(2:3)) %>%
+#       as.data.frame(),
+#     aes(x = 1-specificities, y= sensitivities), colour = "black"
+#   )
+# 
+# ### Biomarker models
+# roc_T1D_with_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_roc_T1D_with_T_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = roc_T1D_with_T_referral,
+#     aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_with_T)) %>%
+#       magrittr::extract(c(2:3)) %>%
+#       as.data.frame(),
+#     aes(x = 1-specificities, y= sensitivities), colour = "black"
+#   )
+# 
+# ## Type 2 referral
+# roc_T2D_new_referral <- calc_roc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_roc_T2D_new_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = roc_T2D_new_referral,
+#     aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::roc(response = dataset.referral_type2$M, predictor = colMeans(predictions_dataset.referral_type2_new)) %>%
+#       magrittr::extract(c(2:3)) %>%
+#       as.data.frame(),
+#     aes(x = 1-specificities, y= sensitivities), colour = "black"
+#   )
 
 
 
@@ -359,58 +359,58 @@ plot_prec_recal_T2D_new_united <- ggplot() +
   )
 
 
-## Type 1 referral
-
-### No biomarker models
-prec_recal_T1D_no_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_prec_recal_T1D_no_T_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = prec_recal_T1D_no_T_referral,
-    aes(x = recall, y= precision, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_no_T)), ret = c("precision", "recall")) %>%
-      as.data.frame(),
-    aes(x = recall, y= precision), colour = "black"
-  )
-
-### Biomarker models
-prec_recal_T1D_with_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_prec_recal_T1D_with_T_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = prec_recal_T1D_with_T_referral,
-    aes(x = recall, y= precision, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_with_T)), ret = c("precision", "recall")) %>%
-      as.data.frame(),
-    aes(x = recall, y= precision), colour = "black"
-  )
-
-## Type 2 referral
-prec_recal_T2D_new_referral <- calc_prec_recal_curve(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
-
-# plot for ROC with grey being iterations, black being the ROC for average prediction
-plot_prec_recal_T2D_new_referral <- ggplot() +
-  ## all iterations
-  geom_path(
-    data = prec_recal_T2D_new_referral,
-    aes(x = recall, y= precision, group = iteration), colour = "grey"
-  ) +
-  ## average predictions
-  geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.referral_type2$M, predictor = colMeans(predictions_dataset.referral_type2_new)), ret = c("precision", "recall")) %>%
-      as.data.frame(),
-    aes(x = recall, y= precision), colour = "black"
-  )
+# ## Type 1 referral
+# 
+# ### No biomarker models
+# prec_recal_T1D_no_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_prec_recal_T1D_no_T_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = prec_recal_T1D_no_T_referral,
+#     aes(x = recall, y= precision, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::coords(pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_no_T)), ret = c("precision", "recall")) %>%
+#       as.data.frame(),
+#     aes(x = recall, y= precision), colour = "black"
+#   )
+# 
+# ### Biomarker models
+# prec_recal_T1D_with_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_prec_recal_T1D_with_T_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = prec_recal_T1D_with_T_referral,
+#     aes(x = recall, y= precision, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::coords(pROC::roc(response = dataset.referral_type1$M, predictor = colMeans(predictions_dataset.referral_type1_with_T)), ret = c("precision", "recall")) %>%
+#       as.data.frame(),
+#     aes(x = recall, y= precision), colour = "black"
+#   )
+# 
+# ## Type 2 referral
+# prec_recal_T2D_new_referral <- calc_prec_recal_curve(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# 
+# # plot for ROC with grey being iterations, black being the ROC for average prediction
+# plot_prec_recal_T2D_new_referral <- ggplot() +
+#   ## all iterations
+#   geom_path(
+#     data = prec_recal_T2D_new_referral,
+#     aes(x = recall, y= precision, group = iteration), colour = "grey"
+#   ) +
+#   ## average predictions
+#   geom_path(
+#     data = pROC::coords(pROC::roc(response = dataset.referral_type2$M, predictor = colMeans(predictions_dataset.referral_type2_new)), ret = c("precision", "recall")) %>%
+#       as.data.frame(),
+#     aes(x = recall, y= precision), colour = "black"
+#   )
 
 
 
@@ -425,11 +425,11 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T
   magrittr::extract(2:3) %>%
   as.data.frame() %>%
   mutate(
-    ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T)) %>%
-      cbind(Mody = dataset.UNITED_type1$M) %>%
-      pROC::roc(response = Mody, predictor = prob) %>%
-      magrittr::extract(c(9)) %>%
-      as.data.frame(),
+    ROCAUC =  unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T)) %>%
+                       cbind(Mody = dataset.UNITED_type1$M) %>%
+                       pROC::roc(response = Mody, predictor = prob) %>%
+                       magrittr::extract(c(9)) %>%
+                       unlist()),
     mean = mean(colMeans(predictions_dataset.UNITED_type1_with_T), na.rm = TRUE)
   ) %>%
   mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
@@ -440,71 +440,72 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_with_T
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type1_no_T)) %>%
-          cbind(Mody = dataset.UNITED_type1$M) %>%
-          pROC::roc(response = Mody, predictor = prob) %>%
-          magrittr::extract(c(9)) %>%
-          as.data.frame(),
+        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_no_T)) %>%
+                          cbind(Mody = dataset.UNITED_type1$M) %>%
+                          pROC::roc(response = Mody, predictor = prob) %>%
+                          magrittr::extract(c(9)) %>%
+                          unlist()),
         mean = mean(colMeans(predictions_dataset.UNITED_type1_no_T), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"),
+      mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
     data.frame(prob = colMeans(predictions_dataset.UNITED_type2_new)) %>%
       cbind(Mody = dataset.UNITED_type2$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.UNITED_type2_new)) %>%
-          cbind(Mody = dataset.UNITED_type2$M) %>%
-          pROC::roc(response = Mody, predictor = prob) %>%
-          magrittr::extract(c(9)) %>%
-          as.data.frame(),
+        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type2_new)) %>%
+                          cbind(Mody = dataset.UNITED_type2$M) %>%
+                          pROC::roc(response = Mody, predictor = prob) %>%
+                          magrittr::extract(c(9)) %>%
+                          unlist()),
         mean = mean(colMeans(predictions_dataset.UNITED_type2_new), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " "),
-    data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
-      cbind(Mody = dataset.referral_type1$M) %>%
-      pROC::roc(response = Mody, predictor = prob) %>%
-      magrittr::extract(2:3) %>%
-      as.data.frame() %>%
-      mutate(
-        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
-          cbind(Mody = dataset.referral_type1$M) %>%
-          pROC::roc(response = Mody, predictor = prob) %>%
-          magrittr::extract(c(9)) %>%
-          as.data.frame(),
-        mean = mean(colMeans(predictions_dataset.referral_type1_with_T), na.rm = TRUE)
-      ) %>%
-      mutate(Dataset = "Referral", Model = "Type 1", Calculator = "Biomarkers"),
-    data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
-      cbind(Mody = dataset.referral_type1$M) %>%
-      pROC::roc(response = Mody, predictor = prob) %>%
-      magrittr::extract(2:3) %>%
-      as.data.frame() %>%
-      mutate(
-        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
-          cbind(Mody = dataset.referral_type1$M) %>%
-          pROC::roc(response = Mody, predictor = prob) %>%
-          magrittr::extract(c(9)) %>%
-          as.data.frame(),
-        mean = mean(colMeans(predictions_dataset.referral_type1_no_T), na.rm = TRUE)
-      ) %>%
-      mutate(Dataset = "Referral", Model = "Type 1", Calculator = "No Biomarkers"),
-    data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
-      cbind(Mody = dataset.referral_type2$M) %>%
-      pROC::roc(response = Mody, predictor = prob) %>%
-      magrittr::extract(2:3) %>%
-      as.data.frame() %>%
-      mutate(
-        ROCAUC =  data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
-          cbind(Mody = dataset.referral_type2$M) %>%
-          pROC::roc(response = Mody, predictor = prob) %>%
-          magrittr::extract(c(9)) %>%
-          as.data.frame(),
-        mean = mean(colMeans(predictions_dataset.referral_type2_new), na.rm = TRUE)
-      ) %>%
-      mutate(Dataset = "Referral", Model = "Type 2", Calculator = " ")
-  )
+      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " ")
+    # , data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
+    #   cbind(Mody = dataset.referral_type1$M) %>%
+    #   pROC::roc(response = Mody, predictor = prob) %>%
+    #   magrittr::extract(2:3) %>%
+    #   as.data.frame() %>%
+    #   mutate(
+    #     ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.referral_type1_with_T)) %>%
+    #       cbind(Mody = dataset.referral_type1$M) %>%
+    #       pROC::roc(response = Mody, predictor = prob) %>%
+    #         magrittr::extract(c(9)) %>%
+    #         unlist()),
+    #     mean = mean(colMeans(predictions_dataset.referral_type1_with_T), na.rm = TRUE)
+    #   ) %>%
+    #   mutate(Dataset = "Referral", Model = "Type 1", Calculator = "Biomarkers"),
+    # data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
+    #   cbind(Mody = dataset.referral_type1$M) %>%
+    #   pROC::roc(response = Mody, predictor = prob) %>%
+    #   magrittr::extract(2:3) %>%
+    #   as.data.frame() %>%
+    #   mutate(
+    #     ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.referral_type1_no_T)) %>%
+    #       cbind(Mody = dataset.referral_type1$M) %>%
+    #       pROC::roc(response = Mody, predictor = prob) %>%
+    #         magrittr::extract(c(9)) %>%
+    #         unlist()),
+    #     mean = mean(colMeans(predictions_dataset.referral_type1_no_T), na.rm = TRUE)
+    #   ) %>%
+    #   mutate(Dataset = "Referral", Model = "Type 1", Calculator = "No Biomarkers"),
+    # data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
+    #   cbind(Mody = dataset.referral_type2$M) %>%
+    #   pROC::roc(response = Mody, predictor = prob) %>%
+    #   magrittr::extract(2:3) %>%
+    #   as.data.frame() %>%
+    #   mutate(
+    #     ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.referral_type2_new)) %>%
+    #       cbind(Mody = dataset.referral_type2$M) %>%
+    #       pROC::roc(response = Mody, predictor = prob) %>%
+    #         magrittr::extract(c(9)) %>%
+    #         unlist()),
+    #     mean = mean(colMeans(predictions_dataset.referral_type2_new), na.rm = TRUE)
+    #   ) %>%
+    #   mutate(Dataset = "Referral", Model = "Type 2", Calculator = " ")
+  ) %>%
+  rename("auc" = "ROCAUC")
 
 
 dat_text <- roc_curves %>%
@@ -541,7 +542,7 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
         key = factor(key, levels = c("prob_without", "prob_with"), labels = c("No Biomarkers", "Biomarkers"))
       ) %>%
       ggplot() +
-      geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white")) +
+      geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
       geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
       scale_y_continuous(labels = scales::percent) +
       scale_colour_manual(values = c("white", "black")) +
@@ -554,12 +555,24 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
     roc_curves %>%
       filter(Dataset == "UNITED" & Model == "Type 1") %>%
       mutate(
-        Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"))
+        Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers")),
+        iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path(
+        data = roc_T1D_no_T_united %>%
+          mutate(
+            Calculator = "No Biomarkers"
+          ) %>%
+          rbind(
+            roc_T1D_with_T_united %>%
+              mutate(Calculator = "Biomarkers")
+          ),
+        aes(group = iteration), colour = "grey"
+      ) + 
       geom_path() +
       theme_bw() +
-      facet_grid(~Calculator, scales = "free") +
+      facet_grid(~factor(Calculator, levels = c("No Biomarkers", "Biomarkers")), scales = "free",) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
@@ -569,8 +582,11 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
         mapping = aes(x = -Inf, y = -Inf, label = ROCAUC),
         size = 7,
         label.size = NA,
-        hjust = -0.4,
+        hjust = -0.3,
         vjust = -0.5
+      ) +
+      theme(
+        panel.spacing.x = unit(1.5, "lines")
       ), 
     
     ncol = 2, nrow = 1
@@ -595,15 +611,20 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
       ggplot() +
       geom_boxplot(aes(y = Probability, x = Mody)) +
       scale_y_continuous(labels = scales::percent) +
-      facet_wrap(~key) +
       theme_bw(),
     
     roc_curves %>%
       filter(Dataset == "UNITED" & Model == "Type 2") %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
+      geom_path(
+        data = roc_T2D_new_united %>%
+          mutate(
+            Calculator = "No Biomarkers"
+          ),
+        aes(group = iteration), colour = "grey"
+      ) +
       geom_path() +
       theme_bw() +
-      facet_grid(~Calculator, scales = "free") +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
@@ -620,14 +641,27 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
     
     ncol = 2, nrow = 1
     
-    ),
+  ),
   
   
   ncol = 1
-    
-    
-) + patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2")))
   
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 15)
+  )
+
+
+#:-------------------------------------------------------------
+# Making plots
+pdf("figures/united_boxplot_roc_thin_100.pdf", width = 11, height = 9)
+plot_prob_boxplot_rocs_united
+dev.off()
+
+
 
 
 
@@ -735,7 +769,7 @@ plot_prob_boxplot_rocs_referral <- patchwork::wrap_plots(
   
 ) + patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2")))
 
-  
+
 
 
 
