@@ -80,6 +80,29 @@ dataset.case_control_type2 <- create_data(dataset = "case-control t2d")
 dataset.UNITED_type1 <- create_data(dataset = "united t1d")
 dataset.UNITED_type2 <- create_data(dataset = "united t2d")
 
+
+
+## Load population representative dataset
+dataset.UNITED_type1_gad <- create_data(dataset = "united t1d", biomarkers = "full") %>%
+  
+  # check if the antibody variable in question is recorded
+  mutate(A = GAD) %>%
+  
+  # add biomarker latent variable
+  mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
+
+
+dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers = "full") %>%
+  
+  # check if the antibody variable in question is recorded
+  mutate(A = ifelse(is.na(GAD) & is.na(IA2), NA, ifelse(is.na(GAD) & IA2 == 1, 1, ifelse(GAD == 1 & is.na(IA2), 1, 0)))) %>%
+  
+  # add biomarker latent variable
+  mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
+
+
+
+
 ## Load referrals dataset
 
 ### load in Referral repository
@@ -296,6 +319,48 @@ predictions_dataset.UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with
 
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type1_with_T, "model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
+
+
+
+## GAD
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_gad_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_gad_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_gad_with_T <- predictions_dataset.UNITED_type1_gad_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_with_T.rds")
+
+
+#:-------------
+
+
+## GAD & IA2
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad_ia2, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_gad_ia2_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_ia2_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_gad_ia2_with_T <- predictions_dataset.UNITED_type1_gad_ia2_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_ia2_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T.rds")
 
 
 
