@@ -95,7 +95,7 @@ unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
 #:------------------------------------------------------------
 
 # Calculate AUROC with intervals
-calc_auroc <- function(data, predictions, thinning = 1) {
+calc_auroc <- function(data, predictions, thinning = 100) {
   
   output <- NULL
   
@@ -122,30 +122,30 @@ calc_auroc <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-auc_T1D_no_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
+auc_T1D_no_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1)
 
 ### Biomarker models
-auc_T1D_with_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
+auc_T1D_with_T_united <- calc_auroc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1)
 
 ## Type 2 UNITED
-auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
+auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1)
 
 # ## Type 1 referrals
 # 
 # ### No biomarker models
-# auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# auc_T1D_no_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 100)
 # 
 # ### Biomarker models
-# auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# auc_T1D_with_T_referrals <- calc_auroc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 100)
 # 
 # ## Type 2 referrals
-# auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 100)
 
 
 #:------------------------------------------------------------
 
 # Calculate ROC with intervals
-calc_roc <- function(data, predictions, thinning = 1) {
+calc_roc <- function(data, predictions, thinning = 100) {
   
   output <- NULL
   
@@ -169,7 +169,7 @@ calc_roc <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
+roc_T1D_no_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_no_T_united <- ggplot() +
@@ -187,7 +187,7 @@ plot_roc_T1D_no_T_united <- ggplot() +
   )
 
 ### Biomarker models
-roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
+roc_T1D_with_T_united <- calc_roc(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T_united <- ggplot() +
@@ -205,7 +205,7 @@ plot_roc_T1D_with_T_united <- ggplot() +
   )
 
 ## Type 2 UNITED
-roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
+roc_T2D_new_united <- calc_roc(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D_new_united <- ggplot() +
@@ -226,7 +226,7 @@ plot_roc_T2D_new_united <- ggplot() +
 # ## Type 1 referrals
 # 
 # ### No biomarker models
-# roc_T1D_no_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# roc_T1D_no_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_roc_T1D_no_T_referral <- ggplot() +
@@ -244,7 +244,7 @@ plot_roc_T2D_new_united <- ggplot() +
 #   )
 # 
 # ### Biomarker models
-# roc_T1D_with_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# roc_T1D_with_T_referral <- calc_roc(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_roc_T1D_with_T_referral <- ggplot() +
@@ -262,7 +262,7 @@ plot_roc_T2D_new_united <- ggplot() +
 #   )
 # 
 # ## Type 2 referral
-# roc_T2D_new_referral <- calc_roc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# roc_T2D_new_referral <- calc_roc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_roc_T2D_new_referral <- ggplot() +
@@ -286,7 +286,7 @@ plot_roc_T2D_new_united <- ggplot() +
 
 
 # Calculate Precision-recall with intervals
-calc_prec_recal_curve <- function(data, predictions, thinning = 1) {
+calc_prec_recal_curve <- function(data, predictions, thinning = 100) {
   
   output <- NULL
   
@@ -308,7 +308,7 @@ calc_prec_recal_curve <- function(data, predictions, thinning = 1) {
 ## Type 1 UNITED
 
 ### No biomarker models
-prec_recal_T1D_no_T_united <- calc_prec_recal_curve(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 1000)
+prec_recal_T1D_no_T_united <- calc_prec_recal_curve(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_no_T_united <- ggplot() +
@@ -325,7 +325,7 @@ plot_prec_recal_T1D_no_T_united <- ggplot() +
   )
 
 ### Biomarker models
-prec_recal_T1D_with_T_united <- calc_prec_recal_curve(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 1000)
+prec_recal_T1D_with_T_united <- calc_prec_recal_curve(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_with_T_united <- ggplot() +
@@ -342,7 +342,7 @@ plot_prec_recal_T1D_with_T_united <- ggplot() +
   )
 
 ## Type 2 UNITED
-prec_recal_T2D_new_united <- calc_prec_recal_curve(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 1000)
+prec_recal_T2D_new_united <- calc_prec_recal_curve(dataset.UNITED_type2$M, predictions_dataset.UNITED_type2_new, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T2D_new_united <- ggplot() +
@@ -362,7 +362,7 @@ plot_prec_recal_T2D_new_united <- ggplot() +
 # ## Type 1 referral
 # 
 # ### No biomarker models
-# prec_recal_T1D_no_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 1000)
+# prec_recal_T1D_no_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_no_T, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_prec_recal_T1D_no_T_referral <- ggplot() +
@@ -379,7 +379,7 @@ plot_prec_recal_T2D_new_united <- ggplot() +
 #   )
 # 
 # ### Biomarker models
-# prec_recal_T1D_with_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 1000)
+# prec_recal_T1D_with_T_referral <- calc_prec_recal_curve(dataset.referral_type1$M, predictions_dataset.referral_type1_with_T, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_prec_recal_T1D_with_T_referral <- ggplot() +
@@ -396,7 +396,7 @@ plot_prec_recal_T2D_new_united <- ggplot() +
 #   )
 # 
 # ## Type 2 referral
-# prec_recal_T2D_new_referral <- calc_prec_recal_curve(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 1000)
+# prec_recal_T2D_new_referral <- calc_prec_recal_curve(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 100)
 # 
 # # plot for ROC with grey being iterations, black being the ROC for average prediction
 # plot_prec_recal_T2D_new_referral <- ggplot() +
@@ -663,7 +663,7 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
 
 #:-------------------------------------------------------------
 # Making plots
-pdf("figures/united_boxplot_roc_thin_1000.pdf", width = 13, height = 9)
+pdf("figures/united_boxplot_roc_thin_100.pdf", width = 13, height = 9)
 plot_prob_boxplot_rocs_united
 dev.off()
 
