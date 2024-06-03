@@ -200,7 +200,7 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     mutate(
       A_count = n(),
       A = ifelse(A == 0, "Negative", "Positive"),
-      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = ceiling),"%)"),
+      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = round),"%)"),
       point_alpha = ifelse(M == 1, 1, 0)
     ) %>%
     ungroup() %>%
@@ -233,7 +233,7 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     mutate(
       A_count = n(),
       A = ifelse(A == 0, "Negative", "Positive"),
-      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = ceiling),"%)"),
+      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = round),"%)"),
       point_alpha = ifelse(M == 1, 1, 0)
     ) %>%
     ungroup() %>%
@@ -266,7 +266,7 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     mutate(
       A_count = n(),
       A = ifelse(A == 0, "Negative", "Positive"),
-      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = ceiling),"%)"),
+      A_label = paste0(A, "\nn=", A_count, " (", plyr::round_any(A_count/total*100, accuracy = 1, f = round),"%)"),
       point_alpha = ifelse(M == 1, 1, 0)
     ) %>%
     ungroup() %>%
