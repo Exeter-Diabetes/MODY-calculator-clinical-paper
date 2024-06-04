@@ -161,7 +161,7 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds > 0.05) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t1" & pedro_prob > 0.05) %>%
+  filter(which_equation == "t1" & pedro_prob > 5) %>%
   nrow()
 
 ### 10%
@@ -169,7 +169,7 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds > 0.1) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t1" & pedro_prob > 0.1) %>%
+  filter(which_equation == "t1" & pedro_prob > 10) %>%
   nrow()
 
 ### 20%
@@ -177,7 +177,7 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds > 0.2) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t1" & pedro_prob > 0.2) %>%
+  filter(which_equation == "t1" & pedro_prob > 20) %>%
   nrow()
 
 ### 30%
@@ -185,7 +185,7 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds > 0.3) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t1" & pedro_prob > 0.3) %>%
+  filter(which_equation == "t1" & pedro_prob > 30) %>%
   nrow()
 
 
@@ -197,7 +197,7 @@ thresholds_UNITED_t2d %>%
   filter(Thresholds > 0.05) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t2" & pedro_prob > 0.05) %>%
+  filter(which_equation == "t2" & pedro_prob > 5) %>%
   nrow()
 
 ### 10%
@@ -205,7 +205,7 @@ thresholds_UNITED_t2d %>%
   filter(Thresholds > 0.1) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t2" & pedro_prob > 0.1) %>%
+  filter(which_equation == "t2" & pedro_prob > 10) %>%
   nrow()
 
 ### 20%
@@ -213,7 +213,7 @@ thresholds_UNITED_t2d %>%
   filter(Thresholds > 0.2) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t2" & pedro_prob > 0.2) %>%
+  filter(which_equation == "t2" & pedro_prob > 20) %>%
   nrow()
 
 ### 25%
@@ -221,7 +221,7 @@ thresholds_UNITED_t2d %>%
   filter(Thresholds > 0.25) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t2" & pedro_prob > 0.25) %>%
+  filter(which_equation == "t2" & pedro_prob > 25) %>%
   nrow()
 
 ### 30%
@@ -229,7 +229,7 @@ thresholds_UNITED_t2d %>%
   filter(Thresholds > 0.3) %>% head()
 
 probabilities_under_30 %>%
-  filter(which_equation == "t2" & pedro_prob > 0.3) %>%
+  filter(which_equation == "t2" & pedro_prob > 30) %>%
   nrow()
 
 
