@@ -14,7 +14,7 @@ library(patchwork)
 # load functions needed for generating data
 source("data/create_data.R")
 
-calculate_thresholds_diagnostics <- function(response, prediction) {
+calculate_thresholds_diagnostics <- function(response, prediction, unique = FALSE) {
   
   ### threshold number to test
   thresholds <- seq(0, 1, 0.0001)
@@ -76,9 +76,11 @@ calculate_thresholds_diagnostics <- function(response, prediction) {
     set_names(c("Thresholds", "Sensitivity", "NTT", "Pick-up rate", "Specificity", "N-Tested", "Cases Missed", "Patients Tested")) %>%
     arrange(desc(Sensitivity), desc(NTT), desc(`Pick-up rate`))
   
-  ## select unique combinations of sensitivity and NTT (only the first occurance)
-  matrix_thresholds <- matrix_thresholds %>%
-    slice(which(duplicated(matrix_thresholds %>% select(-Thresholds, -`Pick-up rate`)) == FALSE))
+  if (unique == TRUE) {
+    ## select unique combinations of sensitivity and NTT (only the first occurance)
+    matrix_thresholds <- matrix_thresholds %>%
+      slice(which(duplicated(matrix_thresholds %>% select(-Thresholds, -`Pick-up rate`)) == FALSE))
+  }
   
   return(matrix_thresholds)
   
@@ -139,43 +141,43 @@ thresholds_UNITED_t1d_gad_ia2 <- calculate_thresholds_diagnostics(dataset.UNITED
 
 ### 5%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.05) %>% arrange(Thresholds) %>% head()
+  filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.05) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.05) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
 ### 10%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 ### 20%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 ### 30%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
+  filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
 
 
