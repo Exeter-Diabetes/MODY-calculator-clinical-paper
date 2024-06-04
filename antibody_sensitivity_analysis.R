@@ -92,7 +92,7 @@ calculate_thresholds_diagnostics <- function(response, prediction, unique = FALS
 predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
 predictions_dataset.UNITED_type1_gad_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_with_T.rds")
 predictions_dataset.UNITED_type1_gad_ia2_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T.rds")
-
+predictions_dataset.UNITED_type1_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_no_T.rds")
 
 
 
@@ -131,6 +131,8 @@ dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers =
 
 
 # Table information
+thresholds_UNITED_t1d_no_T <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T$prob)
+
 thresholds_UNITED_t1d <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T$prob)
 
 thresholds_UNITED_t1d_gad <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad$M, predictions_dataset.UNITED_type1_gad_with_T$prob)
@@ -138,8 +140,10 @@ thresholds_UNITED_t1d_gad <- calculate_thresholds_diagnostics(dataset.UNITED_typ
 thresholds_UNITED_t1d_gad_ia2 <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad_ia2$M, predictions_dataset.UNITED_type1_gad_ia2_with_T$prob)
 
 
-
 ### 5%
+thresholds_UNITED_t1d_no_T %>%
+  filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
+
 thresholds_UNITED_t1d_gad %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
 
@@ -150,6 +154,9 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
 ### 10%
+thresholds_UNITED_t1d_no_T %>%
+  filter(Thresholds == 0.1) %>% arrange(Thresholds) %>% head()
+
 thresholds_UNITED_t1d_gad %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
@@ -160,6 +167,9 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 ### 20%
+thresholds_UNITED_t1d_no_T %>%
+  filter(Thresholds == 0.2) %>% arrange(Thresholds) %>% head()
+
 thresholds_UNITED_t1d_gad %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
@@ -170,6 +180,9 @@ thresholds_UNITED_t1d %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 ### 30%
+thresholds_UNITED_t1d_no_T %>%
+  filter(Thresholds == 0.3) %>% arrange(Thresholds) %>% head()
+
 thresholds_UNITED_t1d_gad %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
