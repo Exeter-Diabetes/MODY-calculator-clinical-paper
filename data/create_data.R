@@ -147,7 +147,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced") {
         ### select the correct variables
         select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
                pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, insoroha, 
-               ZNT8pos, GADResult, IA2Result) %>%
+               ZNT8pos, GADResult, IA2Result, id) %>%
         
         ### rename Antibody variables
         rename(
@@ -170,6 +170,13 @@ create_data <- function(dataset = NULL, biomarkers = "reduced") {
         
         ### drop patients with missing data in the variables we care about
         drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+        
+        ### edit antibody testing for specific patients
+        mutate(
+          ZnT8 = ifelse(id %in% c(892, 8002276), 0, ZnT8),
+          GAD = ifelse(id %in% c(892, 8002276), 0, GAD),
+          IA2 = ifelse(id %in% c(892, 8002276), 0, IA2)
+        ) %>%
         
         ### rename variables for biomarkers
         rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
