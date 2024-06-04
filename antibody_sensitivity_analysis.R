@@ -139,43 +139,43 @@ thresholds_UNITED_t1d_gad_ia2 <- calculate_thresholds_diagnostics(dataset.UNITED
 
 ### 5%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.05) %>% head()
+  filter(Thresholds > 0.05) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.05) %>% head()
+  filter(Thresholds > 0.05) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.05) %>% head()
+  filter(Thresholds > 0.05) %>% arrange(Thresholds)  %>% head()
 
 ### 10%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.1) %>% head()
+  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.1) %>% head()
+  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.1) %>% head()
+  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
 
 ### 20%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.2) %>% head()
+  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.2) %>% head()
+  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.2) %>% head()
+  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
 
 ### 30%
 thresholds_UNITED_t1d_gad %>%
-  filter(Thresholds > 0.3) %>% head()
+  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d_gad_ia2 %>%
-  filter(Thresholds > 0.3) %>% head()
+  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
 
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.3) %>% head()
+  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
 
 
 

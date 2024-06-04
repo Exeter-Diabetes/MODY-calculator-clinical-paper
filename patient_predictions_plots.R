@@ -158,7 +158,7 @@ thresholds_UNITED_t1d <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M
 
 ### 5%
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.05) %>% head()
+  filter(Thresholds > 0.05) %>% arrange(Thresholds) %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t1" & pedro_prob > 5) %>%
@@ -166,7 +166,7 @@ probabilities_under_30 %>%
 
 ### 10%
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.1) %>% head()
+  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t1" & pedro_prob > 10) %>%
@@ -174,7 +174,7 @@ probabilities_under_30 %>%
 
 ### 20%
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.2) %>% head()
+  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t1" & pedro_prob > 20) %>%
@@ -182,7 +182,7 @@ probabilities_under_30 %>%
 
 ### 30%
 thresholds_UNITED_t1d %>%
-  filter(Thresholds > 0.3) %>% head()
+  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t1" & pedro_prob > 30) %>%
@@ -194,7 +194,7 @@ thresholds_UNITED_t2d <- calculate_thresholds_diagnostics(dataset.UNITED_type2$M
 
 ### 5%
 thresholds_UNITED_t2d %>%
-  filter(Thresholds > 0.05) %>% head()
+  filter(Thresholds > 0.05) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t2" & pedro_prob > 5) %>%
@@ -202,7 +202,7 @@ probabilities_under_30 %>%
 
 ### 10%
 thresholds_UNITED_t2d %>%
-  filter(Thresholds > 0.1) %>% head()
+  filter(Thresholds > 0.1) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t2" & pedro_prob > 10) %>%
@@ -210,7 +210,7 @@ probabilities_under_30 %>%
 
 ### 20%
 thresholds_UNITED_t2d %>%
-  filter(Thresholds > 0.2) %>% head()
+  filter(Thresholds > 0.2) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t2" & pedro_prob > 20) %>%
@@ -218,7 +218,7 @@ probabilities_under_30 %>%
 
 ### 25%
 thresholds_UNITED_t2d %>%
-  filter(Thresholds > 0.25) %>% head()
+  filter(Thresholds > 0.25) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t2" & pedro_prob > 25) %>%
@@ -226,7 +226,7 @@ probabilities_under_30 %>%
 
 ### 30%
 thresholds_UNITED_t2d %>%
-  filter(Thresholds > 0.3) %>% head()
+  filter(Thresholds > 0.3) %>% arrange(Thresholds)  %>% head()
 
 probabilities_under_30 %>%
   filter(which_equation == "t2" & pedro_prob > 30) %>%
