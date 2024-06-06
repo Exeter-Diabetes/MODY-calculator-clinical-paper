@@ -185,7 +185,7 @@ posterior_samples_T2D_obj <- list(post = posterior_samples_T2D$samples)
 class(posterior_samples_T2D_obj) <- "T2D"
 
 ### GAD info only model
-posterior_samples_T1D_sensivity_analysis <- readRDS("model_development/type_1_model_posteriors.rds")
+posterior_samples_T1D_sensivity_analysis <- readRDS("model_development/type_1_model_posteriors_sensivity_analysis.rds")
 
 # ### create object to use for prediction
 posterior_samples_T1D_sensivity_analysis_obj <- list(post = posterior_samples_T1D_sensivity_analysis$samples)
