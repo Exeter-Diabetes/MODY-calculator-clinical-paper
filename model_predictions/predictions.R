@@ -184,6 +184,13 @@ posterior_samples_T2D <- readRDS("model_development/type_2_model_posteriors.rds"
 posterior_samples_T2D_obj <- list(post = posterior_samples_T2D$samples)
 class(posterior_samples_T2D_obj) <- "T2D"
 
+### GAD info only model
+posterior_samples_T1D_sensivity_analysis <- readRDS("model_development/type_1_model_posteriors.rds")
+
+# ### create object to use for prediction
+posterior_samples_T1D_sensivity_analysis_obj <- list(post = posterior_samples_T1D_sensivity_analysis$samples)
+class(posterior_samples_T1D_sensivity_analysis_obj) <- "T1D"
+
 ## Old calculator
 posteriors_samples_old_T1D <- readRDS("model_development/type_1_old_model_posteriors.rds")
 
@@ -211,14 +218,36 @@ convert <- tibble(
 ####################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################
 
+# Sensitivity analysis GAD only info
+
+# Type 1 model
+
+### Predictions from new model with T
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_sensitivity_analysis_with_T_full <- predict(posterior_samples_T1D_sensivity_analysis_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_sensitivity_analysis_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- predictions_dataset.UNITED_type1_sensitivity_analysis_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds")
+
 ####################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################
+
 
 # Type 1 model
 
 ### Predictions from new model no T
 interim <- as_tibble(as.matrix(select(dataset.case_control_type1 %>%
-                                        mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
+                                        mutate(C = NA, A = NA), pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 
 predictions_dataset.case_control_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
@@ -241,7 +270,7 @@ saveRDS(predictions_dataset.case_control_type1_no_T, "model_predictions/predicti
 
 
 interim <- as_tibble(as.matrix(select(dataset.referral_type1 %>%
-                                        mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
+                                        mutate(C = NA, A = NA), pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.referral_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
 
@@ -264,7 +293,7 @@ saveRDS(predictions_dataset.referral_type1_no_T, "model_predictions/predictions_
 
 
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type1 %>%
-                                        mutate(T = NA), pardm, agerec, hba1c, agedx, sex, bmi, T)))
+                                        mutate(C = NA, A = NA), pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.UNITED_type1_no_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
 
@@ -288,7 +317,7 @@ saveRDS(predictions_dataset.UNITED_type1_no_T, "model_predictions/predictions_da
 
 ### Predictions from new model with T
 
-interim <- as_tibble(as.matrix(select(dataset.referral_type1, pardm, agerec, hba1c, agedx, sex, bmi, T)))
+interim <- as_tibble(as.matrix(select(dataset.referral_type1, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.referral_type1_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
 
@@ -311,7 +340,7 @@ saveRDS(predictions_dataset.referral_type1_with_T, "model_predictions/prediction
 
 
 
-interim <- as_tibble(as.matrix(select(dataset.UNITED_type1, pardm, agerec, hba1c, agedx, sex, bmi, T)))
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.UNITED_type1_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms) 
 
