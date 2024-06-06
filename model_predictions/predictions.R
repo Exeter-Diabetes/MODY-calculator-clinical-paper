@@ -222,8 +222,9 @@ convert <- tibble(
 
 # Type 1 model
 
+#UNITED all antibody
 ### Predictions from new model with T
-interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.UNITED_type1_sensitivity_analysis_with_T_full <- predict(posterior_samples_T1D_sensivity_analysis_obj, interim, rcs_parms)
 
@@ -238,6 +239,25 @@ predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- predictions_data
 
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type1_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds")
+
+
+# UNITED gad dataset
+### Predictions from new model with T
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T_full <- predict(posterior_samples_T1D_sensivity_analysis_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T <- predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_sensitivity_analysis_with_T.rds")
 
 ####################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################
