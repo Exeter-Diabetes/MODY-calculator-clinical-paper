@@ -93,7 +93,7 @@ predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/prediction
 predictions_dataset.UNITED_type1_gad_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_with_T.rds")
 predictions_dataset.UNITED_type1_gad_ia2_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T.rds")
 predictions_dataset.UNITED_type1_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_no_T.rds")
-
+predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds")
 
 
 ## Load population representative dataset
@@ -118,6 +118,41 @@ dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers =
                                     ifelse(!is.na(IA2) & (IA2 == 0 & is.na(GAD)), 0,
                                            ifelse(IA2 == 1 | GAD == 1, 1, 0))))))
   )
+
+
+
+
+
+####################################################################################################################################################################################################################
+####################################################################################################################################################################################################################
+
+####################################################################################################################################################################################################################
+####################################################################################################################################################################################################################
+
+# Sensitivity analysis: model fitted with GAD information only vs with all antibody information
+
+plot_differences <- patchwork::wrap_plots(
+  data.frame(
+  prob_sens = predictions_dataset.UNITED_type1_sensitivity_analysis_with_T$prob,
+  prob = predictions_dataset.UNITED_type1_with_T$prob
+) %>%
+  ggplot(aes(x = prob, y = prob_sens)) +
+  geom_point() +
+  xlab("All information probabilities") +
+  ylab("GAD only information probabilities") +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  theme_bw(),
+
+  data.frame(
+    diff = predictions_dataset.UNITED_type1_sensitivity_analysis_with_T$prob - predictions_dataset.UNITED_type1_with_T$prob
+  ) %>%
+  ggplot(aes(x = diff)) +
+  geom_histogram() +
+  xlab("GAD only probabilities - All information probabilities") +
+  theme_bw()
+
+)
+
 
 
 
