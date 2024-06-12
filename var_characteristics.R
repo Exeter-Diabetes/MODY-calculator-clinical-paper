@@ -229,7 +229,6 @@ var_characteristics <- function(varlist = varlist, varlist_cat = varlist_cat, da
     }
     
     #IF WANT MEDIAN & IQR
-    browser()
     if(numeric_option == "medianIQR"){
       summaryTable_mIQR_group <- data.frame(variable = varlist)
       for(g in groups){
@@ -298,5 +297,4 @@ var_characteristics <- function(varlist = varlist, varlist_cat = varlist_cat, da
 
 
 
-#var_characteristics(varlist, varlist_cat, dataset, numeric_option = "medianIQR", group = "insulinRequire3")
-#var_characteristics(varlist, varlist_cat, dataset, numeric_option = "medianIQR")
+
