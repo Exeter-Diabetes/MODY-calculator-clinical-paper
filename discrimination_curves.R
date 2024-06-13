@@ -759,6 +759,65 @@ dev.off()
 
 
 
+plot_prob_boxplot_united <- patchwork::wrap_plots(
+  
+  # Boxplots
+  dataset.UNITED_type1 %>%
+    select(M) %>%
+    rename("Mody" = "M") %>%
+    cbind(
+      prob_with = colMeans(predictions_dataset.UNITED_type1_with_T),
+      prob_without = colMeans(predictions_dataset.UNITED_type1_no_T)
+    ) %>%
+    gather("key", "Probability", -Mody) %>% 
+    mutate(
+      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
+      key = factor(key, levels = c("prob_without", "prob_with"), labels = c("Clinical features", "Clinical features and biomarkers"))
+    ) %>%
+    ggplot() +
+    geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
+    geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_colour_manual(values = c("white", "black")) +
+    scale_alpha_manual(values = c(0, 1)) +
+    facet_wrap(~key) +
+    theme_bw() +
+    theme(
+      legend.position = "none"
+    ),
+  
+  # Boxplots
+  dataset.UNITED_type2 %>%
+    select(M) %>%
+    rename("Mody" = "M") %>%
+    cbind(
+      Probability = colMeans(predictions_dataset.UNITED_type2_new),
+      key = ""
+    ) %>%
+    mutate(
+      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
+    ) %>%
+    ggplot() +
+    geom_boxplot(aes(y = Probability, x = Mody)) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_bw()
+  
+  , ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+pdf("figures/united_boxplot_thin_100.pdf", width = 8, height = 9)
+plot_prob_boxplot_united
+dev.off()
+
+
+
 plot_prob_boxplot_rocs_referral <- patchwork::wrap_plots(
   
   # Panel A - Referral insulin-treated
