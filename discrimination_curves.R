@@ -669,6 +669,153 @@ dev.off()
 
 
 
+plot_prob_rocs_united <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  roc_curves %>%
+    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+    mutate(
+      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+      iteration = 0
+    ) %>%
+    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+    geom_path(
+      data = roc_T1D_no_T_united %>%
+        mutate(
+          Calculator = "Clinical features"
+        ) %>%
+        rbind(
+          roc_T1D_with_T_united %>%
+            mutate(Calculator = "Clinical features and biomarkers")
+        ),
+      aes(group = iteration), colour = "grey"
+    ) + 
+    geom_path() +
+    theme_bw() +
+    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
+    scale_y_continuous("Sensitivity", labels = scales::percent) +
+    scale_x_continuous("1- Specificity", labels = scales::percent) +
+    theme_bw() +
+    geom_label(
+      data = roc_curves %>%
+        select(-sensitivities, -specificities) %>%
+        distinct() %>%
+        mutate(
+          auc = paste0(" AUC:", signif(auc, 2), " "),
+          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+        ) %>%
+        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+        mutate(
+          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+        ),
+      mapping = aes(x = -Inf, y = -Inf, label = auc),
+      size = 7,
+      label.size = NA,
+      hjust = -0.4,
+      vjust = -0.5
+    ) +
+    theme(
+      panel.spacing.x = unit(1.5, "lines")
+    ),
+  
+  roc_curves %>%
+    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+    geom_path(
+      data = roc_T2D_new_united %>%
+        mutate(
+          Calculator = "No Biomarkers"
+        ),
+      aes(group = iteration), colour = "grey"
+    ) +
+    geom_path() +
+    theme_bw() +
+    scale_y_continuous("Sensitivity", labels = scales::percent) +
+    scale_x_continuous("1- Specificity", labels = scales::percent) +
+    theme_bw() +
+    geom_label(
+      data = dat_text %>%
+        filter(Dataset == "UNITED" & Model == "Type 2"),
+      mapping = aes(x = -Inf, y = -Inf, label = auc),
+      size = 7,
+      label.size = NA,
+      hjust = -0.4,
+      vjust = -0.5
+    ),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+pdf("figures/united_roc_thin_100.pdf", width = 8, height = 9)
+plot_prob_rocs_united
+dev.off()
+
+
+
+
+plot_prob_boxplot_united <- patchwork::wrap_plots(
+  
+  # Boxplots
+  dataset.UNITED_type1 %>%
+    select(M) %>%
+    rename("Mody" = "M") %>%
+    cbind(
+      prob_with = colMeans(predictions_dataset.UNITED_type1_with_T),
+      prob_without = colMeans(predictions_dataset.UNITED_type1_no_T)
+    ) %>%
+    gather("key", "Probability", -Mody) %>% 
+    mutate(
+      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
+      key = factor(key, levels = c("prob_without", "prob_with"), labels = c("Clinical features", "Clinical features and biomarkers"))
+    ) %>%
+    ggplot() +
+    geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
+    geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_colour_manual(values = c("white", "black")) +
+    scale_alpha_manual(values = c(0, 1)) +
+    facet_wrap(~key) +
+    theme_bw() +
+    theme(
+      legend.position = "none"
+    ),
+  
+  # Boxplots
+  dataset.UNITED_type2 %>%
+    select(M) %>%
+    rename("Mody" = "M") %>%
+    cbind(
+      Probability = colMeans(predictions_dataset.UNITED_type2_new),
+      key = ""
+    ) %>%
+    mutate(
+      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
+    ) %>%
+    ggplot() +
+    geom_boxplot(aes(y = Probability, x = Mody)) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_bw()
+  
+  , ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+pdf("figures/united_boxplot_thin_100.pdf", width = 8, height = 9)
+plot_prob_boxplot_united
+dev.off()
+
 
 
 plot_prob_boxplot_rocs_referral <- patchwork::wrap_plots(
