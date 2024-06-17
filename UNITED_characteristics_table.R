@@ -52,6 +52,17 @@ library(writexl)
 write_xlsx(UNITED_T1D_table,"UNITED_T1D_table.xlsx")
 write_xlsx(UNITED_T2D_table,"UNITED_T2D_table.xlsx")
 
+#Finding the mean MODY prob for M+ AND M- participants
+#load predictions
+predictions_dataset.UNITED_type2_new <- readRDS("~/model_predictions/predictions_dataset.UNITED_type2_new.rds")
+#bind them
+UNITED_type2 <- cbind(dataset.UNITED_type2,predictions_dataset.UNITED_type2_new)
 
+UNITED_type2 %>%
+  filter(M==0) %>%
+  summarise(mean = mean(prob))
 
+UNITED_type2 %>%
+  filter(M==1) %>%
+  summarise(mean = mean(prob))
 
