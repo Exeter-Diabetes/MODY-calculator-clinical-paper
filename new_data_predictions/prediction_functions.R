@@ -186,7 +186,7 @@ predict.T1D <- function(object, newdata, parms, ...) {
 ### predict method for 'post' objects
 predict.T2D <- function(object, newdata, ...) {
   
-  browser()
+  #browser()
   
   ## check input objects
   stopifnot(class(object) == "T2D")
