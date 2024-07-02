@@ -16,7 +16,6 @@ predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/prediction
 predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T.rds")
 predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new.rds")
 
-
 probabilities_under_30 <- read.delim("data/mody_probabilities_under_30s.txt")
 
 # load functions needed
@@ -148,7 +147,6 @@ dataset.referral_type1 <- formatting(
 
 #### remove downloaded folder
 unlink("data/Julieanne-Pedro-MODY-Referrals-main", recursive = TRUE)
-
 
 
 #:--------------------------------------------
