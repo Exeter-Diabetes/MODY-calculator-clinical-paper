@@ -40,7 +40,7 @@
 # # #  | 1 or 0  |         |         |         | 1 - male   |         | 1 or 0   |
 # # #  |         |         |         |         | 2 - female |         |          |
 # # #  |         |         |         |         |            |         |          |
-# # dataset <- data.frame(cbind(pardm = 1, agerec = 30, hba1c = 7, agedx = 25, sex = 2, bmi = 30, insoroha = 1))
+# dataset <- data.frame(cbind(pardm = 1, agerec = 30, hba1c = 7, agedx = 25, sex = 2, bmi = 30, insoroha = 1))
 # 
 # 
 # ## load data
@@ -66,17 +66,16 @@
 #   apply(., 2, function(x) {
 #     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
 #   }) %>%
-#   bind_rows() 
-# # 
+#   bind_rows()
+# #
 # # ### For T2D model
 # posterior_predictions_T2D <- predict(posterior_samples_T2D_obj, dataset) %>%
 #   apply(., 2, function(x) {
 #     data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
 #   }) %>%
-#   bind_rows() 
+#   bind_rows()
 # 
 # 
-#
 ############################################################################
 ############################################################################
 ############################################################################
@@ -185,8 +184,6 @@ predict.T1D <- function(object, newdata, parms, ...) {
 
 ### predict method for 'post' objects
 predict.T2D <- function(object, newdata, ...) {
-  
-  #browser()
   
   ## check input objects
   stopifnot(class(object) == "T2D")
