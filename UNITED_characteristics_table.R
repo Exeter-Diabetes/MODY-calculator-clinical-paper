@@ -5,7 +5,7 @@ library(nimble)
 library(rms)
 library(tidyverse)
 
-# load functions needed for generating data
+## load functions needed for generating data ----
 source("data/create_data.R")
 
 #load in UNITED type 1 dataset
