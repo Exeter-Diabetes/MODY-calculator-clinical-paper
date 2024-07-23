@@ -13,7 +13,7 @@ var_characteristics <- function(varlist = varlist, varlist_cat = varlist_cat, da
       categories <- unique(dataset[[var_cat]])
       for (cat in categories){
         
-        sumtbl$category <- cat
+        sumtbl$category <- as.character(cat)
         sumtbl$n <- sum(dataset[[var_cat]] == cat, na.rm = TRUE)
         sumtbl$perc <- (sum(dataset[[var_cat]] == cat, na.rm = TRUE)/length(dataset[[var_cat]]))*100
         sumtbl$total <- nrow(dataset[dataset[[var_cat]],])
