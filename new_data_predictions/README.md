@@ -39,7 +39,7 @@ The data should be formatted in the following way:
 ``` r
 # ## load posteriors
 # rcs_parms <- readRDS("rcs_parms.rds")
-# posterior_samples_T1D <- readRDS("type_1_model_posteriors_thin_100.rds")
+# posterior_samples_T1D <- readRDS("type_1_model_posteriors_single_value.rds")
 # 
 # # ### create object to use for prediction
 # posterior_samples_T1D_obj <- list(post = posterior_samples_T1D$samples)
@@ -94,7 +94,7 @@ The data should be formatted in the following way:
 
 ``` r
 # ## load posteriors# 
-# posterior_samples_T2D <- readRDS("type_2_model_posteriors_thin_100.rds")
+# posterior_samples_T2D <- readRDS("type_2_model_posteriors_single_value.rds")
 # 
 # posterior_samples_T2D_obj <- list(post = posterior_samples_T2D$samples)
 # class(posterior_samples_T2D_obj) <- "T2D"

@@ -80,6 +80,10 @@ dataset.case_control_type2 <- create_data(dataset = "case-control t2d")
 dataset.UNITED_type1 <- create_data(dataset = "united t1d")
 dataset.UNITED_type2 <- create_data(dataset = "united t2d")
 
+## Load population representative dataset - all genes
+dataset.UNITED_type1_genes <- create_data(dataset = "united t1d", commonmody = FALSE)
+dataset.UNITED_type2_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
+
 
 
 ## Load population representative dataset
@@ -212,6 +216,52 @@ convert <- tibble(
   PPVT1 = c(0.007, 0.019, 0.026, 0.040, 0.049, 0.064, 0.072, 0.082, 0.126, 0.494),
   PPVT2 = c(0.046, 0.151, 0.210, 0.244, 0.329, 0.358, 0.455, 0.580, 0.624, 0.755)
 )
+
+
+
+####################################################################################################################################################################################################################
+####################################################################################################################################################################################################################
+
+# Predictions for datasets with all MODY genes
+
+# Type 1 model
+### Predictions from new model with T
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T_full <- predict(posterior_samples_T1D_obj, interim, rcs_parms)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T <- predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T.rds")
+
+
+
+# Type 2 model
+
+### Predictions from new model
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type2_genes, pardm, agerec, hba1c, agedx, sex, bmi, insoroha)))
+
+predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new_full <- predict(posterior_samples_T2D_obj, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new_full, "model_predictions/predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new_full.rds")
+
+predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new <- predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new_full%>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new, "model_predictions/predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new.rds")
 
 
 
