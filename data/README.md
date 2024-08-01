@@ -1,4 +1,4 @@
-# Data:
+# Data folder:
 
 This folder contains the data used for the analysis (no data included since it cannot be shared) and the file `create_data.R` which transforms the datasets used into the following format:
 
