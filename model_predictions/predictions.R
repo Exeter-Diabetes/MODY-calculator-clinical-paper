@@ -84,7 +84,8 @@ dataset.UNITED_type2 <- create_data(dataset = "united t2d")
 dataset.UNITED_type1_genes <- create_data(dataset = "united t1d", commonmody = FALSE)
 dataset.UNITED_type2_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
 
-
+## Load population representative dataset - pediatric cases
+dataset.UNITED_type1_young_genes <- create_data(dataset = "united t1d pediatrics", commonmody = FALSE)
 
 ## Load population representative dataset
 dataset.UNITED_type1_gad <- create_data(dataset = "united t1d", biomarkers = "full") %>%
@@ -255,9 +256,30 @@ predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T <- prediction
 saveRDS(predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T.rds")
 
 
+# Type 1 model fitted in UNITED pediatric with all genes 
+### Predictions from new model with T
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_young_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_young_all_genes_with_T_full <- predict(posterior_samples_T1D_all_genes_obj, interim, rcs_parms_all_genes)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_young_all_genes_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_young_all_genes_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_young_all_genes_with_T <- predictions_dataset.UNITED_type1_young_all_genes_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_young_all_genes_with_T, "model_predictions/predictions_dataset.UNITED_type1_young_all_genes_with_T.rds")
+
+
+
+
 # Type 1 model fitted in all genes
 ### Predictions from new model with T
-interim  <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
 
 predictions_dataset.UNITED_type1_all_genes_with_T_full <- predict(posterior_samples_T1D_all_genes_obj, interim, rcs_parms_all_genes)
 

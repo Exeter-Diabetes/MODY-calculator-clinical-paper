@@ -9,7 +9,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
   
   # checks for 'dataset'
   if(missing(dataset) | is.null(dataset)) {stop("'dataset' needs to be provided.")}
-  if(!(tolower(dataset) %in% c("case-control t1d", "case-control t2d", "united t1d", "united t2d"))) {stop("'dataset' needs to be: case-control t1d / case-control t2d / united t1d / united t2d")}
+  if(!(tolower(dataset) %in% c("case-control t1d", "case-control t2d", "united t1d", "united t2d", "united t1d pediatrics"))) {stop("'dataset' needs to be: case-control t1d / case-control t2d / united t1d / united t2d / united t1d pediatrics")}
   # checks for 'biomarkers'
   if(!(tolower(biomarkers) %in% c("reduced", "full"))) {stop("'biomarkers' needs to be: reduced / full")}
   # check forr 'commonmody'
@@ -132,7 +132,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         # Find patients with Genes
         # Remove them from the previous dataset to prevent duplication
         # add them back into the dataset with new values
-       
+        
         interim_genes <- dataset.UNITED %>%
           
           ### select those insulin-treated
@@ -424,7 +424,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       select(-commonmody, -DNAResult) %>%
       
       ### rename variables
-      rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
+      rename(M = mody) %>%
       
       ### select the variables we needed
       select(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M", "id")) %>%
@@ -459,7 +459,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         select(-commonmody, -DNAResult) %>%
         
         ### rename variables
-        rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
+        rename(M = mody) %>%
         
         ### select the variables we needed
         select(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M", "Gene", "id")) %>%
@@ -509,7 +509,165 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         select(-id)
     )
     
+  } else if (tolower(dataset) == "united t1d pediatrics") {
+    
+    if (tolower(biomarkers) == "reduced") {
+      
+      ## load libraries
+      library(readr)
+      library(haven)
+      
+      ## load dataset
+      dataset.UNITEDfull <- read_dta("data/UNITEDfull.dta")
+      dataset.UNITED <- read_csv("data/UNITEDfull.csv")
+      
+      ## select the right patients
+      dataset.UNITED_young_type1 <- dataset.UNITEDfull %>% 
+        
+        ### remove patients used in the other analysis
+        filter(!(id %in% dataset.UNITED$id)) %>% 
+        filter(swpaed != 0) %>%
+
+        ### select the correct variables
+        select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
+               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, id, Gene) %>%
+        
+        ### drop patients without patient history for diabetes
+        drop_na(pardm) %>%
+        
+        ### generate the outcome variables
+        mutate(mody = ifelse(is.na(DNAResult), NA, ifelse(tolower(Gene) %in% c("hnf1a", "hnf4a", "gck"), 1, 0))) %>%
+        
+        ### drop not needed variables
+        select(-DNAResult, -Gene) %>%
+        
+        ### drop patients with missing data in the variables we care about
+        drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+        
+        ### rename variables for biomarkers
+        rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
+        
+        #:--- Lets see it in turns:
+        #:---   For M-:
+        #:---     - 2 were missing C (C+ as we know A == 0) #:----------------------------------------------------------
+      mutate(C = ifelse(M == 0 & A == 0 & is.na(C), 1, C)) %>%
+        #:---   For M+:
+        #:---     - 1 was C+ and missing A (needs to be A-) #:--------------------------------------------------------
+      mutate(A = ifelse(M == 1 & C == 1 & is.na(A), 0, A)) %>%
+        #:---     - 1 was missing C and missing A (needs to be C+ and A-)
+        mutate(A = ifelse(M == 1 & is.na(C) & is.na(A), 0, A)) %>%
+        mutate(C = ifelse(M == 1 & is.na(C) & A == 0, 1, C)) %>%
+        mutate(A = ifelse(M == 0 & C == 1 & is.na(A), 0, A)) %>%
+        mutate(C = ifelse(!is.na(M), 1, C)) %>%
+        mutate(A = ifelse(!is.na(M), 0, A)) %>%
+        #:---   For missing M:
+        #:---     - it doesn't matter, there is no one with C+ and A-
+        mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
+        ### make sure it is a data.frame() for use in R
+        as.data.frame()
+      
+      
+      
+      if (!isTRUE(commonmody)) {
+        # Find patients with Genes
+        # Remove them from the previous dataset to prevent duplication
+        # add them back into the dataset with new values
+        
+        interim_genes <- dataset.UNITEDfull %>%
+          
+          ### remove patients used in the other analysis
+          filter(!(id %in% dataset.UNITED$id)) %>% 
+          filter(swpaed != 0) %>%
+          
+          ### keep only patients with Genes
+          drop_na(Gene) %>%
+          filter(Gene != "") %>%
+          
+          ### select the correct variables
+          select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
+                 pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
+          
+          ### drop patients without patient history for diabetes
+          drop_na(pardm) %>%
+          
+          ### generate the outcome variables
+          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          
+          ### drop not needed variables
+          select(-DNAResult) %>%
+          
+          ### drop patients with missing data in the variables we care about
+          drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+          
+          ### rename variables for biomarkers
+          rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
+          
+          #:--- Lets see it in turns:
+          #:---   For M-:
+          #:---     - 2 were missing C (C+ as we know A == 0) #:----------------------------------------------------------
+        mutate(C = ifelse(M == 0 & A == 0 & is.na(C), 1, C)) %>%
+          #:---   For M+:
+          #:---     - 1 was C+ and missing A (needs to be A-) #:--------------------------------------------------------
+        mutate(A = ifelse(M == 1 & C == 1 & is.na(A), 0, A)) %>%
+          #:---     - 1 was missing C and missing A (needs to be C+ and A-)
+          mutate(A = ifelse(M == 1 & is.na(C) & is.na(A), 0, A)) %>%
+          mutate(C = ifelse(M == 1 & is.na(C) & A == 0, 1, C)) %>%
+          mutate(A = ifelse(M == 0 & C == 1 & is.na(A), 0, A)) %>%
+          #:---   For missing M:
+          #:---     - it doesn't matter, there is no one with C+ and A-
+          mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
+          
+          ### make sure it is a data.frame() for use in R
+          as.data.frame()
+        
+        # join additional MODY cases
+        dataset.UNITED_young_type1 <- dataset.UNITED_young_type1 %>%
+          
+          # remove repeated patients
+          filter(!(id %in% interim_genes$id)) %>%
+          
+          # join them back in
+          rbind(
+            
+            interim_genes %>%
+              
+              # remove Gene variable
+              select(-Gene)
+            
+          ) %>%
+          
+          # join Gene variable back in but for everyone
+          left_join(
+            
+            dataset.UNITEDfull %>%
+              
+              # select id and Gene
+              select(id, Gene),
+            
+            by = c("id")
+          )
+        
+      }
+      
+      ## return final dataset
+      return(
+        
+        dataset.UNITED_young_type1 %>%
+          
+          # remove id
+          select(-id)
+      )
+      
+    } else if (tolower(biomarkers) == "full") {
+      
+      print("This has not been coded.")
+      
+    }
+    
+    
   }
+  
+  
   
   # referral t1d
   
