@@ -8,6 +8,7 @@
 library(tidyverse)
 library(nimble)
 library(pROC)
+library(PRROC)
 
 # load functions needed
 source("data/create_data.R")
@@ -16,10 +17,12 @@ source("new_data_predictions/prediction_functions.R")
 # load files required
 predictions_dataset.UNITED_type1_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_no_T_full.rds")
 predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
 # predictions_dataset.referral_type1_no_T <- readRDS("model_predictions/predictions_dataset.referral_type1_no_T_full.rds")
 # predictions_dataset.referral_type1_with_T <- readRDS("model_predictions/predictions_dataset.referral_type1_with_T_full.rds")
 
 predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new_full.rds")
+predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
 # predictions_dataset.referral_type2_new <- readRDS("model_predictions/predictions_dataset.referral_type2_new_full.rds")
 
 
@@ -32,6 +35,16 @@ dataset.UNITED_type1 <- create_data(dataset = "united t1d") %>%
   mutate(M = ifelse(is.na(M), 0, M))
 
 dataset.UNITED_type2 <- create_data(dataset = "united t2d")
+
+## Load population representative dataset
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+  
+  ## if MODY testing missing, change to 0
+  mutate(M = ifelse(is.na(M), 0, M))
+
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
+
+
 
 ## Load referrals dataset
 ### load in Referral repository
@@ -140,6 +153,44 @@ auc_T2D_no_T_united <- calc_auroc(dataset.UNITED_type2$M, predictions_dataset.UN
 # 
 # ## Type 2 referrals
 # auc_T2D_no_T_referrals <- calc_auroc(dataset.referral_type2$M, predictions_dataset.referral_type2_new, thinning = 100)
+
+
+
+
+#:------------------------------------------------------------
+
+# Calculate AUROC with intervals
+calc_auc_pr <- function(data, predictions, class1, thinning = 100) {
+  
+  output <- NULL
+  
+  for (i in seq(1, nrow(predictions), thinning)) {
+    
+    interim <- data.frame(
+      resp = data,
+      pred = predictions[i,]
+    )
+    
+    ## calculate auc pr
+    interim_curve <- pr.curve(
+      scores.class1 = interim %>% filter(resp != class1) %>% select(pred) %>% unlist(), 
+      scores.class0 = interim %>% filter(resp == class1) %>% select(pred) %>% unlist(), 
+      curve = FALSE)
+
+    
+    ## append new value
+    output <- c(output, as.numeric(interim_curve$auc.integral))
+    
+  }
+  
+  return(output)
+  
+}
+
+## Type 1 UNITED
+
+# all genes
+pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, class1 = 1, thinning = 100)
 
 
 #:------------------------------------------------------------
@@ -304,6 +355,30 @@ calc_prec_recal_curve <- function(data, predictions, thinning = 100) {
   return(output)
   
 }
+
+
+
+
+## Type 1 UNITED all genes
+
+### Biomarker models
+prec_recal_T1D_all_genes_with_T_united <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 100)
+
+# plot for ROC with grey being iterations, black being the ROC for average prediction
+plot_prec_recal_T1D_all_genes_with_T_united <- ggplot() +
+  ## all iterations
+  geom_path(
+    data = prec_recal_T1D_all_genes_with_T_united,
+    aes(x = recall, y= precision, group = iteration), colour = "grey"
+  ) +
+  ## average predictions
+  geom_path(
+    data = pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)), ret = c("precision", "recall")) %>%
+      as.data.frame(),
+    aes(x = recall, y= precision), colour = "black"
+  )
+
+
 
 ## Type 1 UNITED
 
