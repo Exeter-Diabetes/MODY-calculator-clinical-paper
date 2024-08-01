@@ -188,6 +188,19 @@ posterior_samples_T2D <- readRDS("model_development/type_2_model_posteriors.rds"
 posterior_samples_T2D_obj <- list(post = posterior_samples_T2D$samples)
 class(posterior_samples_T2D_obj) <- "T2D"
 
+### All genes
+rcs_parms_all_genes <- readRDS("model_development/rcs_parms_all_genes.rds")
+posteriors_samples_T1D_all_genes <- readRDS("model_development/type_1_model_posteriors_all_genes.rds")
+
+# ### create object to use for prediction
+posterior_samples_T1D_all_genes_obj <- list(post = posteriors_samples_T1D_all_genes$samples)
+class(posterior_samples_T1D_all_genes_obj) <- "T1D"
+
+posterior_samples_T2D_all_genes <- readRDS("model_development/type_2_model_posteriors_all_genes.rds")
+
+posterior_samples_T2D_all_genes_obj <- list(post = posterior_samples_T2D_all_genes$samples)
+class(posterior_samples_T2D_all_genes_obj) <- "T2D"
+
 ### GAD info only model
 posterior_samples_T1D_sensivity_analysis <- readRDS("model_development/type_1_model_posteriors_sensivity_analysis.rds")
 
@@ -218,7 +231,6 @@ convert <- tibble(
 )
 
 
-
 ####################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################
 
@@ -243,6 +255,56 @@ predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T <- prediction
 saveRDS(predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T, "model_predictions/predictions_dataset.UNITED_type1_genes_sensitivity_analysis_with_T.rds")
 
 
+# Type 1 model fitted in all genes
+### Predictions from new model with T
+interim  <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- predict(posterior_samples_T1D_all_genes_obj, interim, rcs_parms_all_genes)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_all_genes_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_all_genes_with_T, "model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+
+
+
+### Type 1 old model
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex)))
+
+predictions_dataset.UNITED_type1_all_genes_old_full <- predict(posteriors_samples_old_T1D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_all_genes_old_full, "model_predictions/predictions_dataset.UNITED_type1_all_genes_old_full.rds")
+
+predictions_dataset.UNITED_type1_all_genes_old <- predictions_dataset.UNITED_type1_all_genes_old_full%>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x))
+  }) %>%
+  bind_rows()
+
+for (i in 1:nrow(predictions_dataset.UNITED_type1_all_genes_old)) {
+  prob <- predictions_dataset.UNITED_type1_all_genes_old[i,]
+  prob <- 10 * ((round(prob  * 100, 0)) %/% 10)
+  if (prob == 100) {
+    predictions_dataset.UNITED_type1_all_genes_old[i,] <- convert$PPVT1[10]
+  } else {
+    predictions_dataset.UNITED_type1_all_genes_old[i,] <- convert$PPVT1[convert$threshold == prob]
+  }
+}
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_all_genes_old, "model_predictions/predictions_dataset.UNITED_type1_all_genes_old.rds")
+
+
+
 
 # Type 2 model
 
@@ -263,6 +325,54 @@ predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new <- predictions_d
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new, "model_predictions/predictions_dataset.UNITED_type2_genes_sensitivity_analysis_new.rds")
 
+
+# Type 2 model all genes
+
+### Predictions from new model
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type2_genes, pardm, agerec, hba1c, agedx, sex, bmi, insoroha)))
+
+predictions_dataset.UNITED_type2_all_genes_new_full <- predict(posterior_samples_T2D_all_genes_obj, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_all_genes_new_full, "model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+
+predictions_dataset.UNITED_type2_all_genes_new <- predictions_dataset.UNITED_type2_all_genes_new_full%>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_all_genes_new, "model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
+
+
+### Type 2 old model
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type2_genes, agedx, bmi, hba1c, pardm, agerec, insoroha, sex)))
+
+predictions_dataset.UNITED_type2_all_genes_old_full <- predict(posteriors_samples_old_T2D, interim) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_all_genes_old_full, "model_predictions/predictions_dataset.UNITED_type2_all_genes_old_full.rds")
+
+predictions_dataset.UNITED_type2_all_genes_old <- predictions_dataset.UNITED_type2_all_genes_old_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x))
+  }) %>%
+  bind_rows()
+
+for (i in 1:nrow(predictions_dataset.UNITED_type2_all_genes_old)) {
+  prob <- predictions_dataset.UNITED_type2_all_genes_old[i,]
+  prob <- 10 * ((round(prob  * 100, 0)) %/% 10)
+  if (prob == 100) {
+    predictions_dataset.UNITED_type2_all_genes_old[i,] <- convert$PPVT2[10]
+  } else {
+    predictions_dataset.UNITED_type2_all_genes_old[i,] <- convert$PPVT2[convert$threshold == prob]
+  }
+}
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type2_all_genes_old, "model_predictions/predictions_dataset.UNITED_type2_all_genes_old.rds")
 
 
 ####################################################################################################################################################################################################################
