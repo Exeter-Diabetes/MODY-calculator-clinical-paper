@@ -19,6 +19,9 @@ This repository contains the code for
 4.   `model_predictions`: Vectors containing MODY probability estimations for all of the datasets used (`_full.rds` represents the full posterior dataset, its omission represents the summary results (2.5%, mean, 97.5%))
 
 
--   `new_data_predictions`: R code + data for making predictions in new datasets
+5.   `new_data_predictions`: R code + data + Excel document for making predictions in new datasets
 
 
+## File explanation
+
+1. `discrimination_curves.R`: this file contains the R code for calculating and plotting ROC and Precision-recall curves.
