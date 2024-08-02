@@ -22,6 +22,10 @@ This repository contains the code for
 5.   `new_data_predictions`: R code + data + Excel document for making predictions in new datasets
 
 
+6.   `bootstrap_riley_simulation`: R code for a simulation study on stability of model predictions based on bootstrapped datasets.
+
+
 ## File explanation
 
-1. `discrimination_curves.R`: this file contains the R code for calculating and plotting ROC and Precision-recall curves.
+- `discrimination_curves.R`: this file contains the R code for calculating and plotting ROC and Precision-recall curves.
+- `bootstrap_validation_analysis.R`: this file contains the R code for making calibration plots of bootstrapped datasets.
