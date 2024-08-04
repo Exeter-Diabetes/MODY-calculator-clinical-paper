@@ -7,8 +7,6 @@
 #########################################################################
 
 
-dir.create("output")
-
 ### Load libraries
 library(tidyverse)
 library(modelr)
@@ -29,7 +27,7 @@ nburn = 10000
 library(foreach)
 
 # collect number of cores
-n.cores <- 14
+n.cores <- 10
 
 #create the cluster
 my.cluster <- parallel::makeCluster(
@@ -42,8 +40,6 @@ doParallel::registerDoParallel(cl = my.cluster)
 
 #check if it is registered (optional)
 foreach::getDoParRegistered()
-
-
 
 
 
@@ -67,7 +63,6 @@ united <- create_data(dataset = "united t1d", biomarkers = "reduced", commonmody
 ### set up seeds for the draws
 seeds <- sample(1:1000000, number_simulations)
 
-set.seed(123)
 dataset_bootstrap <- modelr::bootstrap(united, number_simulations)
 
 
@@ -89,7 +84,7 @@ simulation <- foreach(iterations = 1:number_simulations) %dopar% {
   
   
   ## load functions
-  source("prediction_functions.R")
+  source("new_data_predictions/prediction_functions.R")
   
   # Model fitting
   
@@ -345,7 +340,7 @@ simulation <- list(
 
 
 ### save output
-saveRDS(simulation, "bootstrap_riley_simulation/output/simulation_t1d.rds")
+saveRDS(simulation, "bootstrap_riley_simulation/output/simulation_t1d_10.rds")
 
 
 

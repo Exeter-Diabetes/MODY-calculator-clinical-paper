@@ -7,8 +7,6 @@
 #########################################################################
 
 
-dir.create("output")
-
 ### Load libraries
 library(tidyverse)
 library(modelr)
@@ -29,7 +27,7 @@ nburn = 10000
 library(foreach)
 
 # collect number of cores
-n.cores <- 14
+n.cores <- 10
 
 #create the cluster
 my.cluster <- parallel::makeCluster(
@@ -87,7 +85,7 @@ simulation <- foreach(iterations = 1:number_simulations) %dopar% {
   
   
   ## load functions
-  source("prediction_functions.R")
+  source("new_data_predictions/prediction_functions.R")
   
   # Model fitting
   
