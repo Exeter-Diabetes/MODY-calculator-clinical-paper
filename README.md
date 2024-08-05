@@ -30,3 +30,4 @@ This repository contains the code for
 - `discrimination_curves.R`: this file contains the R code for calculating and plotting ROC and Precision-recall curves.
 - `bootstrap_validation_analysis.R`: this file contains the R code for making calibration plots of bootstrapped datasets.
 - `model_convergence.R`: this file contains the R code for checking model convergence in the main models used for this analysis.
+- `calibration_plots.R`: this file contains the R code for creating the calibration plots for the datasets used.

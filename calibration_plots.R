@@ -10,12 +10,12 @@ library(ggplot2)
 library(patchwork)
 
 # load files required
-predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
-predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
 
 
-predictions_dataset.UNITED_type1_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
-predictions_dataset.UNITED_type2_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type2_all_genes_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
 
 
 # load functions needed
@@ -24,11 +24,11 @@ source("data/create_data.R")
 
 
 ## Load population representative dataset
-dataset.UNITED_type1 <- create_data(dataset = "united t1d")
-  # ## if MODY testing missing, change to 0
-  # mutate(M = ifelse(is.na(M), 0, M))    # we don't do this to make the plotting easier since these patients don't have biomarkers and hence their probability is <0.001
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE)
+# ## if MODY testing missing, change to 0
+# mutate(M = ifelse(is.na(M), 0, M))    # we don't do this to make the plotting easier since these patients don't have biomarkers and hence their probability is <0.001
 
-dataset.UNITED_type2 <- create_data(dataset = "united t2d") %>%
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
@@ -50,22 +50,26 @@ legend_dataset <- cbind(
 ) %>%
   as.data.frame()
 
-grouping_values_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))] %>% quantile(probs = c(0.6, 0.8))
+grouping_values_UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T$prob[which(!is.na(dataset.UNITED_type1_all_genes$M))] %>% quantile(probs = c(0.25, 0.5, 0.75))
 
-plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_full[,which(!is.na(dataset.UNITED_type1$M))] %>%
+# Create the points needed for the plot
+## Calculate points for patients with MODY tested
+## Calculate points for patients without MODY tested (assumed negative)
+### Done separately because there is such a big amount of people not tested
+plot_calibration_UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T_full[,which(!is.na(dataset.UNITED_type1_all_genes$M))] %>%
   as.data.frame() %>%
   t() %>%
   as.data.frame() %>%
   gather() %>%
   cbind(
-    group = predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))],
-    M = dataset.UNITED_type1$M[!is.na(dataset.UNITED_type1$M)]
+    group = predictions_dataset.UNITED_type1_all_genes_with_T$prob[which(!is.na(dataset.UNITED_type1_all_genes$M))],
+    M = dataset.UNITED_type1_all_genes$M[!is.na(dataset.UNITED_type1_all_genes$M)]
   ) %>%
   mutate(
-    group = ifelse(group < grouping_values_UNITED_type1_with_T[1], 1,
-                   ifelse(group < grouping_values_UNITED_type1_with_T[2], 2,
-                          ifelse(group < grouping_values_UNITED_type1_with_T[3], 3,
-                                 ifelse(group < grouping_values_UNITED_type1_with_T[4], 4, 5))))
+    group = ifelse(group < grouping_values_UNITED_type1_all_genes_with_T[1], 1,
+                   ifelse(group < grouping_values_UNITED_type1_all_genes_with_T[2], 2,
+                          ifelse(group < grouping_values_UNITED_type1_all_genes_with_T[3], 3,
+                                 ifelse(group < grouping_values_UNITED_type1_all_genes_with_T[4], 4, 5))))
   ) %>%
   group_by(group) %>%
   mutate(
@@ -83,6 +87,32 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
   ungroup() %>%
   select(-key, -value, -group, -M) %>%
   distinct() %>%
+  rbind(
+    # only plotting one patient since they are all the same
+    predictions_dataset.UNITED_type1_all_genes_with_T_full[,which(is.na(dataset.UNITED_type1_all_genes$M))[1]] %>%
+      as.data.frame() %>%
+      gather() %>%
+      cbind(
+        M = dataset.UNITED_type1_all_genes$M[is.na(dataset.UNITED_type1_all_genes$M)][1]
+      ) %>%
+      mutate(
+        M = 0 # need to do this because M is missing
+      ) %>%
+      mutate(
+        x = quantile(value, probs = c(0.5)),
+        y = sum(M)/n(),
+        xmin = quantile(value, probs = c(0.025)),
+        xmin_75 = quantile(value, probs = c(0.125)),
+        xmin_50 = quantile(value, probs = c(0.25)),
+        xmin_25 = quantile(value, probs = c(0.375)),
+        xmax_25 = quantile(value, probs = c(0.625)),
+        xmax_50 = quantile(value, probs = c(0.75)),
+        xmax_75 = quantile(value, probs = c(0.875)),
+        xmax = quantile(value, probs = c(0.975))
+      ) %>%
+      select(-key, -value, -M) %>%
+      distinct() 
+  ) %>%
   ggplot(aes(x = x, y = y)) +
   geom_abline(aes(intercept = 0, slope = 1)) +
   geom_ribbon(aes(xmin = xmin, xmax = xmax), alpha = 0.1) +
@@ -100,7 +130,7 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
   ylab("Observed probability") +
   guides(alpha = guide_legend(title = "Credible interval")) +
   scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
-  coord_cartesian(ylim =c(0, 0.3), xlim =c(0, 1)) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
   scale_y_continuous(labels = scales::percent) +
   scale_x_continuous(labels = scales::percent) +
   theme(
@@ -112,24 +142,24 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
 
 
 
-grouping_values_UNITED_type2_new <- predictions_dataset.UNITED_type2_new$prob[which(!is.na(dataset.UNITED_type2$M))] %>% quantile(probs = c(0.2, 0.8))
+grouping_values_UNITED_type2_all_genes_new <- predictions_dataset.UNITED_type2_all_genes_new$prob[which(!is.na(dataset.UNITED_type2_all_genes$M))] %>% quantile(probs = c(0.25, 0.5, 0.75))
 
 
 
-plot_calibration_UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %>%
+plot_calibration_UNITED_type2_all_genes_new <- predictions_dataset.UNITED_type2_all_genes_new_full %>%
   as.data.frame() %>%
   t() %>%
   as.data.frame() %>%
   gather() %>%
   cbind(
-    group = predictions_dataset.UNITED_type2_new$prob,
-    M = dataset.UNITED_type2$M
+    group = predictions_dataset.UNITED_type2_all_genes_new$prob,
+    M = dataset.UNITED_type2_all_genes$M
   ) %>%
   mutate(
-    group = ifelse(group < grouping_values_UNITED_type2_new[1], 1,
-                   ifelse(group < grouping_values_UNITED_type2_new[2], 2,
-                          ifelse(group < grouping_values_UNITED_type2_new[3], 3,
-                                 ifelse(group < grouping_values_UNITED_type2_new[4], 4, 5))))
+    group = ifelse(group < grouping_values_UNITED_type2_all_genes_new[1], 1,
+                   ifelse(group < grouping_values_UNITED_type2_all_genes_new[2], 2,
+                          ifelse(group < grouping_values_UNITED_type2_all_genes_new[3], 3,
+                                 ifelse(group < grouping_values_UNITED_type2_all_genes_new[4], 4, 5))))
   ) %>%
   mutate(group = factor(group, levels = c(1, 2, 3, 4, 5))) %>%
   group_by(group) %>%
@@ -165,7 +195,7 @@ plot_calibration_UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %
   ylab("Observed probability") +
   guides(alpha = guide_legend(title = "Credible interval")) +
   scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
-  coord_cartesian(ylim =c(0, 0.6), xlim =c(0, 1)) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
   scale_y_continuous(labels = scales::percent) +
   scale_x_continuous(labels = scales::percent) +
   theme(
@@ -181,9 +211,9 @@ plot_calibration_UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %
 
 plot_calibration <- patchwork::wrap_plots(
   
-  plot_calibration_UNITED_type1_with_T,
+  plot_calibration_UNITED_type1_all_genes_with_T,
   
-  plot_calibration_UNITED_type2_new,
+  plot_calibration_UNITED_type2_all_genes_new,
   
   ncol = 1
   
