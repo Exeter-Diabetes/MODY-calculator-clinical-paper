@@ -127,16 +127,21 @@ calc_auc_pr <- function(data, predictions, class1 = 1, thinning = 100) {
 
 ### No biomarker models
 pr_auc_T1D_no_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 10)
-quantile(pr_auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+# quantile(pr_auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+# # 2.5%        50%      97.5% 
+# # 0.04250751 0.05390676 0.06547222 
 
 ### Biomarker models
 pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 10)
-quantile(pr_auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+# quantile(pr_auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+# # 2.5%       50%     97.5% 
+# # 0.2409521 0.2762885 0.3101404 
 
 ## Type 2 UNITED
 pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
-quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-
+# quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+# # 2.5%       50%     97.5% 
+# # 0.5937558 0.6170095 0.6440505 
 
 #:------------------------------------------------------------
 
