@@ -12,7 +12,8 @@ source("data/create_data.R")
 # load function needed for generating patient characteristics table
 source("var_characteristics.R")
 
-#load in UNITED type 1 dataset -----------------------------------------------------
+#load in UNITED type 1 datasets -----------------------------------------------------
+## Just 3 genes ------------------------------------------------------------------------------
 #M = MODY status (NA = not tested for MODY (i.e. T=1), 1 = tested for MODY (T=0) and positive, 0 = tested for MODY (T=0) and negative)
 #C = c-peptide status (1 = UCPCR >= 0.2; 0 = UCPCR < 0.2)
 #A = antibody status (1 = 1+ positive antibody, 0 = all antibodies tested negative)
@@ -27,34 +28,61 @@ dataset.UNITED_type1 <- dataset.UNITED_type1 %>%
 #checked if worked: should have M=1 (n=7) & M=0 (n=1164)
 table(dataset.UNITED_type1$M)
 
-#load in UNITED type 2 dataset ----------------------------------------------------------
+## All genes ---------------------------------------------------------------------------------------
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+  ## if MODY testing missing, change to 0
+  mutate(M = ifelse(is.na(M), 0, M))
+
+#load in UNITED type 2 datasets ----------------------------------------------------------
+## Just 3 genes ----------------------------------------------------------------------------------------
 dataset.UNITED_type2 <- create_data(dataset = "united t2d")
+## all genes -----------------------------------------------------------------------------------------------
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
 
 
 #Produce characteristics tables ------------------------------------------------------------
-# for early-insulin-treated ----------------------------------------------------------------
+## for early-insulin-treated ----------------------------------------------------------------
 #create varlist (numeric variables of interest names)
 varlist_T1D = c("agedx","agerec", "bmi", "hba1c")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat_T1D = c("sex", "pardm", "insoroha", "C", "A", "T")
+### for 3 genes ----------------------------------------------------------------------------------
 #create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
 var_characteristics(varlist = varlist_T1D, varlist_cat = varlist_cat_T1D, dataset = dataset.UNITED_type1, numeric_option = "medianIQR", group = "M")
-
 #save as
 UNITED_T1D_table <- as.data.frame(summaryTable_GROUP_missing)
 write_xlsx(UNITED_T1D_table,"UNITED_T1D_table.xlsx")
+
+### for all genes ----------------------------------------------------------------------------------------
+#create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
+var_characteristics(varlist = varlist_T1D, varlist_cat = varlist_cat_T1D, dataset = dataset.UNITED_type1_all_genes, numeric_option = "medianIQR", group = "M")
+#save as
+UNITED_T1D_all_genes_table <- as.data.frame(summaryTable_GROUP_missing)
+write_xlsx(UNITED_T1D_all_genes_table,"UNITED_T1D_all_genes_table.xlsx")
 
 ## for not-early-insulin-treated ----------------------------------------------------------
 #create varlist (numeric variables of interest names)
 varlist_T2D = c("agedx","agerec", "bmi", "hba1c")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat_T2D = c("sex", "pardm", "insoroha")
+### for 3 genes --------------------------------------------------------------------------
 #create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
 var_characteristics(varlist = varlist_T2D, varlist_cat = varlist_cat_T2D, dataset = dataset.UNITED_type2, numeric_option = "medianIQR", group = "M")
 
 #save as
 UNITED_T2D_table <- as.data.frame(summaryTable_GROUP_missing)
 write_xlsx(UNITED_T2D_table,"UNITED_T2D_table.xlsx")
+
+### for all genes -------------------------------------------------------------------------------------
+#create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
+var_characteristics(varlist = varlist_T2D, varlist_cat = varlist_cat_T2D, dataset = dataset.UNITED_type2_all_genes, numeric_option = "medianIQR", group = "M")
+
+#save as
+UNITED_T2D_all_genes_table <- as.data.frame(summaryTable_GROUP_missing)
+write_xlsx(UNITED_T2D_all_genes_table,"UNITED_T2D_all_genes_table.xlsx")
+
+
+
 
 #Finding the mean MODY prob for M+ AND M- participants
 #load predictions
