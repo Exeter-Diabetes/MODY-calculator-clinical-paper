@@ -12,8 +12,8 @@ library(patchwork)
 
 # load parameters
 
-type_1_model_posteriors <- readRDS("model_development/type_1_model_posteriors.rds")
-type_2_model_posteriors <- readRDS("model_development/type_2_model_posteriors.rds")
+type_1_model_posteriors <- readRDS("model_development/type_1_model_posteriors_all_genes.rds")
+type_2_model_posteriors <- readRDS("model_development/type_2_model_posteriors_all_genes.rds")
 
 
 # Calculate r hat values
