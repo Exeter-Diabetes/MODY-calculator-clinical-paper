@@ -8,11 +8,42 @@
 # load libraries
 library(nimble)
 library(rms)
+library(pROC)
 library(tidyverse)
 library(patchwork)
 
 # load functions needed for generating data
 source("data/create_data.R")
+
+# Calculate ROC with intervals
+calc_roc <- function(data, predictions, thinning = 100) {
+  
+  output <- NULL
+  
+  # sequence to iterate through
+  sequence_list <- seq(1, nrow(predictions), thinning)
+  
+  for (i in 1:length(sequence_list)) {
+    
+    # print the current iteration
+    if (i %% 1000 == 0) {
+      print(paste(i, "out of", length(sequence_list)))
+    }
+    
+    ## calculate ROC
+    interim <- pROC::roc(response = data, predictor = predictions[sequence_list[i],], levels = c(0,1), direction = "<") %>%
+      magrittr::extract(c(2:3)) %>%
+      as.data.frame() %>%
+      mutate(iteration = paste0(sequence_list[i]))
+    
+    output <- rbind(output, interim)
+    
+  }
+  
+  return(output)
+  
+}
+
 
 calculate_thresholds_diagnostics <- function(response, prediction, unique = FALSE) {
   
@@ -90,8 +121,13 @@ calculate_thresholds_diagnostics <- function(response, prediction, unique = FALS
 
 # Predictions
 predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
-predictions_dataset.UNITED_type1_gad_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_with_T.rds")
-predictions_dataset.UNITED_type1_gad_ia2_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T.rds")
+predictions_dataset.UNITED_type1_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_gad_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T.rds")
+predictions_dataset.UNITED_type1_gad_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T.rds")
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full.rds")
 predictions_dataset.UNITED_type1_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_no_T.rds")
 predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds")
 
@@ -101,13 +137,15 @@ predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("model_p
 
 dataset.UNITED_type1 <- create_data(dataset = "united t1d", biomarkers = "reduced")
 
-dataset.UNITED_type1_gad <- create_data(dataset = "united t1d", biomarkers = "full") %>%
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", biomarkers = "reduced", commonmody = FALSE)
+
+dataset.UNITED_type1_gad_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
   
   # check if the antibody variable in question is recorded
   mutate(A = GAD)
 
 
-dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers = "full") %>%
+dataset.UNITED_type1_gad_ia2_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
   
   # check if the antibody variable in question is recorded
   mutate(
@@ -168,66 +206,157 @@ plot_differences <- patchwork::wrap_plots(
 # Table information
 thresholds_UNITED_t1d_no_T <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T$prob)
 
-thresholds_UNITED_t1d <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_with_T$prob)
+thresholds_UNITED_t1d_all_genes <- calculate_thresholds_diagnostics(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T$prob)
 
-thresholds_UNITED_t1d_gad <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad$M, predictions_dataset.UNITED_type1_gad_with_T$prob)
+thresholds_UNITED_t1d_gad_all_genes <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad_all_genes$M, predictions_dataset.UNITED_type1_gad_all_genes_with_T$prob)
 
-thresholds_UNITED_t1d_gad_ia2 <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad_ia2$M, predictions_dataset.UNITED_type1_gad_ia2_with_T$prob)
+thresholds_UNITED_t1d_gad_ia2_all_genes <- calculate_thresholds_diagnostics(dataset.UNITED_type1_gad_ia2_all_genes$M, predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T$prob)
 
 
 ### 5%
 thresholds_UNITED_t1d_no_T %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
 
-thresholds_UNITED_t1d_gad %>%
+thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
 
-thresholds_UNITED_t1d_gad_ia2 %>%
+thresholds_UNITED_t1d_gad_ia2_all_genes %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d %>%
+thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
 ### 10%
 thresholds_UNITED_t1d_no_T %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds) %>% head()
 
-thresholds_UNITED_t1d_gad %>%
+thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d_gad_ia2 %>%
+thresholds_UNITED_t1d_gad_ia2_all_genes %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d %>%
+thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 ### 20%
 thresholds_UNITED_t1d_no_T %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds) %>% head()
 
-thresholds_UNITED_t1d_gad %>%
+thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d_gad_ia2 %>%
+thresholds_UNITED_t1d_gad_ia2_all_genes %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d %>%
+thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 ### 30%
 thresholds_UNITED_t1d_no_T %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds) %>% head()
 
-thresholds_UNITED_t1d_gad %>%
+thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d_gad_ia2 %>%
+thresholds_UNITED_t1d_gad_ia2_all_genes %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
-thresholds_UNITED_t1d %>%
+thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
 
 
+#################################
+
+# Roc curves
+
+### GAD only 
+roc_T1D_with_T_united_gad_all_genes <- calc_roc(dataset.UNITED_type1_gad_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictions_dataset.UNITED_type1_gad_all_genes_with_T_full, thinning = 1000)
+
+# AUC ROC
+auc_roc_T1D_with_T_united_gad_all_genes <- unname(data.frame(prob = predictions_dataset.UNITED_type1_gad_all_genes_with_T$prob) %>%
+                                                    cbind(Mody = dataset.UNITED_type1_gad_all_genes$M) %>%
+                                                    mutate(Mody = ifelse(is.na(Mody), 0, Mody)) %>%
+                                                    pROC::roc(response = Mody, predictor = prob) %>%
+                                                    magrittr::extract(c(9)) %>%
+                                                    unlist())
+
+# plot for ROC with grey being iterations, black being the ROC for average prediction
+plot_roc_T1D_with_T_united_gad_all_genes <- ggplot() +
+  ## all iterations
+  geom_path(
+    data = roc_T1D_with_T_united_gad_all_genes,
+    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+  ) +
+  ## average predictions
+  geom_path(
+    data = pROC::roc(response = dataset.UNITED_type1_gad_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictor = predictions_dataset.UNITED_type1_gad_all_genes_with_T$prob, levels = c(0,1), direction = "<") %>%
+      magrittr::extract(c(2:3)) %>%
+      as.data.frame(),
+    aes(x = 1-specificities, y= sensitivities), colour = "black"
+  ) +
+  theme_bw() +
+  scale_y_continuous("Sensitivity", labels = scales::percent) +
+  scale_x_continuous("1- Specificity", labels = scales::percent)
+
+
+### GAD and IA2
+roc_T1D_with_T_united_gad_ia2_all_genes <- calc_roc(dataset.UNITED_type1_gad_ia2_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full, thinning = 1000)
+
+# AUC ROC
+auc_roc_T1D_with_T_united_gad_ia2_all_genes <- unname(data.frame(prob = predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T$prob) %>%
+                                                    cbind(Mody = dataset.UNITED_type1_gad_ia2_all_genes$M) %>%
+                                                    mutate(Mody = ifelse(is.na(Mody), 0, Mody)) %>%
+                                                    pROC::roc(response = Mody, predictor = prob) %>%
+                                                    magrittr::extract(c(9)) %>%
+                                                    unlist())
+
+# plot for ROC with grey being iterations, black being the ROC for average prediction
+plot_roc_T1D_with_T_united_gad_ia2_all_genes <- ggplot() +
+  ## all iterations
+  geom_path(
+    data = roc_T1D_with_T_united_gad_ia2_all_genes,
+    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+  ) +
+  ## average predictions
+  geom_path(
+    data = pROC::roc(response = dataset.UNITED_type1_gad_ia2_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictor = predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T$prob, levels = c(0,1), direction = "<") %>%
+      magrittr::extract(c(2:3)) %>%
+      as.data.frame(),
+    aes(x = 1-specificities, y= sensitivities), colour = "black"
+  ) +
+  theme_bw() +
+  scale_y_continuous("Sensitivity", labels = scales::percent) +
+  scale_x_continuous("1- Specificity", labels = scales::percent)
+
+### All antibodies
+roc_T1D_with_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 1000)
+
+# AUC ROC
+auc_roc_T1D_with_T_united_all_genes <- unname(data.frame(prob = predictions_dataset.UNITED_type1_all_genes_with_T$prob) %>%
+                                                        cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+                                                        mutate(Mody = ifelse(is.na(Mody), 0, Mody)) %>%
+                                                        pROC::roc(response = Mody, predictor = prob) %>%
+                                                        magrittr::extract(c(9)) %>%
+                                                        unlist())
+
+# plot for ROC with grey being iterations, black being the ROC for average prediction
+plot_roc_T1D_with_T_united_all_genes <- ggplot() +
+  ## all iterations
+  geom_path(
+    data = roc_T1D_with_T_united_all_genes,
+    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+  ) +
+  ## average predictions
+  geom_path(
+    data = pROC::roc(response = dataset.UNITED_type1_all_genes %>% mutate(M = ifelse(is.na(M), 0, M)) %>% select(M) %>% unlist(), predictor = predictions_dataset.UNITED_type1_all_genes_with_T$prob, levels = c(0,1), direction = "<") %>%
+      magrittr::extract(c(2:3)) %>%
+      as.data.frame(),
+    aes(x = 1-specificities, y= sensitivities), colour = "black"
+  ) +
+  theme_bw() +
+  scale_y_continuous("Sensitivity", labels = scales::percent) +
+  scale_x_continuous("1- Specificity", labels = scales::percent)
 
 
 #################################
@@ -235,12 +364,13 @@ thresholds_UNITED_t1d %>%
 plot_antibody_boxplot <- patchwork::wrap_plots(
   
   # GAD
-  dataset.UNITED_type1_gad %>%
+  ## boxplot
+  dataset.UNITED_type1_gad_all_genes %>%
     mutate(
       M = ifelse(is.na(M), 0, M)
     ) %>%
     select(A, M) %>%
-    cbind(prob = predictions_dataset.UNITED_type1_gad_with_T$prob) %>%
+    cbind(prob = predictions_dataset.UNITED_type1_gad_all_genes_with_T$prob) %>%
     drop_na() %>%
     mutate(
       total = n(),
@@ -256,24 +386,34 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     ungroup() %>%
     select(-A, -total, -A_count) %>%
     ggplot(aes(x = M, y = prob)) +
-    geom_boxplot(colour = c("white", "black", "black")) +
+    geom_boxplot(colour = c("white", "black", "black"), alpha = c(0, 1, 1)) +
     geom_point(aes(alpha = M)) +
     scale_y_continuous("MODY probability", labels = scales::percent, breaks = seq(0, 0.7, 0.1), limits = c(0, 0.7)) +
     scale_alpha_manual(values = c(1, 0)) +
-    ggtitle(paste0("GAD only tested (n=", nrow(dataset.UNITED_type1_gad %>% filter(!is.na(A))), ")")) +
+    ggtitle(paste0("GAD only tested (n=", nrow(dataset.UNITED_type1_gad_all_genes %>% filter(!is.na(A))), ")")) +
     facet_wrap(~A_label) +
     theme_bw() +
     theme(
       legend.position = "none"
+    ),
+  
+  ## roc curve
+  plot_roc_T1D_with_T_united_gad_all_genes +
+    geom_label(
+      mapping = aes(x = -Inf, y = -Inf), label = paste0("AUC:", signif(auc_roc_T1D_with_T_united_gad_all_genes, 2)),
+      size = 7,
+      label.size = NA,
+      hjust = -1,
+      vjust = -0.5
     ),
   
   # GAD & IA2
-  dataset.UNITED_type1_gad_ia2 %>%
+  dataset.UNITED_type1_gad_ia2_all_genes %>%
     mutate(
       M = ifelse(is.na(M), 0, M)
     ) %>%
     select(A, M) %>%
-    cbind(prob = predictions_dataset.UNITED_type1_gad_ia2_with_T$prob) %>%
+    cbind(prob = predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T$prob) %>%
     drop_na() %>%
     mutate(
       total = n(),
@@ -289,24 +429,34 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     ungroup() %>%
     select(-A, -total, -A_count) %>%
     ggplot(aes(x = M, y = prob)) +
-    geom_boxplot(colour = c("white", "black", "black")) +
+    geom_boxplot(colour = c("white", "black", "black"), alpha = c(0, 1, 1)) +
     geom_point(aes(alpha = M)) +
     scale_y_continuous("MODY probability", labels = scales::percent, breaks = seq(0, 0.7, 0.1), limits = c(0, 0.7)) +
     scale_alpha_manual(values = c(1, 0)) +
-    ggtitle(paste0("GAD & IA2 tested (n=", nrow(dataset.UNITED_type1_gad_ia2 %>% filter(!is.na(A))), ")")) +
+    ggtitle(paste0("GAD & IA2 tested (n=", nrow(dataset.UNITED_type1_gad_ia2_all_genes %>% filter(!is.na(A))), ")")) +
     facet_wrap(~A_label) +
     theme_bw() +
     theme(
       legend.position = "none"
+    ),
+  
+  ## roc curve
+  plot_roc_T1D_with_T_united_gad_ia2_all_genes +
+    geom_label(
+      mapping = aes(x = -Inf, y = -Inf), label = paste0("AUC:", signif(auc_roc_T1D_with_T_united_gad_ia2_all_genes, 2)),
+      size = 7,
+      label.size = NA,
+      hjust = -1,
+      vjust = -0.5
     ),
   
   # all antibodies
-  dataset.UNITED_type1 %>%
+  dataset.UNITED_type1_all_genes %>%
     mutate(
       M = ifelse(is.na(M), 0, M)
     ) %>%
     select(A, M) %>%
-    cbind(prob = predictions_dataset.UNITED_type1_with_T$prob) %>%
+    cbind(prob = predictions_dataset.UNITED_type1_all_genes_with_T$prob) %>%
     drop_na() %>%
     mutate(
       total = n(),
@@ -322,20 +472,31 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
     ungroup() %>%
     select(-A, -total, -A_count) %>%
     ggplot(aes(x = M, y = prob)) +
-    geom_boxplot(colour = c("white", "black", "black")) +
+    geom_boxplot(colour = c("white", "black", "black"), alpha = c(0, 1, 1)) +
     geom_point(aes(alpha = M)) +
     scale_y_continuous("MODY probability", labels = scales::percent, breaks = seq(0, 0.7, 0.1), limits = c(0, 0.7)) +
     scale_alpha_manual(values = c(1, 0)) +
-    ggtitle(paste0("GAD & IA2 & ZnT8 tested (n=", nrow(dataset.UNITED_type1 %>% filter(!is.na(A))), ")")) +
+    ggtitle(paste0("GAD & IA2 & ZnT8 tested (n=", nrow(dataset.UNITED_type1_all_genes %>% filter(!is.na(A))), ")")) +
     facet_wrap(~A_label) +
     theme_bw() +
     theme(
       legend.position = "none"
     ),
   
-  nrow = 1
+  ## roc curve
+  plot_roc_T1D_with_T_united_all_genes +
+    geom_label(
+      mapping = aes(x = -Inf, y = -Inf), label = paste0("AUC:", signif(auc_roc_T1D_with_T_united_all_genes, 2)),
+      size = 7,
+      label.size = NA,
+      hjust = -1,
+      vjust = -0.5
+    ),
+  
+  nrow = 3
   
 ) +
+  patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B.1", "B.2", "C.1", "C.2"))) +
   patchwork::plot_layout(axis_titles = "collect") &
   theme(
     axis.title.x = element_blank(),
@@ -346,7 +507,7 @@ plot_antibody_boxplot <- patchwork::wrap_plots(
   )
 
 
-pdf("figures/plot_antibody_sensitivity.pdf", width = 13, height = 4)
+pdf("figures/plot_antibody_sensitivity.pdf", width = 9, height = 12)
 plot_antibody_boxplot
 dev.off()
 

@@ -112,6 +112,35 @@ dataset.UNITED_type1_gad_ia2 <- create_data(dataset = "united t1d", biomarkers =
   # add biomarker latent variable
   mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
 
+## Load population representative dataset all genes
+dataset.UNITED_type1_gad_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
+  
+  # check if the antibody variable in question is recorded
+  mutate(A = GAD) %>%
+  
+  # add biomarker latent variable
+  mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
+
+dataset.UNITED_type1_gad_ia2_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
+  
+  # check if the antibody variable in question is recorded
+  mutate(
+    A = ifelse(is.na(GAD) & is.na(IA2), NA,
+               ifelse(!is.na(GAD) & (GAD == 1 & is.na(IA2)), 1,
+                      ifelse(!is.na(GAD) & (GAD == 0 & is.na(IA2)), 0,
+                             ifelse(!is.na(IA2) & (IA2 == 1 & is.na(GAD)), 1,
+                                    ifelse(!is.na(IA2) & (IA2 == 0 & is.na(GAD)), 0,
+                                           ifelse(IA2 == 1 | GAD == 1, 1, 0))))))
+  ) %>%
+  
+  # add biomarker latent variable
+  mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
+
+
+
+
+
+
 
 
 
@@ -598,6 +627,26 @@ predictions_dataset.UNITED_type1_gad_with_T <- predictions_dataset.UNITED_type1_
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type1_gad_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_with_T.rds")
 
+### All genes
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad_all_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_gad_all_genes_with_T_full <- predict(posterior_samples_T1D_all_genes_obj, interim, rcs_parms_all_genes) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_all_genes_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_gad_all_genes_with_T <- predictions_dataset.UNITED_type1_gad_all_genes_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_all_genes_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T.rds")
+
+
+
 
 #:-------------
 
@@ -619,6 +668,24 @@ predictions_dataset.UNITED_type1_gad_ia2_with_T <- predictions_dataset.UNITED_ty
 
 #### save the predictions
 saveRDS(predictions_dataset.UNITED_type1_gad_ia2_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_ia2_with_T.rds")
+
+### All genes
+
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_gad_ia2_all_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
+
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full <- predict(posterior_samples_T1D_all_genes_obj, interim, rcs_parms_all_genes) 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full, "model_predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full.rds")
+
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T <- predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x), LCI = quantile(x, probs = 0.025), UCI = quantile(x, probs = 0.975))
+  }) %>%
+  bind_rows() 
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T, "model_predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T.rds")
 
 
 
