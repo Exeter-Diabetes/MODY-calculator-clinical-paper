@@ -29,7 +29,7 @@ dataset.UNITED_type1 <- dataset.UNITED_type1 %>%
 table(dataset.UNITED_type1$M)
 
 ## All genes ---------------------------------------------------------------------------------------
-dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
