@@ -83,7 +83,7 @@ MYDIABETES <- MYDIABETES %>%
                       1,
                       0)),
     #this variable denotes which biomarker status (based on cpeptide (C) and islet autibodies(A)) individual has
-    #0 is if Cpep >= 200pmol/l AND A == 0 (all negative), 1 is if Cpep < 200 pmol/l OR A ==1 (1+ positive antibody)
+    #0 is if Cpep >= 80pmol/l AND A == 0 (all negative), 1 is if Cpep < 80 pmol/l OR A ==1 (1+ positive antibody)
     biomark_status = ifelse(C == 1 & A == 0, 0, 1), 
     #if diagnosed under age of 30
     agediag30 = ifelse(agedx < 30, "Yes", "No"),
