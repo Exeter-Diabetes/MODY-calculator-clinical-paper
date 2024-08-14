@@ -75,7 +75,7 @@ MYDIABETES <- MYDIABETES %>%
                         "T1D", 
                         "T2D"), 
     #defines C (cpeptide status) as 1 if >= 200 pmol/l and 0 if less than 200 pmol/l
-    C = ifelse(Cpeptide >= 200, 1, 0), 
+    C = ifelse(Cpeptide >= 80, 1, 0), 
     #defines A (antibody status) as 1 if 1+ islet autoantibody positive and 0 if all negative
     A = ifelse(is.na(GAD_PN) & is.na(IA2_PN) & is.na(ZnT8_PN0),
                NA,
