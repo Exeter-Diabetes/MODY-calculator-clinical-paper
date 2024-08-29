@@ -59,7 +59,7 @@ MYDIABETES <- MYDIABETES %>%
          
 table(MYDIABETES$insfromdiag, useNA = "ifany")
 
-
+table(MYDIABETES$Gene)
 
 ### make new variables -------------------------------------------------------------------------------------------------------------------
 MYDIABETES <- MYDIABETES %>%
@@ -92,7 +92,7 @@ MYDIABETES <- MYDIABETES %>%
     #convert hba1c mmol/mol into %
     hba1c_perc = (0.0915*hba1c)+2.15,
     #clean up M
-    M = ifelse(MODY == "Mutation" | MODY == "VUS", 1, 0),
+    M = ifelse(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NEUROD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6", 1, 0),
     #Make MODY variable based on 3 genes only
     M3 = ifelse(is.na(Gene),
                 0,
