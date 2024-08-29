@@ -149,7 +149,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6" , 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-commonmody, -DNAResult) %>%
@@ -318,7 +318,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6", 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-commonmody, -DNAResult) %>%
@@ -453,7 +453,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
                pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
         
         ### generate the outcome variables
-        mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+        mutate(mody = ifelse(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6", 1, DNAResult)) %>%
         
         ### remove variables not needed
         select(-commonmody, -DNAResult) %>%
@@ -591,7 +591,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6", 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-DNAResult) %>%
