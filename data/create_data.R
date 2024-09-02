@@ -79,7 +79,10 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       library(readr)
       
       ## load dataset
-      dataset.UNITED <- read_csv("data/UNITEDfull.csv")
+      dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
+        
+        ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
       
       ## select the right patients
       dataset.UNITED_type1 <- dataset.UNITED %>%
@@ -139,7 +142,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(t1ort2 == 1) %>%
           
           ### keep only patients with Genes
-          filter(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6") %>%
+          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
           
           ### select the correct variables
           select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
@@ -221,7 +224,10 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       library(readr)
       
       ## load dataset
-      dataset.UNITED <- read_csv("data/UNITEDfull.csv")
+      dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
+        
+        ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
       
       ## select the right patients
       dataset.UNITED_type1 <- dataset.UNITED %>%
@@ -297,7 +303,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(t1ort2 == 1) %>%
           
           ### keep only patients with Genes
-          filter(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6") %>%
+          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
           
           ### select the correct variables
           select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
@@ -402,7 +408,11 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
     library(readr)
     
     ## load dataset
-    dataset.UNITED <- read_csv("data/UNITEDfull.csv")
+    dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
+      
+      ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
+      filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+    
     
     ## select the right patients
     dataset.UNITED_type2 <- dataset.UNITED %>%
@@ -446,7 +456,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(t1ort2 == 2) %>%
         
         ### keep only patients with Genes
-        filter(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6") %>%
+        filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
         
         ### select the correct variables
         select(commonmody, sex, bmi, agedx = agediag, insoroha, hba1c = hba1cpc, 
@@ -518,8 +528,16 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       library(haven)
       
       ## load dataset
-      dataset.UNITEDfull <- read_dta("data/UNITEDfull.dta")
-      dataset.UNITED <- read_csv("data/UNITEDfull.csv")
+      dataset.UNITEDfull <- read_dta("data/UNITEDfull.dta") %>%
+        
+        ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+      
+      dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
+        
+        ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+      
       
       ## select the right patients
       dataset.UNITED_young_type1 <- dataset.UNITEDfull %>% 
@@ -580,9 +598,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(swpaed != 0) %>%
           
           ### keep only patients with Genes
-          #drop_na(Gene) %>%
-          #filter(Gene != "") %>%
-          filter(Gene == "HNF1A" | Gene == "HNF4A" | Gene == "HNF1B" | Gene == "GCK" | Gene == "NeuroD1" | Gene == "KCNJ11" | Gene == "GATA6" | Gene == "ABCC8" | Gene == "INS" | Gene == "RFX6") %>%
+          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
           
           ### select the correct variables
           select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
