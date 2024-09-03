@@ -21,19 +21,19 @@ probabilities <- probabilities_under_30 %>%
   as.data.frame() %>%
   
   ## remove the column which the model used
-  select(-which_equation) %>%
+  select(-which_eq) %>%
   
   ## rename variables
-  rename("Old Calculator" = "mody_adj_prob_fh0", "New Calculator" = "pedro_prob") %>%
+  rename("Old Calculator" = "old_prob", "New Calculator" = "new_prob") %>%
   
   ## gather in long format
   gather("key", "value") %>%
   
   ## turn key into factor
-  mutate(key = factor(key, levels = c("Old Calculator", "New Calculator"))) %>%
+  mutate(key = factor(key, levels = c("Old Calculator", "New Calculator")))
   
   ## divide values by 100 to decimals
-  mutate(value = value/100)
+  # mutate(value = value/100)
 
 
 plot_cprd_probabilities_density <- patchwork::wrap_plots(
