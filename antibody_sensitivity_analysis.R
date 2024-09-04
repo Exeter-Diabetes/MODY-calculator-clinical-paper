@@ -134,9 +134,6 @@ predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("model_p
 
 ## Load population representative dataset
 
-
-dataset.UNITED_type1 <- create_data(dataset = "united t1d", biomarkers = "reduced")
-
 dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", biomarkers = "reduced", commonmody = FALSE)
 
 dataset.UNITED_type1_gad_all_genes <- create_data(dataset = "united t1d", biomarkers = "full", commonmody = FALSE) %>%
@@ -204,7 +201,6 @@ plot_differences <- patchwork::wrap_plots(
 
 
 # Table information
-thresholds_UNITED_t1d_no_T <- calculate_thresholds_diagnostics(dataset.UNITED_type1$M, predictions_dataset.UNITED_type1_no_T$prob)
 
 thresholds_UNITED_t1d_all_genes <- calculate_thresholds_diagnostics(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T$prob)
 
@@ -214,8 +210,6 @@ thresholds_UNITED_t1d_gad_ia2_all_genes <- calculate_thresholds_diagnostics(data
 
 
 ### 5%
-thresholds_UNITED_t1d_no_T %>%
-  filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds) %>% head()
@@ -227,8 +221,6 @@ thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.05) %>% arrange(Thresholds)  %>% head()
 
 ### 10%
-thresholds_UNITED_t1d_no_T %>%
-  filter(Thresholds == 0.1) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
@@ -240,8 +232,6 @@ thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.1) %>% arrange(Thresholds)  %>% head()
 
 ### 20%
-thresholds_UNITED_t1d_no_T %>%
-  filter(Thresholds == 0.2) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
@@ -253,8 +243,6 @@ thresholds_UNITED_t1d_all_genes %>%
   filter(Thresholds == 0.2) %>% arrange(Thresholds)  %>% head()
 
 ### 30%
-thresholds_UNITED_t1d_no_T %>%
-  filter(Thresholds == 0.3) %>% arrange(Thresholds) %>% head()
 
 thresholds_UNITED_t1d_gad_all_genes %>%
   filter(Thresholds == 0.3) %>% arrange(Thresholds)  %>% head()
