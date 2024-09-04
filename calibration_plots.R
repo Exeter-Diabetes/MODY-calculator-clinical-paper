@@ -10,12 +10,12 @@ library(ggplot2)
 library(patchwork)
 
 # load files required
-predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T.rds")
-predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new.rds")
+predictions_dataset.UNITED_type1_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_dataset.UNITED_type2_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
 
 
-predictions_dataset.UNITED_type1_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
-predictions_dataset.UNITED_type2_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_new_full.rds")
+predictions_dataset.UNITED_type1_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type2_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
 
 
 # load functions needed
@@ -24,12 +24,12 @@ source("data/create_data.R")
 
 
 ## Load population representative dataset
-dataset.UNITED_type1 <- create_data(dataset = "united t1d")
+dataset.UNITED_type1 <- create_data(dataset = "united t1d", commonmody = FALSE)
 # we don't do this to make the plotting easier since these patients don't have the correct biomarker status for testing (cpeptide negative or antibody positive)
 # and hence their probabilities are all the same <0.001
   # ## if MODY testing missing, change to 0
   # mutate(M = ifelse(is.na(M), 0, M))    
-dataset.UNITED_type2 <- create_data(dataset = "united t2d") %>%
+dataset.UNITED_type2 <- create_data(dataset = "united t2d", commonmody = FALSE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
@@ -57,7 +57,7 @@ legend_dataset <- cbind(
 #that were therefore eligible for testing and will have a prob that isn't (and is greater than) <0.001
 grouping_values_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))] %>% 
   #we then find the 60th and 80th quantile for these individuals
-  quantile(probs = c(0.2, 0.4, 0.6, 0.8))
+  quantile(probs = c(0.33, 0.66))
 
 predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))] %>% 
   #we then find the 60th and 80th quantile for these individuals
@@ -89,8 +89,7 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
     #e.g.if the predicted probs are less than the 1st element in grouping_values (quantile), then change its value to 1
     group = ifelse(group < grouping_values_UNITED_type1_with_T[1], 1,
                    ifelse(group < grouping_values_UNITED_type1_with_T[2], 2,
-                          ifelse(group < grouping_values_UNITED_type1_with_T[3], 3,
-                                 ifelse(group < grouping_values_UNITED_type1_with_T[4], 4, 5))))
+                          ifelse(group < grouping_values_UNITED_type1_with_T[3], 3, 4)))
   ) %>%
   #now we want to group by these 5 defined groups (or defined predicted probability ranges)
   group_by(group) %>%
@@ -127,6 +126,57 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
   #currently have 80000000 rows of repeating rows
   #use distinct to keep only unique rows
   distinct() %>%
+  # add those patients not tested for MODY
+  rbind(
+    predictions_dataset.UNITED_type1_with_T_full[,which(is.na(dataset.UNITED_type1$M))[c(1)]] %>%
+      as.data.frame() %>%
+      #gather() does the same as pivot_longer
+      #i.e. all column names become categories under the new "key" column 
+      #and all the values that went in the respective columns get moved to the corresponding space in the "values" column
+      gather() %>%
+      #bind two columns in addition to the "key" and "value" columns
+      cbind(
+        #group denotes the predicted probabilities for those with MODY testing (& correct biomarker status)
+        group = 1,
+        #M denotes the MODY status (1= has MODY gene; 0 = doesn't have MODY gene)
+        M = 0
+      ) %>%
+      #now we want to group by these 5 defined groups (or defined predicted probability ranges)
+      group_by(group) %>%
+      #now we want to define new variables for each group
+      mutate(
+        #x which is the 50th quantile of the probs in value for each group (median probability)
+        x = quantile(value, probs = c(0.5)),
+        #y which is the proportion of MODY cases in each group
+        y = sum(M)/n(),
+        #xmin which is the 2.5th quantile contributing to the lower limit of the 95% CI bounds
+        #xmin and max provide 95% CI
+        xmin = quantile(value, probs = c(0.025)),
+        #xmin75 provides the 12.5th quantile contributing to the lower limit of the 75% CI bounds
+        xmin_75 = quantile(value, probs = c(0.125)),
+        #xmin50 which is the 25th quantile contributing to the lower limit of the 50% CI bounds
+        xmin_50 = quantile(value, probs = c(0.25)),
+        #xmin25 provides the 37.5th quantile contributing to the lower limit of the 25% CI bounds
+        xmin_25 = quantile(value, probs = c(0.375)),
+        #xmax25 provides the 62.5th quantile contributing to the upper limit of the 25% CI bounds
+        xmax_25 = quantile(value, probs = c(0.625)),
+        #xmax50 which is the 75th quantile contributing to the upper limit of the 50% CI bounds
+        xmax_50 = quantile(value, probs = c(0.75)),
+        #xmax75 which is the 87.5th quantile contributing to the upper limit of the 75% CI bounds
+        xmax_75 = quantile(value, probs = c(0.875)),
+        #xmax which is the 97.5th quantile contributing to the upper limit of the 95% CI bounds
+        xmax = quantile(value, probs = c(0.975))
+      ) %>%
+      #ungroup by group
+      ungroup() %>%
+      #we now have specific x,y, xmin etc for each group (quintile)
+      #i.e. everytime see a group 4 will have same x, y, xmin etc
+      #as these are the key values needed to plot, we don't need the rest and therefore deselect/drop them
+      select(-key, -value, -group, -M) %>%
+      #currently have 80000000 rows of repeating rows
+      #use distinct to keep only unique rows
+      distinct()
+  ) %>%
   #now we can start plotting
   #x is the median predicted probability
   #y is the proportion of MODY in that quintile
@@ -156,7 +206,7 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
   ylim(0, 1) +
   #set the coordinated of the cartesian plane (axes)
   #this allows us to zoom into the area of interest without messing with the ribbon plotting
-  coord_cartesian(ylim =c(0, 0.3), xlim =c(0, 1)) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
   #rewrite the x and y axes scales to percent for the purpose of labelling
   scale_y_continuous(labels = scales::percent) +
   scale_x_continuous(labels = scales::percent) +
@@ -186,6 +236,13 @@ plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_
 
 plot(plot_calibration_UNITED_type1_with_T)
 
+
+#:--------------------------------------------
+
+## Calibration plots for UNITED type 2
+
+
+
 #Define grouping values
 #this takes the probabilities in the "probs" column and filters them based on whether their corresponding line in the dataset has a non-missing M
 #i.e. only looking at the probabilities for those individuals weren't tested for MODY
@@ -193,7 +250,7 @@ plot(plot_calibration_UNITED_type1_with_T)
 #therefore looking for quantiles on all predicted probs
 grouping_values_UNITED_type2_new <- predictions_dataset.UNITED_type2_new$prob[which(!is.na(dataset.UNITED_type2$M))] %>% 
   #we then find the 20th and 80th quantile for these individuals
-  quantile(probs = c(0.2, 0.8))
+  quantile(probs = c(0.33, 0.66))
 
 
 
@@ -246,7 +303,7 @@ plot_calibration_UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %
   ylab("Observed probability") +
   guides(alpha = guide_legend(title = "Credible interval")) +
   scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
-  coord_cartesian(ylim =c(0, 0.6), xlim =c(0, 1)) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
   scale_y_continuous(labels = scales::percent) +
   scale_x_continuous(labels = scales::percent) +
   theme(
