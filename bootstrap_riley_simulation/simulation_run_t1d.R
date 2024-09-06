@@ -340,8 +340,7 @@ simulation <- list(
 
 
 ### save output
-saveRDS(simulation, "bootstrap_riley_simulation/output/simulation_t1d_10.rds")
-
+saveRDS(simulation, "bootstrap_riley_simulation/output/simulation_t1d.rds")
 
 
 ### turn off Parallel cores
