@@ -306,6 +306,41 @@ saveRDS(predictions_dataset.UNITED_type1_young_all_genes_with_T, "model_predicti
 
 
 
+
+
+# Type 1 model fitted in UNITED pediatric with all genes
+### Predictions from new model with old
+interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_young_genes, pardm, agerec, hba1c, agedx, sex)))
+
+predictions_dataset.UNITED_type1_young_all_genes_old_full <- predict(posteriors_samples_old_T1D, interim)
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_young_all_genes_old_full, "model_predictions/predictions_dataset.UNITED_type1_young_all_genes_old_full.rds")
+
+predictions_dataset.UNITED_type1_young_all_genes_old <- predictions_dataset.UNITED_type1_young_all_genes_old_full %>%
+  apply(., 2, function(x) {
+    data.frame(prob = mean(x))
+  }) %>%
+  bind_rows()
+
+for (i in 1:nrow(predictions_dataset.UNITED_type1_young_all_genes_old)) {
+  prob <- predictions_dataset.UNITED_type1_young_all_genes_old[i,]
+  prob <- 10 * ((round(prob  * 100, 0)) %/% 10)
+  if (prob == 100) {
+    predictions_dataset.UNITED_type1_young_all_genes_old[i,] <- convert$PPVT1[10]
+  } else {
+    predictions_dataset.UNITED_type1_young_all_genes_old[i,] <- convert$PPVT1[convert$threshold == prob]
+  }
+}
+
+#### save the predictions
+saveRDS(predictions_dataset.UNITED_type1_young_all_genes_old, "model_predictions/predictions_dataset.UNITED_type1_young_all_genes_old.rds")
+
+
+
+
+
+
 # Type 1 model fitted in all genes
 ### Predictions from new model with T
 interim <- as_tibble(as.matrix(select(dataset.UNITED_type1_genes, pardm, agerec, hba1c, agedx, sex, bmi, C, A)))
