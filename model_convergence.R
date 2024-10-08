@@ -95,7 +95,7 @@ plot_type_1_model <- type_1_posteriors %>%
   guides(colour = guide_legend(nrow = 1)) +
   theme_bw() +
   theme(
-    legend.position = "bottom",
+    legend.position = "none",
     axis.title.y = element_blank()
   )
   
@@ -105,18 +105,6 @@ plot_type_1_model
 dev.off()
 
 
-# labels for parameters
-type_1_labels <- list(
-  'beta0'="Intercept",
-  'beta[1]'="At least one parent affected with diabetes",
-  'beta[2]'="Age at recruitment",
-  'beta[3]'="HbA1c",
-  'beta[4]'="At at diagnosis",
-  'beta[5]'="Sex",
-  'gamma0'="Gamma 0",
-  'gamma1'="Gamma 1",
-  'pMp_Cn_or_Ap'="P(M) | C- OR A+"
-)
 # labels for parameters
 type_2_labels <- list(
   'beta0'="Intercept",
@@ -160,7 +148,7 @@ plot_type_2_model <- type_2_posteriors %>%
   guides(colour = guide_legend(nrow = 1)) +
   theme_bw() +
   theme(
-    legend.position = "bottom",
+    legend.position = "none",
     axis.title.y = element_blank()
   )
 
@@ -169,4 +157,19 @@ plot_type_2_model <- type_2_posteriors %>%
 pdf("figures/type_2_model_trace_plots.pdf", width = 6, height = 12)
 plot_type_2_model
 dev.off()
+
+
+pdf("figures/models_trace_plots.pdf", width = 10, height = 12)
+patchwork::wrap_plots(
+  
+  plot_type_1_model,
+  
+  plot_type_2_model,
+  
+  ncol = 2, nrow = 1
+  
+) +
+  patchwork::plot_annotation(tag_levels = list(c("A", "B")))
+dev.off()
+
 
