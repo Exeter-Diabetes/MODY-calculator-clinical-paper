@@ -178,7 +178,7 @@ calc_roc <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-roc_T1D_no_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 1000)
+roc_T1D_no_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_no_T_united_all_genes <- ggplot() +
@@ -196,7 +196,7 @@ plot_roc_T1D_no_T_united_all_genes <- ggplot() +
   )
 
 ### Biomarker models
-roc_T1D_with_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 1000)
+roc_T1D_with_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T_united_all_genes <- ggplot() +
@@ -214,7 +214,7 @@ plot_roc_T1D_with_T_united_all_genes <- ggplot() +
   )
 
 ## Type 2 UNITED
-roc_T2D_new_united_all_genes <- calc_roc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 1000)
+roc_T2D_new_united_all_genes <- calc_roc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D_new_united_all_genes <- ggplot() +
@@ -268,7 +268,7 @@ calc_prec_recal_curve <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-prec_recal_T1D_no_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 1000)
+prec_recal_T1D_no_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_no_T_united_all_genes <- ggplot() +
@@ -285,7 +285,7 @@ plot_prec_recal_T1D_no_T_united_all_genes <- ggplot() +
   )
 
 ### Biomarker models
-prec_recal_T1D_with_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 1000)
+prec_recal_T1D_with_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_with_T_united_all_genes <- ggplot() +
@@ -302,7 +302,7 @@ plot_prec_recal_T1D_with_T_united_all_genes <- ggplot() +
   )
 
 ## Type 2 UNITED
-prec_recal_T2D_new_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 1000)
+prec_recal_T2D_new_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T2D_new_united_all_genes <- ggplot() +
@@ -534,7 +534,7 @@ dev.off()
 plot_prob_rocs_united <- patchwork::wrap_plots(
   
   # roc insulin-treated
-  roc_curves %>%
+  free(roc_curves %>%
     filter(Dataset == "UNITED" & Model == "Type 1") %>%
     mutate(
       Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
@@ -573,14 +573,14 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
       mapping = aes(x = -Inf, y = -Inf, label = auc),
       size = 7,
       label.size = NA,
-      hjust = -0.4,
+      hjust = -0.8,
       vjust = -0.5
     ) +
     theme(
       panel.spacing.x = unit(1.5, "lines")
-    ),
+    )),
   
-  roc_curves %>%
+  free(roc_curves %>%
     filter(Dataset == "UNITED" & Model == "Type 2") %>%
     ggplot(aes(x = 1- specificities, y = sensitivities)) +
     geom_path(
@@ -601,9 +601,9 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
       mapping = aes(x = -Inf, y = -Inf, label = auc),
       size = 7,
       label.size = NA,
-      hjust = -0.4,
+      hjust = -0.8,
       vjust = -0.5
-    ),
+    )),
   
   ncol = 1
   
@@ -614,8 +614,14 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
     strip.text = element_text(size = 11)
   )
 
-pdf("figures/united_roc_thin_100.pdf", width = 8, height = 9)
-plot_prob_rocs_united
+pdf("figures/united_roc_thin_100.pdf", width = 8, height = 8)
+plot_prob_rocs_united +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
 dev.off()
 
 
@@ -624,7 +630,7 @@ dev.off()
 plot_prob_boxplot_united <- patchwork::wrap_plots(
   
   # Boxplots
-  dataset.UNITED_type1_all_genes %>%
+  free(dataset.UNITED_type1_all_genes %>%
     select(M) %>%
     rename("Mody" = "M") %>%
     cbind(
@@ -646,10 +652,10 @@ plot_prob_boxplot_united <- patchwork::wrap_plots(
     theme_bw() +
     theme(
       legend.position = "none"
-    ),
+    )),
   
   # Boxplots
-  dataset.UNITED_type2_all_genes %>%
+  free(dataset.UNITED_type2_all_genes %>%
     select(M) %>%
     rename("Mody" = "M") %>%
     cbind(
@@ -662,7 +668,7 @@ plot_prob_boxplot_united <- patchwork::wrap_plots(
     ggplot() +
     geom_boxplot(aes(y = Probability, x = Mody)) +
     scale_y_continuous(labels = scales::percent) +
-    theme_bw()
+    theme_bw())
   
   , ncol = 1
   
@@ -675,6 +681,158 @@ plot_prob_boxplot_united <- patchwork::wrap_plots(
 
 
 pdf("figures/united_boxplot_thin_100.pdf", width = 8, height = 9)
-plot_prob_boxplot_united
+plot_prob_boxplot_united +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
 dev.off()
+
+
+################
+
+
+prec_recal_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)) %>%
+  cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+  pROC::roc(response = Mody, predictor = prob) %>%
+  pROC::coords(ret = c("precision", "recall")) %>%
+  as.data.frame() %>%
+  mutate(
+    ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T))), thinning = 1),
+    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T), na.rm = TRUE)
+  ) %>%
+  mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
+  rbind(
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)) %>%
+      cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      pROC::coords(ret = c("precision", "recall")) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T))), thinning = 1),
+        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new)) %>%
+      cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
+      pROC::roc(response = Mody, predictor = prob) %>%
+      pROC::coords(ret = c("precision", "recall")) %>%
+      as.data.frame() %>%
+      mutate(
+        ROCAUC = calc_auc_pr(dataset.UNITED_type2_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type2_all_genes_new))), thinning = 1),
+        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new), na.rm = TRUE)
+      ) %>%
+      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " ")
+  ) %>%
+  rename("auc" = "ROCAUC")
+
+
+dat_text <- prec_recal_curves %>%
+  select(-precision, -recall) %>%
+  distinct() %>%
+  mutate(
+    auc = paste0(" AUC:", signif(auc, 2), " "),
+    mean = paste0("Mean prob:", signif(mean, 2)*100, "%"),
+    Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+  )
+
+
+
+
+plot_prob_prec_recal_united <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  free(prec_recal_curves %>%
+         filter(Dataset == "UNITED" & Model == "Type 1") %>%
+         mutate(
+           Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+           iteration = 0
+         ) %>%
+         ggplot(aes(x = recall, y = precision)) +
+         geom_path(
+           data = prec_recal_T1D_no_T_united_all_genes %>%
+             mutate(
+               Calculator = "Clinical features"
+             ) %>%
+             rbind(
+               prec_recal_T1D_with_T_united_all_genes %>%
+                 mutate(Calculator = "Clinical features and biomarkers")
+             ),
+           aes(group = iteration), colour = "grey"
+         ) + 
+         geom_path() +
+         theme_bw() +
+         facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
+         scale_y_continuous("Precision", labels = scales::percent) +
+         scale_x_continuous("Recall", labels = scales::percent) +
+         theme_bw() +
+         geom_label(
+           data = prec_recal_curves %>%
+             select(-precision, -recall) %>%
+             distinct() %>%
+             mutate(
+               auc = paste0(" AUC:", signif(auc, 2), " "),
+               mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+             ) %>%
+             filter(Dataset == "UNITED" & Model == "Type 1") %>%
+             mutate(
+               Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+             ),
+           mapping = aes(x = -Inf, y = -Inf, label = auc),
+           size = 7,
+           label.size = NA,
+           hjust = -1,
+           vjust = -6.5
+         ) +
+         theme(
+           panel.spacing.x = unit(1.5, "lines")
+         )),
+  
+  free(prec_recal_curves %>%
+         filter(Dataset == "UNITED" & Model == "Type 2") %>%
+         ggplot(aes(x = recall, y = precision)) +
+         geom_path(
+           data = prec_recal_T2D_new_united_all_genes %>%
+             mutate(
+               Calculator = "No Biomarkers"
+             ),
+           aes(group = iteration), colour = "grey"
+         ) +
+         geom_path() +
+         theme_bw() +
+         scale_y_continuous("Precision", labels = scales::percent) +
+         scale_x_continuous("Recall", labels = scales::percent) +
+         theme_bw() +
+         geom_label(
+           data = dat_text %>%
+             filter(Dataset == "UNITED" & Model == "Type 2"),
+           mapping = aes(x = -Inf, y = -Inf, label = auc),
+           size = 7,
+           label.size = NA,
+           hjust = -1,
+           vjust = -6.5
+         )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+pdf("figures/united_prec_recal_thin_100.pdf", width = 8, height = 8)
+plot_prob_prec_recal_united +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+dev.off()
+
+
 
