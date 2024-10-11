@@ -671,6 +671,9 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         
         dataset.UNITED_young_type1 %>%
           
+          # drop those with T = NA
+          drop_na(T) %>%
+          
           # remove id
           select(-id)
       )
