@@ -343,7 +343,7 @@ predictions_dataset.UNITED_type1_young_all_genes_old <- predictions_dataset.UNIT
   bind_rows()
 
 for (i in 1:nrow(predictions_dataset.UNITED_type1_young_all_genes_old)) {
-  prob <- predictions_dataset.UNITED_type1_young_all_genes_old[i,]predictions_dataset.UNITED_type1_young_all_genes_with_T
+  prob <- predictions_dataset.UNITED_type1_young_all_genes_old[i,]
   prob <- 10 * ((round(prob  * 100, 0)) %/% 10)
   if (prob == 100) {
     predictions_dataset.UNITED_type1_young_all_genes_old[i,] <- convert$PPVT1[10]
