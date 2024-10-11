@@ -319,15 +319,14 @@ plot_simulation_riley_t2d <- combined_probabilities_t2d %>%
 
 plot_simulation_riley_combined <- wrap_plots(
  
-  plot_simulation_riley_t1d +
-    ggtitle("Early-insulin-treated"),
+  plot_simulation_riley_t1d,
   
-  plot_simulation_riley_t2d +
-    ggtitle("Non-early-insulin-treated"),
+  plot_simulation_riley_t2d,
   
   nrow = 1
    
 ) +
+  patchwork::plot_annotation(tag_levels = list(c("A", "B"))) +
   plot_layout(guides = 'collect') &
   theme(
     legend.position = "bottom"
