@@ -21,7 +21,7 @@ probabilities <- probabilities_under_30 %>%
   as.data.frame() %>%
   
   ## remove the column which the model used
-  select(-which_eq) %>%
+  select(-which_equation) %>%
   
   ## rename variables
   rename("Old Calculator" = "old_prob", "New Calculator" = "new_prob") %>%
