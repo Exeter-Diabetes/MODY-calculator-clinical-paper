@@ -456,7 +456,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(t1ort2 == 2) %>%
         
         ### keep only patients with Genes
-        filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+        filter(Gene %in% c("HNF1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
         
         ### select the correct variables
         select(commonmody, sex, bmi, agedx = agediag, insoroha, hba1c = hba1cpc, 
