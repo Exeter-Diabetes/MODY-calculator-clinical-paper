@@ -82,7 +82,7 @@ auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, 
 auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
 # quantile(auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # # 2.5%       50%     97.5% 
-# # 0.7968750 0.8106250 0.8246875 
+# # 0.7892308 0.8042308 0.8192308 
 
 
 #:------------------------------------------------------------
@@ -141,7 +141,7 @@ pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes
 pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
 # quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # # 2.5%       50%     97.5% 
-# # 0.5937558 0.6170095 0.6440505 
+# # 0.5601752 0.5872483 0.6154755 
 
 #:------------------------------------------------------------
 
