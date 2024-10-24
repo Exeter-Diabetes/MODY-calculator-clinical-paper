@@ -811,7 +811,7 @@ plot_prob_prec_recal_united <- patchwork::wrap_plots(
            mapping = aes(x = -Inf, y = -Inf, label = auc),
            size = 7,
            label.size = NA,
-           hjust = -1,
+           hjust = -0.9,
            vjust = -6.5
          )),
   
