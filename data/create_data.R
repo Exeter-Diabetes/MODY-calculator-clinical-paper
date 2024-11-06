@@ -5,7 +5,7 @@
 #:----------------------------------------------------------------------------
 
 
-create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRUE) {
+create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRUE, id = FALSE) {
   
   # checks for 'dataset'
   if(missing(dataset) | is.null(dataset)) {stop("'dataset' needs to be provided.")}
@@ -212,10 +212,19 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       ## return final dataset
       return(
         
-        dataset.UNITED_type1 %>%
+        if (isTRUE(id)) {
           
-          # remove id
-          select(-id)
+          dataset.UNITED_type1
+          
+        } else {
+          
+          dataset.UNITED_type1 %>%
+            
+            # remove id
+            select(-id)
+          
+        }
+        
       )
       
     } else if (tolower(biomarkers) == "full") {
@@ -393,10 +402,20 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       ## return final dataset
       return(
         
-        dataset.UNITED_type1 %>%
+        
+        if (isTRUE(id)) {
           
-          # remove id
-          select(-id)
+          dataset.UNITED_type1
+          
+        } else {
+          
+          dataset.UNITED_type1 %>%
+            
+            # remove id
+            select(-id)
+          
+        }
+        
       )
       
     }
@@ -513,10 +532,20 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
     ## return final dataset
     return(
       
-      dataset.UNITED_type2 %>%
+      
+      if (isTRUE(id)) {
         
-        # remove id
-        select(-id)
+        dataset.UNITED_type2
+        
+      } else {
+        
+        dataset.UNITED_type2 %>%
+          
+          # remove id
+          select(-id)
+        
+      }
+      
     )
     
   } else if (tolower(dataset) == "united t1d pediatrics") {
@@ -578,6 +607,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         mutate(A = ifelse(M == 0 & C == 1 & is.na(A), 0, A)) %>%
         mutate(C = ifelse(!is.na(M), 1, C)) %>%
         mutate(A = ifelse(!is.na(M), 0, A)) %>%
+        mutate(A = ifelse(id %in% c(946), 1, A)) %>%      # patient with wrong antibody status coded (IA2 was positive)
         #:---   For missing M:
         #:---     - it doesn't matter, there is no one with C+ and A-
         mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
@@ -633,6 +663,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           #:---   For missing M:
           #:---     - it doesn't matter, there is no one with C+ and A-
           mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
+          mutate(A = ifelse(id %in% c(946), 1, A)) %>%      # patient with wrong antibody status coded (IA2 was positive)
           
           ### make sure it is a data.frame() for use in R
           as.data.frame()
@@ -669,13 +700,25 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       ## return final dataset
       return(
         
-        dataset.UNITED_young_type1 %>%
+        
+        if (isTRUE(id)) {
           
-          # drop those with T = NA
-          drop_na(T) %>%
+          dataset.UNITED_young_type1 %>%
+            
+            # drop those with T = NA
+            drop_na(T)
           
-          # remove id
-          select(-id)
+        } else {
+          
+          dataset.UNITED_young_type1 %>%
+            
+            # drop those with T = NA
+            drop_na(T) %>%
+            
+            # remove id
+            select(-id)
+          
+        }
       )
       
     } else if (tolower(biomarkers) == "full") {
@@ -749,6 +792,8 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         #:---   For missing M:
         #:---     - it doesn't matter, there is no one with C+ and A-
         mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
+        mutate(A = ifelse(id %in% c(946), 1, A)) %>%      # patient with wrong antibody status coded (IA2 was positive)
+        
         ### make sure it is a data.frame() for use in R
         as.data.frame()
       
@@ -812,6 +857,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           #:---   For missing M:
           #:---     - it doesn't matter, there is no one with C+ and A-
           mutate(T = ifelse(C == 0 | A == 1, 1, 0)) %>% # T is 1 if Cn or Ap
+          mutate(A = ifelse(id %in% c(946), 1, A)) %>%      # patient with wrong antibody status coded (IA2 was positive)
           
           ### make sure it is a data.frame() for use in R
           as.data.frame()
@@ -848,13 +894,27 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       ## return final dataset
       return(
         
-        dataset.UNITED_young_type1 %>%
+        
+        
+        if (isTRUE(id)) {
           
-          # drop those with T = NA
-          drop_na(T) %>%
+          dataset.UNITED_young_type1 %>%
+            
+            # drop those with T = NA
+            drop_na(T)
           
-          # remove id
-          select(-id)
+        } else {
+          
+          dataset.UNITED_young_type1 %>%
+            
+            # drop those with T = NA
+            drop_na(T) %>%
+            
+            # remove id
+            select(-id)
+          
+        }
+        
       )
       
       
