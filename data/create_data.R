@@ -152,7 +152,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-commonmody, -DNAResult) %>%
@@ -333,7 +333,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-commonmody, -DNAResult) %>%
@@ -482,7 +482,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
                pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
         
         ### generate the outcome variables
-        mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+        mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
         
         ### remove variables not needed
         select(-commonmody, -DNAResult) %>%
@@ -583,7 +583,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         drop_na(pardm) %>%
         
         ### generate the outcome variables
-        mutate(mody = ifelse(is.na(DNAResult), NA, ifelse(tolower(Gene) %in% c("hnf1a", "hnf4a", "gck"), 1, 0))) %>%
+        mutate(mody = ifelse(is.na(DNAResult), NA, ifelse(tolower(Gene) %in% c("hnf1a", "hnf4a", "gck") & DNAResult == 1, 1, 0))) %>%
         
         ### drop not needed variables
         select(-DNAResult, -Gene) %>%
@@ -638,7 +638,7 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene), 1, DNAResult)) %>%
+          mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-DNAResult) %>%
