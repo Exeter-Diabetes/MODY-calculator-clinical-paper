@@ -10,6 +10,7 @@ library(nimble)
 library(pROC)
 library(PRROC)
 
+
 # load functions needed
 source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
@@ -69,21 +70,20 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 ### No biomarker models
 auc_T1D_no_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 10)
 # quantile(auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-# # 2.5%       50%     97.5% 
-# # 0.7986016 0.8357906 0.8562092 
+# 2.5%       50%     97.5% 
+# 0.7053243 0.7924399 0.8190743 
 
 ### Biomarker models
 auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 10)
 # quantile(auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-# # 2.5%       50%     97.5% 
-# # 0.9765922 0.9792268 0.9812028 
+# 2.5%       50%     97.5% 
+# 0.9487113 0.9768041 0.9779210 
 
 ## Type 2 UNITED
 auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
 # quantile(auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-# # 2.5%       50%     97.5% 
-# # 0.7892308 0.8042308 0.8192308 
-
+# 2.5%       50%     97.5% 
+# 0.8412832 0.8564795 0.8704095 
 
 #:------------------------------------------------------------
 
@@ -129,19 +129,19 @@ calc_auc_pr <- function(data, predictions, class1 = 1, thinning = 100) {
 pr_auc_T1D_no_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 10)
 # quantile(pr_auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%        50%      97.5% 
-# 0.02233093 0.03205236 0.04040395 
+# 0.01548813 0.02644908 0.03477454 
 
 ### Biomarker models
 pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 10)
 # quantile(pr_auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-# 2.5%       50%     97.5% 
-# 0.1705823 0.2104027 0.2396283 
+# 2.5%        50%      97.5% 
+# 0.09617254 0.19216510 0.22411871 
 
 ## Type 2 UNITED
 pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
 # quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
-# # 2.5%       50%     97.5% 
-# # 0.5601752 0.5872483 0.6154755 
+# 2.5%       50%     97.5% 
+# 0.5954615 0.6265107 0.6578567 
 
 #:------------------------------------------------------------
 
@@ -365,7 +365,7 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_ge
                           unlist()),
         mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " ")
+      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers")
   ) %>%
   rename("auc" = "ROCAUC")
 
@@ -534,76 +534,81 @@ dev.off()
 plot_prob_rocs_united <- patchwork::wrap_plots(
   
   # roc insulin-treated
-  free(roc_curves %>%
-    filter(Dataset == "UNITED" & Model == "Type 1") %>%
-    mutate(
-      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
-      iteration = 0
-    ) %>%
-    ggplot(aes(x = 1- specificities, y = sensitivities)) +
-    geom_path(
-      data = roc_T1D_no_T_united_all_genes %>%
-        mutate(
-          Calculator = "Clinical features"
-        ) %>%
-        rbind(
-          roc_T1D_with_T_united_all_genes %>%
-            mutate(Calculator = "Clinical features and biomarkers")
-        ),
-      aes(group = iteration), colour = "grey"
-    ) + 
-    geom_path() +
-    theme_bw() +
-    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
-    scale_y_continuous("Sensitivity", labels = scales::percent) +
-    scale_x_continuous("1- Specificity", labels = scales::percent) +
-    theme_bw() +
-    geom_label(
-      data = roc_curves %>%
-        select(-sensitivities, -specificities) %>%
-        distinct() %>%
-        mutate(
-          auc = paste0(" AUC:", signif(auc, 2), " "),
-          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
-        ) %>%
-        filter(Dataset == "UNITED" & Model == "Type 1") %>%
-        mutate(
-          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
-        ),
-      mapping = aes(x = -Inf, y = -Inf, label = auc),
-      size = 7,
-      label.size = NA,
-      hjust = -0.8,
-      vjust = -0.5
-    ) +
-    theme(
-      panel.spacing.x = unit(1.5, "lines")
-    )),
-  
-  free(roc_curves %>%
-    filter(Dataset == "UNITED" & Model == "Type 2") %>%
-    ggplot(aes(x = 1- specificities, y = sensitivities)) +
-    geom_path(
-      data = roc_T2D_new_united_all_genes %>%
-        mutate(
-          Calculator = "No Biomarkers"
-        ),
-      aes(group = iteration), colour = "grey"
-    ) +
-    geom_path() +
-    theme_bw() +
-    scale_y_continuous("Sensitivity", labels = scales::percent) +
-    scale_x_continuous("1- Specificity", labels = scales::percent) +
-    theme_bw() +
-    geom_label(
-      data = dat_text %>%
-        filter(Dataset == "UNITED" & Model == "Type 2"),
-      mapping = aes(x = -Inf, y = -Inf, label = auc),
-      size = 7,
-      label.size = NA,
-      hjust = -0.8,
-      vjust = -0.5
-    )),
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T1D_no_T_united_all_genes %>%
+                        mutate(
+                          Calculator = "Clinical features"
+                        ) %>%
+                        rbind(
+                          roc_T1D_with_T_united_all_genes %>%
+                            mutate(Calculator = "Clinical features and biomarkers")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) + 
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T2D_new_united_all_genes %>%
+                        mutate(
+                          Calculator = factor("Not-early-insulin-treated")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
   
   ncol = 1
   
@@ -614,8 +619,293 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
     strip.text = element_text(size = 11)
   )
 
-pdf("figures/united_roc_thin_100.pdf", width = 8, height = 8)
+plot_prob_rocs_united1 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T1D_no_T_united_all_genes %>%
+                        mutate(
+                          Calculator = "Clinical features"
+                        ) %>%
+                        rbind(
+                          roc_T1D_with_T_united_all_genes %>%
+                            mutate(Calculator = "Clinical features and biomarkers")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) + 
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated: Clinical features")) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T2D_new_united_all_genes %>%
+                        mutate(
+                          Calculator = factor("Not-early-insulin-treated: Clinical features")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~Calculator, labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated: Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+plot_prob_rocs_united2 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T1D_no_T_united_all_genes %>%
+                        mutate(
+                          Calculator = "Clinical features"
+                        ) %>%
+                        rbind(
+                          roc_T1D_with_T_united_all_genes %>%
+                            mutate(Calculator = "Clinical features and biomarkers")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) + 
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 40, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T2D_new_united_all_genes %>%
+                        mutate(
+                          Calculator = factor("Not-early-insulin-treated")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+plot_prob_rocs_united3 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T1D_no_T_united_all_genes %>%
+                        mutate(
+                          Calculator = "Clinical features"
+                        ) %>%
+                        rbind(
+                          roc_T1D_with_T_united_all_genes %>%
+                            mutate(Calculator = "Clinical features and biomarkers")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) + 
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 40, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated: Clinical features")) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path(
+                      data = roc_T2D_new_united_all_genes %>%
+                        mutate(
+                          Calculator = factor("Not-early-insulin-treated: Clinical features")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~Calculator, labeller = label_wrap_gen(width = 40, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated: Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+pdf("figures/united_roc_thin_100.pdf", width = 9, height = 8)
 plot_prob_rocs_united +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united1 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united2 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united3 +
   patchwork::plot_layout(
     design = "
     AAAA
@@ -630,45 +920,45 @@ dev.off()
 plot_prob_boxplot_united <- patchwork::wrap_plots(
   
   # Boxplots
-  free(dataset.UNITED_type1_all_genes %>%
-    select(M) %>%
-    rename("Mody" = "M") %>%
-    cbind(
-      prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T),
-      prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)
-    ) %>%
-    gather("key", "Probability", -Mody) %>% 
-    mutate(
-      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
-      key = factor(key, levels = c("prob_without", "prob_with"), labels = c("Clinical features", "Clinical features and biomarkers"))
-    ) %>%
-    ggplot() +
-    geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
-    geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
-    scale_y_continuous(labels = scales::percent) +
-    scale_colour_manual(values = c("white", "black")) +
-    scale_alpha_manual(values = c(0, 1)) +
-    facet_wrap(~key) +
-    theme_bw() +
-    theme(
-      legend.position = "none"
-    )),
+  patchwork::free(dataset.UNITED_type1_all_genes %>%
+                    select(M) %>%
+                    rename("Mody" = "M") %>%
+                    cbind(
+                      prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T),
+                      prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)
+                    ) %>%
+                    gather("key", "Probability", -Mody) %>% 
+                    mutate(
+                      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive")),
+                      key = factor(key, levels = c("prob_without", "prob_with"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                    ) %>%
+                    ggplot() +
+                    geom_boxplot(aes(y = Probability, x = Mody), colour = c("black", "white", "black", "white"), alpha = c(1, 0, 1, 0)) +
+                    geom_point(aes(y = Probability, x = Mody, colour = Mody, alpha = Mody)) +
+                    scale_y_continuous(labels = scales::percent) +
+                    scale_colour_manual(values = c("white", "black")) +
+                    scale_alpha_manual(values = c(0, 1)) +
+                    facet_wrap(~key) +
+                    theme_bw() +
+                    theme(
+                      legend.position = "none"
+                    )),
   
   # Boxplots
-  free(dataset.UNITED_type2_all_genes %>%
-    select(M) %>%
-    rename("Mody" = "M") %>%
-    cbind(
-      Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new),
-      key = ""
-    ) %>%
-    mutate(
-      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
-    ) %>%
-    ggplot() +
-    geom_boxplot(aes(y = Probability, x = Mody)) +
-    scale_y_continuous(labels = scales::percent) +
-    theme_bw())
+  patchwork::free(dataset.UNITED_type2_all_genes %>%
+                    select(M) %>%
+                    rename("Mody" = "M") %>%
+                    cbind(
+                      Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new),
+                      key = ""
+                    ) %>%
+                    mutate(
+                      Mody = factor(Mody, levels = c(0, 1), labels = c("Negative", "Positive"))
+                    ) %>%
+                    ggplot() +
+                    geom_boxplot(aes(y = Probability, x = Mody)) +
+                    scale_y_continuous(labels = scales::percent) +
+                    theme_bw())
   
   , ncol = 1
   
@@ -744,76 +1034,76 @@ dat_text <- prec_recal_curves %>%
 plot_prob_prec_recal_united <- patchwork::wrap_plots(
   
   # roc insulin-treated
-  free(prec_recal_curves %>%
-         filter(Dataset == "UNITED" & Model == "Type 1") %>%
-         mutate(
-           Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
-           iteration = 0
-         ) %>%
-         ggplot(aes(x = recall, y = precision)) +
-         geom_path(
-           data = prec_recal_T1D_no_T_united_all_genes %>%
-             mutate(
-               Calculator = "Clinical features"
-             ) %>%
-             rbind(
-               prec_recal_T1D_with_T_united_all_genes %>%
-                 mutate(Calculator = "Clinical features and biomarkers")
-             ),
-           aes(group = iteration), colour = "grey"
-         ) + 
-         geom_path() +
-         theme_bw() +
-         facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
-         scale_y_continuous("Precision", labels = scales::percent) +
-         scale_x_continuous("Recall", labels = scales::percent) +
-         theme_bw() +
-         geom_label(
-           data = prec_recal_curves %>%
-             select(-precision, -recall) %>%
-             distinct() %>%
-             mutate(
-               auc = paste0(" AUC:", signif(auc, 2), " "),
-               mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
-             ) %>%
-             filter(Dataset == "UNITED" & Model == "Type 1") %>%
-             mutate(
-               Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
-             ),
-           mapping = aes(x = -Inf, y = -Inf, label = auc),
-           size = 7,
-           label.size = NA,
-           hjust = -1,
-           vjust = -6.5
-         ) +
-         theme(
-           panel.spacing.x = unit(1.5, "lines")
-         )),
+  patchwork::free(prec_recal_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = recall, y = precision)) +
+                    geom_path(
+                      data = prec_recal_T1D_no_T_united_all_genes %>%
+                        mutate(
+                          Calculator = "Clinical features"
+                        ) %>%
+                        rbind(
+                          prec_recal_T1D_with_T_united_all_genes %>%
+                            mutate(Calculator = "Clinical features and biomarkers")
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) + 
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers")), scales = "free",) +
+                    scale_y_continuous("Precision", labels = scales::percent) +
+                    scale_x_continuous("Recall", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = prec_recal_curves %>%
+                        select(-precision, -recall) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -1,
+                      vjust = -6.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
   
-  free(prec_recal_curves %>%
-         filter(Dataset == "UNITED" & Model == "Type 2") %>%
-         ggplot(aes(x = recall, y = precision)) +
-         geom_path(
-           data = prec_recal_T2D_new_united_all_genes %>%
-             mutate(
-               Calculator = "No Biomarkers"
-             ),
-           aes(group = iteration), colour = "grey"
-         ) +
-         geom_path() +
-         theme_bw() +
-         scale_y_continuous("Precision", labels = scales::percent) +
-         scale_x_continuous("Recall", labels = scales::percent) +
-         theme_bw() +
-         geom_label(
-           data = dat_text %>%
-             filter(Dataset == "UNITED" & Model == "Type 2"),
-           mapping = aes(x = -Inf, y = -Inf, label = auc),
-           size = 7,
-           label.size = NA,
-           hjust = -0.9,
-           vjust = -6.5
-         )),
+  patchwork::free(prec_recal_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    ggplot(aes(x = recall, y = precision)) +
+                    geom_path(
+                      data = prec_recal_T2D_new_united_all_genes %>%
+                        mutate(
+                          Calculator = "No Biomarkers"
+                        ),
+                      aes(group = iteration), colour = "grey"
+                    ) +
+                    geom_path() +
+                    theme_bw() +
+                    scale_y_continuous("Precision", labels = scales::percent) +
+                    scale_x_continuous("Recall", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2"),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.9,
+                      vjust = -6.5
+                    )),
   
   ncol = 1
   
@@ -833,6 +1123,4 @@ plot_prob_prec_recal_united +
     "
   )
 dev.off()
-
-
 
