@@ -41,6 +41,55 @@ dataset.UNITED_type2 <- create_data(dataset = "united t2d", commonmody = FALSE) 
 ## Calibration plots for UNITED type 1
 
 
+# ######
+# # Testing other way of plotting
+# test <- apply(predictions_dataset.UNITED_type1_with_T_full[1:100,which(!is.na(dataset.UNITED_type1$M))], 1 , function(
+#     x, 
+#     mody = dataset.UNITED_type1$M[!is.na(dataset.UNITED_type1$M)]
+#   ) {
+#   # cut-points
+#   cut_point <- quantile(x, probs = c(0.33, 0.66))
+#   groupings <- as.numeric(cut(x, breaks = c(0, cut_point, 1))) + 1
+#   
+#   dataset <- data.frame(probs = x, group = groupings, M = mody) %>%
+#     #now we want to group by these 5 defined groups (or defined predicted probability ranges)
+#     group_by(group) %>%
+#     #now we want to define new variables for each group
+#     mutate(
+#       #x which is the 50th quantile of the probs in value for each group (median probability)
+#       x = quantile(probs, probs = c(0.5)),
+#       #y which is the proportion of MODY cases in each group
+#       y = sum(M)/n()
+#     ) %>%
+#     #ungroup by group
+#     ungroup() %>%
+#     #we now have specific x,y for each group (quintile)
+#     #i.e. everytime see a group 4 will have same x, y etc
+#     #as these are the key values needed to plot, we don't need the rest and therefore deselect/drop them
+#     select(x, y) %>%
+#     #use distinct to keep only unique rows
+#     distinct()
+#   
+#   x = dataset$x; names(x) <- NA
+#   y = dataset$y; names(y) <- NA
+#   return(list(x = x, y = y))
+# })
+# 
+# 
+# 
+# data.frame(
+#   x = unlist(test)[attr(unlist(test),"names")=="x.NA"],
+#   y = unlist(test)[attr(unlist(test),"names")=="y.NA"]
+# ) %>%
+#   ggplot(aes(x = x, y = y)) +
+#   geom_point() + 
+#   xlim(0, 0.5) + ylim(0, 0.5) +
+#   # geom_density2d()
+#   geom_smooth(method = 'lm', formula = y ~ x,
+#               aes(fill = after_scale(color)), alpha = 0.3)
+# 
+# ######
+
 
 
 #
@@ -332,6 +381,440 @@ plot_calibration <- patchwork::wrap_plots(
     legend.position = "bottom"
   )
 
+
+
+#:--------------------------------------------
+
+
+plot_calibration_UNITED_type1_with_T <- data.frame(
+  prob = predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))],
+  M = dataset.UNITED_type1$M[which(!is.na(dataset.UNITED_type1$M))]
+) %>%
+  mutate(
+    group = as.numeric(cut(prob, breaks = c(0, grouping_values_UNITED_type1_with_T, 1))) + 1
+  ) %>%
+  group_by(group) %>%
+  mutate(
+    x = quantile(prob, probs = c(0.5)),
+    y = sum(M)/n()
+  ) %>%
+  ungroup() %>%
+  select(x, y) %>%
+  distinct() %>%
+  rbind(
+    data.frame(
+      prob = predictions_dataset.UNITED_type1_with_T$prob[which(is.na(dataset.UNITED_type1$M))],
+      M = dataset.UNITED_type1$M[which(is.na(dataset.UNITED_type1$M))],
+      group = 1
+    ) %>%
+      mutate(
+        M = ifelse(is.na(M), 0, M)
+      ) %>%
+      group_by(group) %>%
+      mutate(
+        x = quantile(prob, probs = c(0.5)),
+        y = sum(M)/n()
+      ) %>%
+      ungroup() %>%
+      select(x, y) %>%
+      distinct()
+  ) %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_point(data = legend_dataset, aes(x = x, y = y, alpha = alpha), shape = "square", size = 4) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  theme_light() +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  guides(alpha = guide_legend(title = "Credible interval")) +
+  scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
+  coord_cartesian(ylim =c(0, 0.5), xlim =c(0, 0.5)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+
+
+plot_calibration_UNITED_type2_new <- data.frame(
+  prob = predictions_dataset.UNITED_type2_new$prob,
+  M = dataset.UNITED_type2$M
+) %>%
+  mutate(
+    group = as.numeric(cut(prob, breaks = c(0, grouping_values_UNITED_type2_new, 1))) + 1
+  ) %>%
+  group_by(group) %>%
+  mutate(
+    x = quantile(prob, probs = c(0.5)),
+    y = sum(M)/n()
+  ) %>%
+  ungroup() %>%
+  select(x, y) %>%
+  distinct() %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_point(data = legend_dataset, aes(x = x, y = y, alpha = alpha), shape = "square", size = 4) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  theme_light() +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  guides(alpha = guide_legend(title = "Credible interval")) +
+  scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
+  coord_cartesian(ylim =c(0, 0.5), xlim =c(0, 0.5)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+  
+
+
+plot_calibration2 <- patchwork::wrap_plots(
+  
+  plot_calibration_UNITED_type1_with_T,
+  
+  plot_calibration_UNITED_type2_new,
+  
+  ncol = 1
+  
+) +
+  patchwork::plot_annotation(tag_levels = 'A') +
+  plot_layout(guides = 'collect') &
+  theme(
+    legend.position = "bottom"
+  )
+
+
+
+
+
+#:--------------------------------------------
+
+
+
+plot_calibration_UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T_full[,which(!is.na(dataset.UNITED_type1$M))] %>%
+  as.data.frame() %>%
+  t() %>%
+  as.data.frame() %>%
+  gather() %>%
+  cbind(
+    group = predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))],
+    M = dataset.UNITED_type1$M[!is.na(dataset.UNITED_type1$M)]
+  ) %>%
+  mutate(
+    group = ifelse(group < grouping_values_UNITED_type1_with_T[1], 1,
+                   ifelse(group < grouping_values_UNITED_type1_with_T[2], 2,
+                          ifelse(group < grouping_values_UNITED_type1_with_T[3], 3, 4)))
+  ) %>%
+  group_by(group) %>%
+  mutate(
+    x = quantile(value, probs = c(0.5)),
+    y = sum(M)/n(),
+    xmin = quantile(value, probs = c(0.025)),
+    xmin_75 = quantile(value, probs = c(0.125)),
+    xmin_50 = quantile(value, probs = c(0.25)),
+    xmin_25 = quantile(value, probs = c(0.375)),
+    xmax_25 = quantile(value, probs = c(0.625)),
+    xmax_50 = quantile(value, probs = c(0.75)),
+    xmax_75 = quantile(value, probs = c(0.875)),
+    xmax = quantile(value, probs = c(0.975))
+  ) %>%
+  ungroup() %>%
+  select(-key, -value, -group, -M) %>%
+  distinct() %>%
+  rbind(
+    predictions_dataset.UNITED_type1_with_T_full[,which(is.na(dataset.UNITED_type1$M))[c(1)]] %>%
+      as.data.frame() %>%
+      gather() %>%
+      cbind(
+        group = 1,
+        M = 0
+      ) %>%
+      group_by(group) %>%
+      mutate(
+        x = quantile(value, probs = c(0.5)),
+        y = sum(M)/n(),
+        xmin = quantile(value, probs = c(0.025)),
+        xmin_75 = quantile(value, probs = c(0.125)),
+        xmin_50 = quantile(value, probs = c(0.25)),
+        xmin_25 = quantile(value, probs = c(0.375)),
+        xmax_25 = quantile(value, probs = c(0.625)),
+        xmax_50 = quantile(value, probs = c(0.75)),
+        xmax_75 = quantile(value, probs = c(0.875)),
+        xmax = quantile(value, probs = c(0.975))
+      ) %>%
+      ungroup() %>%
+      select(-key, -value, -group, -M) %>%
+      distinct()
+  ) %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  geom_errorbar(aes(xmin = xmin, xmax = xmax)) +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  geom_point(data = legend_dataset, aes(x = x, y = y, alpha = alpha), shape = "square", size = 4) +
+  scale_alpha_continuous(name = "Credible interval", labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
+  theme_light() +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+
+
+
+plot_calibration_UNITED_type2_new <- predictions_dataset.UNITED_type2_new_full %>%
+  as.data.frame() %>%
+  t() %>%
+  as.data.frame() %>%
+  gather() %>%
+  cbind(
+    group = predictions_dataset.UNITED_type2_new$prob,
+    M = dataset.UNITED_type2$M
+  ) %>%
+  mutate(
+    group = ifelse(group < grouping_values_UNITED_type2_new[1], 1,
+                   ifelse(group < grouping_values_UNITED_type2_new[2], 2,
+                          ifelse(group < grouping_values_UNITED_type2_new[3], 3,
+                                 ifelse(group < grouping_values_UNITED_type2_new[4], 4, 5))))
+  ) %>%
+  mutate(group = factor(group, levels = c(1, 2, 3, 4, 5))) %>%
+  group_by(group) %>%
+  mutate(
+    x = quantile(value, probs = c(0.5)),
+    y = sum(M)/n(),
+    xmin = quantile(value, probs = c(0.025)),
+    xmin_75 = quantile(value, probs = c(0.125)),
+    xmin_50 = quantile(value, probs = c(0.25)),
+    xmin_25 = quantile(value, probs = c(0.375)),
+    xmax_25 = quantile(value, probs = c(0.625)),
+    xmax_50 = quantile(value, probs = c(0.75)),
+    xmax_75 = quantile(value, probs = c(0.875)),
+    xmax = quantile(value, probs = c(0.975))
+  ) %>%
+  ungroup() %>%
+  select(-key, -value, -group, -M) %>%
+  distinct() %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_point(data = legend_dataset, aes(x = x, y = y, alpha = alpha), shape = "square", size = 4) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  geom_errorbar(aes(xmin = xmin, xmax = xmax)) +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  theme_light() +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  guides(alpha = guide_legend(title = "Credible interval")) +
+  scale_alpha_continuous(labels = c("95%", "75%", "50%", "25%"), range = c(0.1, 0.4)) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+
+
+
+
+plot_calibration3 <- patchwork::wrap_plots(
+  
+  plot_calibration_UNITED_type1_with_T,
+  
+  plot_calibration_UNITED_type2_new,
+  
+  ncol = 1
+  
+) +
+  patchwork::plot_annotation(tag_levels = 'A') +
+  plot_layout(guides = 'collect') &
+  theme(
+    legend.position = "bottom"
+  )
+
+
+
+#:--------------------------------------------
+
+plot_calibration_UNITED_type1_with_T <- data.frame(
+  prob = predictions_dataset.UNITED_type1_with_T$prob[which(!is.na(dataset.UNITED_type1$M))],
+  M = dataset.UNITED_type1$M[which(!is.na(dataset.UNITED_type1$M))]
+) %>%
+  mutate(
+    group = as.numeric(cut(prob, breaks = c(0, grouping_values_UNITED_type1_with_T, 1)))
+  )
+
+dataset_plot <- NULL
+
+for (i in 1:length(unique(plot_calibration_UNITED_type1_with_T$group))) {
+  
+  interim_data <- plot_calibration_UNITED_type1_with_T %>%
+    filter(group == i) %>%
+    mutate(M = factor(M))
+  
+  interim_model <- glm(M ~ 1, data = interim_data, family=binomial(link='logit'))
+  
+  prediction <- predict(interim_model, newdata = data.frame(prob = mean(interim_data$prob)), type = "link", se.fit = TRUE)
+  
+  critval <- 1.96 ## approx 95% CI
+  upr <- prediction$fit + (critval * prediction$se.fit)
+  lwr <- prediction$fit - (critval * prediction$se.fit)
+  fit <- prediction$fit
+  
+  fit2 <- interim_model$family$linkinv(fit)
+  upr2 <- interim_model$family$linkinv(upr)
+  lwr2 <- interim_model$family$linkinv(lwr)
+  
+  dataset_plot <- rbind(
+    dataset_plot,
+    data.frame(mean = mean(interim_data$prob), fit = fit2, upr = upr2, lwr = lwr2)
+  )
+   
+}
+
+plot_calibration_UNITED_type1_with_T <- dataset_plot %>%
+  rbind(
+    data.frame(
+      mean = mean(predictions_dataset.UNITED_type1_with_T_full[,which(is.na(dataset.UNITED_type1$M))]),
+      fit = 0, upr = 0, lwr = 0
+    )
+  ) %>%
+  ggplot(aes(x = mean, y = fit)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  geom_errorbar(aes(ymin = lwr, ymax = upr)) +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  theme_light() +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+
+
+
+
+plot_calibration_UNITED_type2_new <- data.frame(
+  prob = predictions_dataset.UNITED_type2_new$prob,
+  M = dataset.UNITED_type2$M
+) %>%
+  mutate(
+    group = as.numeric(cut(prob, breaks = c(0, grouping_values_UNITED_type2_new, 1)))
+  )
+
+dataset_plot <- NULL
+
+for (i in 1:length(unique(plot_calibration_UNITED_type2_new$group))) {
+  
+  interim_data <- plot_calibration_UNITED_type2_new %>%
+    filter(group == i) %>%
+    mutate(M = factor(M))
+  
+  interim_model <- glm(M ~ 1, data = interim_data, family=binomial(link='logit'))
+  
+  prediction <- predict(interim_model, newdata = data.frame(prob = mean(interim_data$prob)), type = "link", se.fit = TRUE)
+  
+  critval <- 1.96 ## approx 95% CI
+  upr <- prediction$fit + (critval * prediction$se.fit)
+  lwr <- prediction$fit - (critval * prediction$se.fit)
+  fit <- prediction$fit
+  
+  fit2 <- interim_model$family$linkinv(fit)
+  upr2 <- interim_model$family$linkinv(upr)
+  lwr2 <- interim_model$family$linkinv(lwr)
+  
+  dataset_plot <- rbind(
+    dataset_plot,
+    data.frame(mean = mean(interim_data$prob), fit = fit2, upr = upr2, lwr = lwr2)
+  )
+  
+}
+
+
+plot_calibration_UNITED_type2_new <- dataset_plot %>%
+  ggplot(aes(x = mean, y = fit)) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_smooth(method = 'lm', formula = y ~ x,
+              aes(fill = after_scale(color)), alpha = 0) +
+  geom_point(shape = "triangle") +
+  geom_errorbar(aes(ymin = lwr, ymax = upr)) +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  coord_cartesian(ylim =c(0, 1), xlim =c(0, 1)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  xlab("Model predictions") +
+  ylab("Observed probability") +
+  theme_light() +
+  theme(
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 16),
+    title = element_text(size = 17),
+    legend.position = "bottom",
+    legend.text = element_text(size = 12))
+
+
+
+
+plot_calibration4 <- patchwork::wrap_plots(
+  
+  plot_calibration_UNITED_type1_with_T,
+  
+  plot_calibration_UNITED_type2_new,
+  
+  ncol = 1
+  
+) +
+  patchwork::plot_annotation(tag_levels = 'A') +
+  plot_layout(guides = 'collect') &
+  theme(
+    legend.position = "bottom"
+  )
+
+
+
+
+
 pdf("figures/united_calibration_plots.pdf", width = 6, height = 9)
 plot_calibration
+plot_calibration2
+plot_calibration3
+plot_calibration4
 dev.off()
