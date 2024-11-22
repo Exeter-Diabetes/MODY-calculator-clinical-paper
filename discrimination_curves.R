@@ -16,9 +16,13 @@ source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
 
 # load files required
-predictions_dataset.UNITED_type1_all_genes_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+predictions_dataset.UNITED_type1_all_genes_no_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type2_all_genes_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+
+predictions_dataset.UNITED_type1_all_genes_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
 
 # load datasets
 ## Load population representative dataset
@@ -68,19 +72,19 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-auc_T1D_no_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 10)
+auc_T1D_no_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 10)
 # quantile(auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.7053243 0.7924399 0.8190743 
 
 ### Biomarker models
-auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 10)
+auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 10)
 # quantile(auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.9487113 0.9768041 0.9779210 
 
 ## Type 2 UNITED
-auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
+auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
 # quantile(auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.8412832 0.8564795 0.8704095 
@@ -126,19 +130,19 @@ calc_auc_pr <- function(data, predictions, class1 = 1, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-pr_auc_T1D_no_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 10)
+pr_auc_T1D_no_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 10)
 # quantile(pr_auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%        50%      97.5% 
 # 0.01548813 0.02644908 0.03477454 
 
 ### Biomarker models
-pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 10)
+pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 10)
 # quantile(pr_auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%        50%      97.5% 
 # 0.09617254 0.19216510 0.22411871 
 
 ## Type 2 UNITED
-pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 10)
+pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
 # quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.5954615 0.6265107 0.6578567 
@@ -178,7 +182,7 @@ calc_roc <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-roc_T1D_no_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 100)
+roc_T1D_no_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_no_T_united_all_genes <- ggplot() +
@@ -189,14 +193,14 @@ plot_roc_T1D_no_T_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T), levels = c(0,1), direction = "<") %>%
+    data = pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full), levels = c(0,1), direction = "<") %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame(),
     aes(x = 1-specificities, y= sensitivities), colour = "black"
   )
 
 ### Biomarker models
-roc_T1D_with_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 100)
+roc_T1D_with_T_united_all_genes <- calc_roc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T_united_all_genes <- ggplot() +
@@ -207,14 +211,14 @@ plot_roc_T1D_with_T_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)) %>%
+    data = pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame(),
     aes(x = 1-specificities, y= sensitivities), colour = "black"
   )
 
 ## Type 2 UNITED
-roc_T2D_new_united_all_genes <- calc_roc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 100)
+roc_T2D_new_united_all_genes <- calc_roc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D_new_united_all_genes <- ggplot() +
@@ -225,7 +229,7 @@ plot_roc_T2D_new_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type2_all_genes_new)) %>%
+    data = pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame(),
     aes(x = 1-specificities, y= sensitivities), colour = "black"
@@ -268,7 +272,7 @@ calc_prec_recal_curve <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-prec_recal_T1D_no_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T, thinning = 100)
+prec_recal_T1D_no_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_no_T_united_all_genes <- ggplot() +
@@ -279,13 +283,13 @@ plot_prec_recal_T1D_no_T_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)), ret = c("precision", "recall")) %>%
+    data = pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)), ret = c("precision", "recall")) %>%
       as.data.frame(),
     aes(x = recall, y= precision), colour = "black"
   )
 
 ### Biomarker models
-prec_recal_T1D_with_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T, thinning = 100)
+prec_recal_T1D_with_T_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T1D_with_T_united_all_genes <- ggplot() +
@@ -296,13 +300,13 @@ plot_prec_recal_T1D_with_T_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)), ret = c("precision", "recall")) %>%
+    data = pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)), ret = c("precision", "recall")) %>%
       as.data.frame(),
     aes(x = recall, y= precision), colour = "black"
   )
 
 ## Type 2 UNITED
-prec_recal_T2D_new_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new, thinning = 100)
+prec_recal_T2D_new_united_all_genes <- calc_prec_recal_curve(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 100)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_prec_recal_T2D_new_united_all_genes <- ggplot() +
@@ -313,7 +317,7 @@ plot_prec_recal_T2D_new_united_all_genes <- ggplot() +
   ) +
   ## average predictions
   geom_path(
-    data = pROC::coords(pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type2_all_genes_new)), ret = c("precision", "recall")) %>%
+    data = pROC::coords(pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)), ret = c("precision", "recall")) %>%
       as.data.frame(),
     aes(x = recall, y= precision), colour = "black"
   )
@@ -323,47 +327,47 @@ plot_prec_recal_T2D_new_united_all_genes <- ggplot() +
 
 # Boxplot and roc curves
 
-roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)) %>%
+roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
   cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
   pROC::roc(response = Mody, predictor = prob) %>%
   magrittr::extract(2:3) %>%
   as.data.frame() %>%
   mutate(
-    ROCAUC =  unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)) %>%
+    ROCAUC =  unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
                        cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
                        pROC::roc(response = Mody, predictor = prob) %>%
                        magrittr::extract(c(9)) %>%
                        unlist()),
-    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T), na.rm = TRUE)
+    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full), na.rm = TRUE)
   ) %>%
   mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
   rbind(
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)) %>%
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
       cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)) %>%
+        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
                           cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
                           pROC::roc(response = Mody, predictor = prob) %>%
                           magrittr::extract(c(9)) %>%
                           unlist()),
-        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T), na.rm = TRUE)
+        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new)) %>%
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
       cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new)) %>%
+        ROCAUC = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
                           cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
                           pROC::roc(response = Mody, predictor = prob) %>%
                           magrittr::extract(c(9)) %>%
                           unlist()),
-        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new), na.rm = TRUE)
+        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers")
   ) %>%
@@ -392,8 +396,8 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
       select(M) %>%
       rename("Mody" = "M") %>%
       cbind(
-        prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T),
-        prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)
+        prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full),
+        prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)
       ) %>%
       gather("key", "Probability", -Mody) %>% 
       mutate(
@@ -470,7 +474,7 @@ plot_prob_boxplot_rocs_united <- patchwork::wrap_plots(
       select(M) %>%
       rename("Mody" = "M") %>%
       cbind(
-        Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new),
+        Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full),
         key = ""
       ) %>%
       mutate(
@@ -924,8 +928,8 @@ plot_prob_boxplot_united <- patchwork::wrap_plots(
                     select(M) %>%
                     rename("Mody" = "M") %>%
                     cbind(
-                      prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T),
-                      prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)
+                      prob_with = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full),
+                      prob_without = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)
                     ) %>%
                     gather("key", "Probability", -Mody) %>% 
                     mutate(
@@ -949,7 +953,7 @@ plot_prob_boxplot_united <- patchwork::wrap_plots(
                     select(M) %>%
                     rename("Mody" = "M") %>%
                     cbind(
-                      Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new),
+                      Probability = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full),
                       key = ""
                     ) %>%
                     mutate(
@@ -984,35 +988,35 @@ dev.off()
 ################
 
 
-prec_recal_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T)) %>%
+prec_recal_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
   cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
   pROC::roc(response = Mody, predictor = prob) %>%
   pROC::coords(ret = c("precision", "recall")) %>%
   as.data.frame() %>%
   mutate(
-    ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T))), thinning = 1),
-    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T), na.rm = TRUE)
+    ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full))), thinning = 1),
+    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full), na.rm = TRUE)
   ) %>%
   mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
   rbind(
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T)) %>%
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
       cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       pROC::coords(ret = c("precision", "recall")) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T))), thinning = 1),
-        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T), na.rm = TRUE)
+        ROCAUC = calc_auc_pr(dataset.UNITED_type1_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full))), thinning = 1),
+        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new)) %>%
+    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
       cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       pROC::coords(ret = c("precision", "recall")) %>%
       as.data.frame() %>%
       mutate(
-        ROCAUC = calc_auc_pr(dataset.UNITED_type2_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type2_all_genes_new))), thinning = 1),
-        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new), na.rm = TRUE)
+        ROCAUC = calc_auc_pr(dataset.UNITED_type2_all_genes$M, t(as.data.frame(colMeans(predictions_dataset.UNITED_type2_all_genes_new_full))), thinning = 1),
+        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 2", Calculator = " ")
   ) %>%
@@ -1123,4 +1127,552 @@ plot_prob_prec_recal_united +
     "
   )
 dev.off()
+
+
+
+
+
+################################
+# Testing different roc curves
+
+
+plot_prob_rocs_united_testing_1 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot(aes(x = 1- specificities, y = sensitivities)) +
+                    geom_path() +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+#:----------------------
+
+roc_t1d_no_T <- pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_no_T$prob)
+
+roccoords_t1d_no_T <- pROC::coords(roc_t1d_no_T, ret = c("threshold", "specificity", "sensitivity"), transpose = FALSE)
+
+roc_t1d_with_T <- pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_with_T$prob)
+
+roccoords_t1d_with_T <- pROC::coords(roc_t1d_with_T, ret = c("threshold", "specificity", "sensitivity"), transpose = FALSE)
+
+roc_t2d_new <- pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = predictions_dataset.UNITED_type2_all_genes_new$prob)
+
+roccoords_t2d_new <- pROC::coords(roc_t2d_new, ret = c("threshold", "specificity", "sensitivity"), transpose = FALSE)
+
+
+roc_curves_new <- data.frame(
+  ci.coords(roc_t1d_no_T, roccoords_t1d_no_T$threshold, ret= c("specificity", "sensitivity"))
+) %>%
+  mutate(
+    Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"
+  ) %>%
+  rbind(
+    data.frame(
+      ci.coords(roc_t1d_with_T, roccoords_t1d_with_T$threshold, ret= c("specificity", "sensitivity"))
+    ) %>%
+      mutate(
+        Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers"
+      ),
+    data.frame(
+      ci.coords(roc_t2d_new, roccoords_t2d_new$threshold, ret= c("specificity", "sensitivity"))
+    ) %>%
+      mutate(
+        Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers"
+      )
+  )
+
+
+plot_prob_rocs_united_testing_2 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves_new %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers")),
+                      iteration = 0
+                    ) %>%
+                    ggplot() +
+                    geom_path(aes(x = 1- `specificity.2.5.`, y = `sensitivity.2.5.`), linetype = "dashed", colour = "grey") +
+                    geom_path(aes(x = 1- `specificity.97.5.`, y = `sensitivity.97.5.`), linetype = "dashed", colour = "grey") +
+                    geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves_new %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot() +
+                    geom_path(aes(x = 1- `specificity.2.5.`, y = `sensitivity.2.5.`), linetype = "dashed", colour = "grey") +
+                    geom_path(aes(x = 1- `specificity.97.5.`, y = `sensitivity.97.5.`), linetype = "dashed", colour = "grey") +
+                    geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+#:----------------------
+
+
+roc_curves_new_polygon <- data.frame(
+  x = c(
+    ci.coords(roc_t1d_no_T, roccoords_t1d_no_T$threshold, ret= c("specificity", "sensitivity"))$specificity[,1], 
+    rev(ci.coords(roc_t1d_no_T, roccoords_t1d_no_T$threshold, ret= c("specificity", "sensitivity"))$specificity[,3])
+  ),
+  y = c(
+    ci.coords(roc_t1d_no_T, roccoords_t1d_no_T$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,1], 
+    rev(ci.coords(roc_t1d_no_T, roccoords_t1d_no_T$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,3])
+  )
+) %>%
+  mutate(
+    Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"
+  ) %>%
+  rbind(
+    data.frame(
+      x = c(
+        ci.coords(roc_t1d_with_T, roccoords_t1d_with_T$threshold, ret= c("specificity", "sensitivity"))$specificity[,1], 
+        rev(ci.coords(roc_t1d_with_T, roccoords_t1d_with_T$threshold, ret= c("specificity", "sensitivity"))$specificity[,3])
+      ),
+      y = c(
+        ci.coords(roc_t1d_with_T, roccoords_t1d_with_T$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,1], 
+        rev(ci.coords(roc_t1d_with_T, roccoords_t1d_with_T$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,3])
+      )
+    ) %>%
+      mutate(
+        Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers"
+      ),
+    data.frame(
+      x = c(
+        ci.coords(roc_t2d_new, roccoords_t2d_new$threshold, ret= c("specificity", "sensitivity"))$specificity[,1], 
+        rev(ci.coords(roc_t2d_new, roccoords_t2d_new$threshold, ret= c("specificity", "sensitivity"))$specificity[,3])
+      ),
+      y = c(
+        ci.coords(roc_t2d_new, roccoords_t2d_new$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,1], 
+        rev(ci.coords(roc_t2d_new, roccoords_t2d_new$threshold, ret= c("specificity", "sensitivity"))$sensitivity[,3])
+      )
+    ) %>%
+      mutate(
+        Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers"
+      )
+  )
+
+
+
+plot_prob_rocs_united_testing_3 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves_new %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                    ) %>%
+                    ggplot() +
+                    geom_polygon(
+                      data = roc_curves_new_polygon %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                        ),
+                      aes(x = 1 - x, y = y), fill = "grey") +
+                    geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves_new %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot() +
+                    geom_polygon(
+                      data = roc_curves_new_polygon %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")),
+                      aes(x = 1 - x, y = y), fill = "grey") +
+                    geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+
+#:----------------------
+
+
+
+### No biomarker models
+auc_T1D_no_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 10)
+
+min_no_T <- order(auc_T1D_no_T_united_all_genes)[0.025*length(auc_T1D_no_T_united_all_genes)]
+max_no_T <- order(auc_T1D_no_T_united_all_genes)[0.975*length(auc_T1D_no_T_united_all_genes)]
+
+coords_min_no_T <- pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_no_T_full[seq(1, 800000, 10)[min_no_T],]))
+coords_max_no_T <- pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_no_T_full[seq(1, 800000, 10)[max_no_T],]))
+
+d1 <- coords_min_no_T %>%
+  mutate(type = "min") %>%
+  rbind(
+    coords_max_no_T %>%
+      mutate(type = "max")
+  ) %>%
+  mutate(
+    Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"
+  )
+
+### Biomarker models
+auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 10)
+
+min_with_T <- order(auc_T1D_with_T_united_all_genes)[0.025*length(auc_T1D_with_T_united_all_genes)]
+max_with_T <- order(auc_T1D_with_T_united_all_genes)[0.975*length(auc_T1D_with_T_united_all_genes)]
+
+coords_min_with_T <- pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_with_T_full[seq(1, 800000, 10)[min_with_T],]))
+coords_max_with_T <- pROC::coords(pROC::roc(response = dataset.UNITED_type1_all_genes$M, predictor = predictions_dataset.UNITED_type1_all_genes_with_T_full[seq(1, 800000, 10)[max_with_T],]))
+
+d2 <- coords_min_with_T %>%
+  mutate(type = "min") %>%
+  rbind(
+    coords_max_with_T %>%
+      mutate(type = "max")
+  ) %>%
+  mutate(
+    Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers"
+  )
+
+## Type 2 UNITED
+auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
+
+min_new <- order(auc_T2D_new_united_all_genes)[0.025*length(auc_T2D_new_united_all_genes)]
+max_new <- order(auc_T2D_new_united_all_genes)[0.975*length(auc_T2D_new_united_all_genes)]
+
+coords_min_new <- pROC::coords(pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = predictions_dataset.UNITED_type2_all_genes_new_full[seq(1, 800000, 10)[min_new],]))
+coords_max_new <- pROC::coords(pROC::roc(response = dataset.UNITED_type2_all_genes$M, predictor = predictions_dataset.UNITED_type2_all_genes_new_full[seq(1, 800000, 10)[max_new],]))
+
+d3 <- coords_min_new %>%
+  mutate(type = "min") %>%
+  rbind(
+    coords_max_new %>%
+      mutate(type = "max")
+  ) %>%
+  mutate(
+    Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers"
+  )
+
+
+
+roc_dataset_test <- rbind(d1, d2, d3)
+
+
+plot_prob_rocs_united_testing_4 <- patchwork::wrap_plots(
+  
+  # roc insulin-treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                    mutate(
+                      Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                    ) %>%
+                    ggplot() +
+                    geom_path(
+                      data = roc_dataset_test %>%
+                        filter(type == "min") %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                        ),
+                      aes(x = 1 - `specificity`, y = `sensitivity`), colour = "blue"
+                    ) +
+                    geom_path(
+                      data = roc_dataset_test %>%
+                        filter(type == "max") %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
+                        ),
+                      aes(x = 1 - `specificity`, y = `sensitivity`), colour = "red"
+                    ) +
+                    geom_path(aes(x = 1- specificities, y = sensitivities)) +
+                    theme_bw() +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = roc_curves %>%
+                        select(-sensitivities, -specificities) %>%
+                        distinct() %>%
+                        mutate(
+                          auc = paste0(" AUC:", signif(auc, 2), " "),
+                          mean = paste0("Mean prob:", signif(mean, 2)*100, "%")
+                        ) %>%
+                        filter(Dataset == "UNITED" & Model == "Type 1") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    ) +
+                    theme(
+                      panel.spacing.x = unit(1.5, "lines")
+                    )),
+  # roc not early insulin treated
+  patchwork::free(roc_curves %>%
+                    filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                    mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+                    ggplot() +
+                    geom_path(
+                      data = roc_dataset_test %>%
+                        filter(type == "min") %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")
+                        ),
+                      aes(x = 1 - `specificity`, y = `sensitivity`), colour = "blue"
+                    ) +
+                    geom_path(
+                      data = roc_dataset_test %>%
+                        filter(type == "max") %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")
+                        ),
+                      aes(x = 1 - `specificity`, y = `sensitivity`), colour = "red"
+                    ) +
+                    geom_path(aes(x = 1- specificities, y = sensitivities)) +
+                    theme_bw() +
+                    facet_grid(~Calculator) +
+                    scale_y_continuous("Sensitivity", labels = scales::percent) +
+                    scale_x_continuous("1- Specificity", labels = scales::percent) +
+                    theme_bw() +
+                    geom_label(
+                      data = dat_text %>%
+                        filter(Dataset == "UNITED" & Model == "Type 2") %>%
+                        mutate(
+                          Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+                        ),
+                      mapping = aes(x = -Inf, y = -Inf, label = auc),
+                      size = 7,
+                      label.size = NA,
+                      hjust = -0.8,
+                      vjust = -0.5
+                    )),
+  
+  ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A", "B"))) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+
+
+
+
+pdf("figures/united_roc_thin_100_testing.pdf", width = 9, height = 8)
+plot_prob_rocs_united +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united_testing_1 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united_testing_2 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united_testing_3 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+plot_prob_rocs_united_testing_4 +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  )
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
