@@ -708,7 +708,7 @@ plot_calibration_UNITED_type1_with_T <- dataset_plot %>%
     )
   ) %>%
   ggplot(aes(x = mean, y = fit)) +
-  geom_abline(aes(intercept = 0, slope = 1)) +
+  geom_abline(aes(intercept = 0, slope = 1), linetype = "dashed") +
   geom_smooth(method = 'lm', formula = y ~ x,
               aes(fill = after_scale(color)), alpha = 0) +
   geom_point(shape = "triangle") +
