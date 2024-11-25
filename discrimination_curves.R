@@ -558,7 +558,7 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
                     ) + 
                     geom_path() +
                     theme_bw() +
-                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: clinical features, no biomarkers", "Early-insulin-treated: clinical features, with biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -572,7 +572,7 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
                         ) %>%
                         filter(Dataset == "UNITED" & Model == "Type 1") %>%
                         mutate(
-                          Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+                          Calculator = factor(Calculator, levels = c("No Biomarkers", "Biomarkers"), labels = c("Clinical features", "Clinical features and biomarkers"))
                         ),
                       mapping = aes(x = -Inf, y = -Inf, label = auc),
                       size = 7,
@@ -597,7 +597,7 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
                     ) +
                     geom_path() +
                     theme_bw() +
-                    facet_grid(~Calculator) +
+                    facet_grid(~factor(Calculator, levels = "Not-early-insulin-treated", labels = "Not-early-insulin-treated: clinical features, no biomarkers"), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -622,6 +622,7 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
     axis.title = element_text(size = 16),
     strip.text = element_text(size = 11)
   )
+
 
 plot_prob_rocs_united1 <- patchwork::wrap_plots(
   
@@ -1148,7 +1149,7 @@ plot_prob_rocs_united_testing_1 <- patchwork::wrap_plots(
                     ggplot(aes(x = 1- specificities, y = sensitivities)) +
                     geom_path() +
                     theme_bw() +
-                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: clinical features, no biomarkers", "Early-insulin-treated: clinical features, with biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1180,7 +1181,7 @@ plot_prob_rocs_united_testing_1 <- patchwork::wrap_plots(
                     ggplot(aes(x = 1- specificities, y = sensitivities)) +
                     geom_path() +
                     theme_bw() +
-                    facet_grid(~Calculator) +
+                    facet_grid(~~factor(Calculator, levels = c("Not-early-insulin-treated"), labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1257,7 +1258,7 @@ plot_prob_rocs_united_testing_2 <- patchwork::wrap_plots(
                     geom_path(aes(x = 1- `specificity.97.5.`, y = `sensitivity.97.5.`), linetype = "dashed", colour = "grey") +
                     geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
                     theme_bw() +
-                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: clinical features, no biomarkers", "Early-insulin-treated: clinical features, with biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1291,7 +1292,7 @@ plot_prob_rocs_united_testing_2 <- patchwork::wrap_plots(
                     geom_path(aes(x = 1- `specificity.97.5.`, y = `sensitivity.97.5.`), linetype = "dashed", colour = "grey") +
                     geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
                     theme_bw() +
-                    facet_grid(~Calculator) +
+                    facet_grid(~factor(Calculator, levels = c("Not-early-insulin-treated"), labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1383,7 +1384,7 @@ plot_prob_rocs_united_testing_3 <- patchwork::wrap_plots(
                       aes(x = 1 - x, y = y), fill = "grey") +
                     geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
                     theme_bw() +
-                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: clinical features, no biomarkers", "Early-insulin-treated: clinical features, with biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1420,7 +1421,7 @@ plot_prob_rocs_united_testing_3 <- patchwork::wrap_plots(
                       aes(x = 1 - x, y = y), fill = "grey") +
                     geom_path(aes(x = 1- `specificity.50.`, y = `sensitivity.50.`), colour = "black") +
                     theme_bw() +
-                    facet_grid(~Calculator) +
+                    facet_grid(~factor(Calculator, levels = c("Not-early-insulin-treated"), labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1543,7 +1544,7 @@ plot_prob_rocs_united_testing_4 <- patchwork::wrap_plots(
                     ) +
                     geom_path(aes(x = 1- specificities, y = sensitivities)) +
                     theme_bw() +
-                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: Clinical features", "Early-insulin-treated: Clinical features and biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                    facet_grid(~factor(Calculator, levels = c("Clinical features", "Clinical features and biomarkers"), labels = c("Early-insulin-treated: clinical features, no biomarkers", "Early-insulin-treated: clinical features, with biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
@@ -1593,7 +1594,7 @@ plot_prob_rocs_united_testing_4 <- patchwork::wrap_plots(
                     ) +
                     geom_path(aes(x = 1- specificities, y = sensitivities)) +
                     theme_bw() +
-                    facet_grid(~Calculator) +
+                    facet_grid(~factor(Calculator, levels = c("Not-early-insulin-treated"), labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
                     scale_y_continuous("Sensitivity", labels = scales::percent) +
                     scale_x_continuous("1- Specificity", labels = scales::percent) +
                     theme_bw() +
