@@ -87,7 +87,7 @@ auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, 
 auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
 # quantile(auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
-# 0.8412832 0.8564795 0.8704095 
+# 0.8465473 0.8618926 0.8768116  
 
 #:------------------------------------------------------------
 
@@ -145,7 +145,7 @@ pr_auc_T1D_with_T_united_all_genes <- calc_auc_pr(dataset.UNITED_type1_all_genes
 pr_auc_T2D_new_united_all_genes <- calc_auc_pr(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
 # quantile(pr_auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
-# 0.5954615 0.6265107 0.6578567 
+# 0.5980896 0.6291710 0.6611516 
 
 
 # #:------------------------------------------------------------
@@ -551,7 +551,7 @@ plot_prob_density_rocs_external_bio_only <- patchwork::wrap_plots(
   )
 
 # Making plots
-pdf("figures/united_boxplot_roc_thin_100.pdf", width = 13, height = 9)
+pdf("figures/united_boxplot_roc.pdf", width = 13, height = 9)
 plot_prob_density_rocs_external_bio_only
 dev.off()
 
@@ -633,7 +633,7 @@ plot_prob_rocs_united <- patchwork::wrap_plots(
   )
 
 
-pdf("figures/united_roc_thin_100.pdf", width = 10, height = 8)
+pdf("figures/united_roc.pdf", width = 10, height = 8)
 plot_prob_rocs_united
 dev.off()
 
@@ -768,7 +768,7 @@ plot_prob_prec_recal_united <- patchwork::wrap_plots(
 
 
 
-pdf("figures/united_prec_recal_thin_100.pdf", width = 10, height = 8)
+pdf("figures/united_prec_recal_thin.pdf", width = 10, height = 8)
 plot_prob_prec_recal_united
 dev.off()
 
