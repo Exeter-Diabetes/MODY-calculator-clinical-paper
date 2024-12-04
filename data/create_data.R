@@ -462,7 +462,10 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M")) %>%
       
       ### make sure it is a data.frame() for use in R
-      as.data.frame()
+      as.data.frame() %>%
+      
+      ### change specific patient
+      mutate(M = ifelse(id %in% c(8002013), 1, M))
     
     if (!isTRUE(commonmody)) {
       # Find patients with Genes
@@ -481,6 +484,8 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         select(commonmody, sex, bmi, agedx = agediag, insoroha, hba1c = hba1cpc, 
                pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
         
+        ### change specific patient
+        mutate(DNAResult = ifelse(id %in% c(8002013), 1, DNAResult)) %>%
         ### generate the outcome variables
         mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
         
@@ -535,11 +540,15 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       
       if (isTRUE(id)) {
         
-        dataset.UNITED_type2
+        dataset.UNITED_type2 %>%
+          
+        filter(!(id %in% c(540)))
         
       } else {
         
         dataset.UNITED_type2 %>%
+          
+          filter(!(id %in% c(540))) %>%
           
           # remove id
           select(-id)
