@@ -29,7 +29,7 @@ type_1_posteriors <- type_1_model_posteriors$samples$chain1 %>%
 
 ## Calculate r hat
 apply(type_1_posteriors, 2, rstan::Rhat)
-# R_hat < 1.002
+# R_hat < 1.000003
 # beta[1]        beta[2]        beta[3]        beta[4]        beta[5]          beta0 
 # 1.000011       1.000006       1.000105       1.000266       1.000028       1.000249 
 # beta_spline[1] beta_spline[2] beta_spline[3]      beta_t[1]      beta_t[2]      beta_t[3] 
@@ -51,9 +51,9 @@ type_2_posteriors <- type_2_model_posteriors$samples$chain1 %>%
 
 ## Calculate r hat
 apply(type_2_posteriors %>% select(where(is.numeric)), 2, rstan::Rhat)
-# R_hat < 1.0005
+# R_hat < 1.001
 # beta[1]  beta[2]  beta[3]  beta[4]  beta[5]  beta[6]  beta[7]    beta0   gamma0   gamma1 
-# 1.000462 1.000122 1.000184 1.000011 1.000223 1.000040 1.000209 1.000118 1.000014 1.000025 
+# 1.001117 1.001601 1.000263 1.000052 1.000052 1.000135 1.000013 1.002117 1.000010 1.000187 
 
 
 # labels for parameters
