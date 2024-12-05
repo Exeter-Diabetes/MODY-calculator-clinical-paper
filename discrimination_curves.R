@@ -36,6 +36,195 @@ dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody
 
 #:------------------------------------------------------------
 
+plot_prob_density <- patchwork::wrap_plots(
+  
+  # T1D models
+  patchwork::wrap_plots(
+    
+    # Clinical features
+    patchwork::wrap_plots(
+      
+      # Density
+      dataset.UNITED_type1_all_genes %>%
+        mutate(prob = predictions_dataset.UNITED_type1_all_genes_no_T$prob) %>%
+        filter(M == 0) %>%
+        select(M, prob) %>%
+        rename("Mody" = "M") %>%
+        mutate(
+          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+        ) %>%
+        ggplot() +
+        geom_density(aes(x = prob), fill = "grey") +
+        coord_cartesian(xlim =c(0, 1)) +
+        scale_x_continuous(labels = scales::percent) +
+        theme_bw() +
+        theme(
+          panel.border = element_blank(),
+          axis.line = element_line(),
+          axis.ticks.x = element_blank(), 
+          axis.text.x = element_blank(), 
+          axis.title.x = element_blank()
+        ) +
+        ylab("Non-MODY (n=1164)"),
+      #point
+      dataset.UNITED_type1_all_genes %>%
+        mutate(prob = predictions_dataset.UNITED_type1_all_genes_no_T$prob) %>%
+        filter(M == 1) %>%
+        select(M, prob) %>%
+        rename("Mody" = "M") %>%
+        mutate(
+          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+        ) %>%
+        ggplot() +
+        geom_point(aes(x = prob, y=0), position = position_jitter(height = 0.1, seed = 20)) +
+        coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
+        scale_x_continuous(labels = scales::percent) +
+        theme_classic() +
+        theme(
+          axis.ticks.y = element_blank(), 
+          axis.text.y = element_blank(), 
+          #axis.title.y = element_blank()
+        ) +
+        ylab("MODY \n cases \n (n=10)") +
+        xlab("Model probabilities"),
+      ncol = 1, nrow = 2, heights = c(4,1)
+      
+    ),
+    
+    # Biomarkers
+    patchwork::wrap_plots(
+      
+      # Density
+      dataset.UNITED_type1_all_genes %>%
+        mutate(prob = predictions_dataset.UNITED_type1_all_genes_with_T$prob) %>%
+        filter(M == 0) %>%
+        select(M, prob) %>%
+        rename("Mody" = "M") %>%
+        mutate(
+          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+        ) %>%
+        ggplot() +
+        geom_density(aes(x = prob), fill = "grey") +
+        coord_cartesian(xlim =c(0, 1)) +
+        scale_x_continuous(labels = scales::percent) +
+        theme_bw() +
+        theme(
+          panel.border = element_blank(),
+          axis.line = element_line(),
+          axis.ticks.x = element_blank(), 
+          axis.text.x = element_blank(), 
+          axis.title.x = element_blank()
+        ) +
+        ylab("Non-MODY (n=1164)"),
+      #point
+      dataset.UNITED_type1_all_genes %>%
+        mutate(prob = predictions_dataset.UNITED_type1_all_genes_with_T$prob) %>%
+        filter(M == 1) %>%
+        select(M, prob) %>%
+        rename("Mody" = "M") %>%
+        mutate(
+          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+        ) %>%
+        ggplot() +
+        geom_point(aes(x = prob, y=0), position = position_jitter(height = 0.1, seed = 20)) +
+        coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
+        scale_x_continuous(labels = scales::percent) +
+        theme_classic() +
+        theme(
+          axis.ticks.y = element_blank(), 
+          axis.text.y = element_blank(), 
+          #axis.title.y = element_blank()
+        ) +
+        ylab("MODY \n cases \n (n=10)") +
+        xlab("Model probabilities"),
+      ncol = 1, nrow = 2, heights = c(4,1)
+      
+      
+    ),
+    
+    nrow = 1, ncol = 2
+    
+  ),
+  
+  # T2D models
+  patchwork::free(patchwork::wrap_plots(
+    
+    # Density
+    dataset.UNITED_type2_all_genes %>%
+      mutate(prob = predictions_dataset.UNITED_type2_all_genes_new$prob) %>%
+      filter(M == 0) %>%
+      select(M, prob) %>%
+      rename("Mody" = "M") %>%
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+      ) %>%
+      ggplot() +
+      geom_density(aes(x = prob), fill = "grey") +
+      coord_cartesian(xlim =c(0, 1)) +
+      scale_x_continuous(labels = scales::percent) +
+      theme_bw() +
+      theme(
+        panel.border = element_blank(),
+        axis.line = element_line(),
+        axis.ticks.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.title.x = element_blank()
+      ) +
+      ylab("Non-MODY (n=102)"),
+    #point
+    dataset.UNITED_type2_all_genes %>%
+      mutate(prob = predictions_dataset.UNITED_type2_all_genes_new$prob) %>%
+      filter(M == 1) %>%
+      select(M, prob) %>%
+      rename("Mody" = "M") %>%
+      mutate(
+        Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+      ) %>%
+      ggplot() +
+      geom_point(aes(x = prob, y=0), position = position_jitter(height = 0.1, seed = 20)) +
+      coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
+      scale_x_continuous(labels = scales::percent) +
+      theme_classic() +
+      theme(
+        axis.ticks.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        #axis.title.y = element_blank()
+      ) +
+      ylab("MODY \n cases \n (n=23)") +
+      xlab("Model probabilities"),
+    ncol = 1, nrow = 2, heights = c(4,1)
+    
+    
+  )
+  
+  ),
+  
+  nrow = 2, ncol = 1
+  
+) + patchwork::plot_annotation(tag_levels = list(c("A.1", "", "A.2", "", "B", ""))) +
+  patchwork::plot_layout(
+    design = "
+    AAAA
+    #BB#
+    "
+  ) &
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    strip.text = element_text(size = 11)
+  )
+
+
+# Making plots
+pdf("figures/united_prob_density.pdf", width = 13, height = 9)
+plot_prob_density
+dev.off()
+
+
+
+#:------------------------------------------------------------
+
+
 # Calculate AUROC with intervals
 calc_auroc <- function(data, predictions, thinning = 100) {
   
@@ -336,10 +525,10 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_ge
   as.data.frame() %>%
   mutate(
     auc =  unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
-                       cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
-                       pROC::roc(response = Mody, predictor = prob) %>%
-                       magrittr::extract(c(9)) %>%
-                       unlist()),
+                    cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+                    pROC::roc(response = Mody, predictor = prob) %>%
+                    magrittr::extract(c(9)) %>%
+                    unlist()),
     auc_low = quantile(auc_T1D_with_T_united_all_genes, probs = c(0.025)),
     auc_high = quantile(auc_T1D_with_T_united_all_genes, probs= c(0.975)),
     mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full), na.rm = TRUE)
@@ -353,10 +542,10 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_ge
       as.data.frame() %>%
       mutate(
         auc = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
-                          cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
-                          pROC::roc(response = Mody, predictor = prob) %>%
-                          magrittr::extract(c(9)) %>%
-                          unlist()),
+                       cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+                       pROC::roc(response = Mody, predictor = prob) %>%
+                       magrittr::extract(c(9)) %>%
+                       unlist()),
         auc_low = quantile(auc_T1D_no_T_united_all_genes, probs = c(0.025)),
         auc_high = quantile(auc_T1D_no_T_united_all_genes, probs= c(0.975)),
         mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full), na.rm = TRUE)
@@ -369,10 +558,10 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_ge
       as.data.frame() %>%
       mutate(
         auc = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
-                          cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
-                          pROC::roc(response = Mody, predictor = prob) %>%
-                          magrittr::extract(c(9)) %>%
-                          unlist()),
+                       cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
+                       pROC::roc(response = Mody, predictor = prob) %>%
+                       magrittr::extract(c(9)) %>%
+                       unlist()),
         auc_low = quantile(auc_T2D_new_united_all_genes, probs = c(0.025)),
         auc_high = quantile(auc_T2D_new_united_all_genes, probs= c(0.975)),
         mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new_full), na.rm = TRUE)
@@ -416,7 +605,7 @@ plot_prob_density_rocs_external_bio_only <- patchwork::wrap_plots(
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY (n=935)"),
+        ylab("Non-MODY (n=1164)"),
       #point
       dataset.UNITED_type1_all_genes %>%
         mutate(prob = predictions_dataset.UNITED_type1_all_genes_with_T$prob) %>%
@@ -436,7 +625,7 @@ plot_prob_density_rocs_external_bio_only <- patchwork::wrap_plots(
           axis.text.y = element_blank(), 
           #axis.title.y = element_blank()
         ) +
-        ylab("MODY \n cases \n (n=5)") +
+        ylab("MODY \n cases \n (n=10)") +
         xlab("Model probabilities"),
       ncol = 1, nrow = 2, heights = c(4,1)
     ),
@@ -491,7 +680,7 @@ plot_prob_density_rocs_external_bio_only <- patchwork::wrap_plots(
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY (n=70)"),
+        ylab("Non-MODY (n=102)"),
       #point
       dataset.UNITED_type2_all_genes %>%
         mutate(prob = predictions_dataset.UNITED_type2_all_genes_new$prob) %>%
@@ -511,7 +700,7 @@ plot_prob_density_rocs_external_bio_only <- patchwork::wrap_plots(
           axis.text.y = element_blank(), 
           #axis.title.y = element_blank()
         ) +
-        ylab("MODY \n cases \n (n=15)") +
+        ylab("MODY \n cases \n (n=23)") +
         xlab("Model probabilities"),
       ncol = 1, nrow = 2, heights = c(4,1)
     ),
