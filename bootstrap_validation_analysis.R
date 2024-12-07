@@ -333,6 +333,6 @@ plot_simulation_riley_combined <- wrap_plots(
   )
 
 
-pdf("figures/bootstrap_riley_simulation.pdf", width = 10, height = 5)
+pdf("figures/bootstrap_riley_simulation.pdf", width = 11, height = 6)
 plot_simulation_riley_combined
 dev.off()
