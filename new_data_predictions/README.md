@@ -21,14 +21,14 @@ To make predictions, you will need all of the files present on this folder [here
 source("prediction_functions.R")
 ```
 
-2.  Next, load the data containing the patient information.
+2.  Next, load the dataset containing the patient information.
 
 ``` r
 # load dataset  
-data <- ...
+dataset <- ...
 ```
 
-The data should be formatted in the following way:
+The dataset should be formatted in the following way:
 
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | C<br>numeric | A<br>numeric |
 |---------|---------|---------|---------|---------|---------|---------|---------|
@@ -77,14 +77,14 @@ To make predictions, you will need all of the files present on this folder [here
 source("prediction_functions.R")
 ```
 
-2.  Next, load the data containing the patient information.
+2.  Next, load the dataset containing the patient information.
 
 ``` r
 # load dataset
-data <- ...
+dataset <- ...
 ```
 
-The data should be formatted in the following way:
+The dataset should be formatted in the following way:
 
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | insoroha<br>numeric |
 |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
