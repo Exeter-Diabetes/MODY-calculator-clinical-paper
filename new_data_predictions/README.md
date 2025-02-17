@@ -32,7 +32,7 @@ The data should be formatted in the following way:
 
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | C<br>numeric | A<br>numeric |
 |---------|---------|---------|---------|---------|---------|---------|---------|
-| 1 or 0 | \>1 or \<35 | \>3% or \< 15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70 | 1 or 0 | 1 or 0 |
+| 1 - positive<br>0 - negative | \>1 or \<35 | \>3% or \< 15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70 | 1 - positive<br>0 - negative | 1 - positive<br>0 - negative |
 
 3.  Load the necessary model parameters.
 
@@ -88,7 +88,7 @@ The data should be formatted in the following way:
 
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | insoroha<br>numeric |
 |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| 1 or 0 | \>1 or \<35 | \>3% or \<15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70   | 1 or 0 |
+| 1 - positive<br>0 - negative | \>1 or \<35 | \>3% or \<15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70   | 1 - positive<br>0 - negative |
 
 3.  Load the necessary model parameters.
 
