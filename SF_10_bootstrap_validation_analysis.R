@@ -1,5 +1,6 @@
 #:--------------------------------------------------------
-#   
+# Supplementary Figure 10
+#
 # In this file we check Rhat and calibration plots for 
 #   the riley simulation
 #
