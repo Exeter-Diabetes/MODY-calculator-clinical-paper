@@ -54,7 +54,9 @@ MY_T2D <- MY_T2D %>%
   )
 
 # UNITED paediatric ---------------------------------------------------------------------
-dataset.UNITED_p <- create_data(dataset = "united t1d pediatrics", commonmody = FALSE)
+dataset.UNITED_p <- create_data(dataset = "united t1d pediatrics", 
+                                commonmody = FALSE, 
+                                id = TRUE)
 
 #need to change M=NA to M=0
 dataset.UNITED_p <- dataset.UNITED_p %>%
@@ -112,7 +114,7 @@ dataset_type2 <- full_join(dataset.MYDIABETES_type2, dataset.UNITED_type2p, by =
 
 #run predictions ------------------------------------------------------------------------------
 ## In MYDIABETES
-setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/new_data_predictions")
+setwd("new_data_predictions")
 # ## load posteriors
 rcs_parms <- readRDS("rcs_parms.rds")
 
@@ -161,7 +163,7 @@ dataset_type2 <- cbind(dataset_type2, predictions_dataset.type2_new)
 External_joint <- full_join(dataset_type1, dataset_type2)
 
 #Plotting ------------------------------------------------------------------------------
-setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
+setwd("..")
 
 # Calculate AUROC with intervals
 calc_auroc <- function(data, predictions, thinning = 100) {
