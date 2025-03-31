@@ -313,6 +313,12 @@ patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B", "C"))) &
   )
 
 # Making plots
-pdf("figures/Figure2.pdf", width = 13, height = 9)
+pdf("figures/Figure2.pdf", width = 13, height = 9, res= 1200)
+plot_prob_fig2
+dev.off()
+
+
+# Making plots for presenting
+ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1200)
 plot_prob_fig2
 dev.off()
