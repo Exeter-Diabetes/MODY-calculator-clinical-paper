@@ -4,8 +4,26 @@
 #
 #:----------------------------------------------------------------------------
 
+# ARGUMENTS
+# dataset - ("case-control t1d", 
+#            "case-control t2d",
+#           "united t1d pediatrics") 
+#           Which dataset to load and clean
+# biomarkers - ("reduced", )
+# commonmody - (TRUE (default)/ FALSE) Whether to define MODY genes based on 
+#               "common genes" (HNF1A, HNF4A or GCK) or to extend definition 
+#               to additional genes
+# id - (TRUE / FALSE (default)) Whether to include id numbers in cleaned output
 
-create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRUE, id = FALSE) {
+
+create_data <- function(
+    dataset = NULL, 
+    biomarkers = "reduced", 
+    commonmody = TRUE, 
+    id = FALSE) {
+  
+  
+  # FUNCTION USE CHECKS
   
   # checks for 'dataset'
   if(missing(dataset) | is.null(dataset)) {stop("'dataset' needs to be provided.")}
@@ -790,7 +808,8 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
                DNAResult, 
                id, 
                Gene,
-               tti) %>%
+               tti,
+               insoroha) %>%
         
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
@@ -874,7 +893,8 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
                  DNAResult, 
                  Gene, 
                  id,
-                 tti) %>%
+                 tti,
+                 insoroha) %>%
           
           ### drop patients without patient history for diabetes
           drop_na(pardm) %>%
