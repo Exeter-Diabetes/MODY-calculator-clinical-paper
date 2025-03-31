@@ -19,15 +19,11 @@ source("new_data_predictions/prediction_functions.R")
 ### read in data ------------------------------------------------------------------------------------------------------------------------
 #readin MYDIABETES
 #load T1D
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T1D.RData")
+load("data/MY_T1D.RData")
 #load T2D 
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T2D.RData")
+load("data/MY_T2D.RData")
 
 # MyDiabetes ------------------------------------------------------------------------------------
-#load T1D
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T1D.RData")
-#load T2D 
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T2D.RData")
 # LIMIT TO ONLY WHITE ETHNICITY
 MY_T1D <- MY_T1D %>%
   filter(ethnicity == "White")
@@ -475,7 +471,11 @@ nrow = 1, ncol = 2
   ) 
 
 
-pdf("figures/Figure3.pdf", width = 10, height = 8)
+pdf("figures/Figure3.pdf", width = 13, height = 9)
 plot_prob_external_fig3
 dev.off()
 
+
+ggsave("figures/Figure3.tif", width = 13, height = 9, dpi= 1200)
+plot_prob_external_fig3
+dev.off()
