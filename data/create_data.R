@@ -82,7 +82,18 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       ## select the right patients
       dataset.UNITED_type1 <- dataset.UNITED %>%
@@ -91,11 +102,24 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(t1ort2 == 1) %>%
         
         ### select the correct type of MODY
-        filter(commonmody == 1 | (completepway == 1 & monogenicinctngs == 0 & is.na(knowncause))) %>%
+        filter(commonmody == 1 | 
+                 (completepway == 1 & monogenicinctngs == 0 & 
+                    is.na(knowncause))) %>%
         
         ### select the correct variables
-        select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, insoroha, id) %>%
+        select(commonmody, 
+               sex, 
+               bmi, 
+               agedx = agediag, 
+               hba1c = hba1cpc, 
+               pardm, 
+               agerec, 
+               UCPCRPosNegFinal, 
+               AntibodyFINAL, 
+               DNAResult, 
+               insoroha, 
+               id,
+               tti) %>%
         
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
@@ -142,17 +166,39 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(t1ort2 == 1) %>%
           
           ### keep only patients with Genes
-          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+          filter(Gene %in% c("HN1A", 
+                             "HNF4A", 
+                             "HNF1B", 
+                             "GCK", 
+                             "NeuroD1", 
+                             "KCNJ11", 
+                             "GATA6", 
+                             "ABCC8", 
+                             "INS", 
+                             "RFX6")) %>%
           
           ### select the correct variables
-          select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-                 pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, insoroha, Gene, id) %>%
+          select(commonmody, 
+                 sex,
+                 bmi, 
+                 agedx = agediag, 
+                 hba1c = hba1cpc, 
+                 pardm, 
+                 agerec, 
+                 UCPCRPosNegFinal, 
+                 AntibodyFINAL, 
+                 DNAResult, 
+                 insoroha, 
+                 Gene, 
+                 id,
+                 tti) %>%
           
           ### drop patients without patient history for diabetes
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
+          mutate(mody = ifelse(!is.na(Gene) 
+                               & DNAResult == 1, 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-commonmody, -DNAResult) %>%
@@ -236,7 +282,18 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       ## select the right patients
       dataset.UNITED_type1 <- dataset.UNITED %>%
@@ -245,12 +302,28 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(t1ort2 == 1) %>%
         
         ### select the correct type of MODY
-        filter(commonmody == 1 | (completepway == 1 & monogenicinctngs == 0 & is.na(knowncause))) %>%
+        filter(commonmody == 1 | 
+                 (completepway == 1 & 
+                    monogenicinctngs == 0 & 
+                    is.na(knowncause))) %>%
         
         ### select the correct variables
-        select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, insoroha, 
-               ZNT8pos, GADResult, IA2Result, id) %>%
+        select(commonmody, 
+               sex, 
+               bmi, 
+               agedx = agediag, 
+               hba1c = hba1cpc, 
+               pardm, 
+               agerec, 
+               UCPCRPosNegFinal, 
+               AntibodyFINAL, 
+               DNAResult, 
+               insoroha, 
+               ZNT8pos, 
+               GADResult, 
+               IA2Result, 
+               id,
+               tti) %>%
         
         ### rename Antibody variables
         rename(
@@ -312,12 +385,35 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(t1ort2 == 1) %>%
           
           ### keep only patients with Genes
-          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+          filter(Gene %in% c("HN1A", 
+                             "HNF4A", 
+                             "HNF1B", 
+                             "GCK", 
+                             "NeuroD1", 
+                             "KCNJ11", 
+                             "GATA6", 
+                             "ABCC8", 
+                             "INS", 
+                             "RFX6")) %>%
           
           ### select the correct variables
-          select(commonmody, sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-                 pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, insoroha, 
-                 ZNT8pos, GADResult, IA2Result, Gene, id) %>%
+          select(commonmody, 
+                 sex, 
+                 bmi, 
+                 agedx = agediag, 
+                 hba1c = hba1cpc, 
+                 pardm, 
+                 agerec, 
+                 UCPCRPosNegFinal, 
+                 AntibodyFINAL, 
+                 DNAResult, 
+                 insoroha, 
+                 ZNT8pos, 
+                 GADResult, 
+                 IA2Result, 
+                 Gene, 
+                 id,
+                 tti) %>%
           
           ### rename Antibody variables
           rename(
@@ -430,7 +526,18 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
     dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
       
       ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-      filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+      filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                         "TRMT10A", 
+                                         "3243", 
+                                         "MDP", 
+                                         "MT-ND1", 
+                                         "Mitochondrial", 
+                                         "WFS1", 
+                                         "SLC19A2", 
+                                         "ZNF808", 
+                                         "INSR", 
+                                         "LMNA", 
+                                         "PPARG")))
     
     
     ## select the right patients
@@ -443,8 +550,19 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       filter(commonmody == 1 | (completepway == 1 & monogenicinctngs == 0 & is.na(knowncause))) %>%
       
       ### select the correct variables
-      select(commonmody, sex, bmi, agedx = agediag, insoroha, hba1c = hba1cpc, 
-             pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, id) %>%
+      select(commonmody, 
+             sex, 
+             bmi, 
+             agedx = agediag, 
+             insoroha, 
+             hba1c = hba1cpc, 
+             pardm, 
+             agerec, 
+             UCPCRPosNegFinal, 
+             AntibodyFINAL, 
+             DNAResult, 
+             id,
+             tti) %>%
       
       ### generate the outcome variables
       mutate(mody = DNAResult) %>%
@@ -456,10 +574,26 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       rename(M = mody) %>%
       
       ### select the variables we needed
-      select(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M", "id")) %>%
+      select(c("sex", 
+               "bmi", 
+               "agedx", 
+               "insoroha", 
+               "hba1c", 
+               "pardm", 
+               "agerec", 
+               "M", 
+               "id", 
+               "tti")) %>%
       
       ### drop patients with missing data in the variables we care about
-      drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M")) %>%
+      drop_na(c("sex", 
+                "bmi", 
+                "agedx", 
+                "insoroha", 
+                "hba1c", 
+                "pardm", 
+                "agerec", 
+                "M")) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame() %>%
@@ -478,11 +612,32 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(t1ort2 == 2) %>%
         
         ### keep only patients with Genes
-        filter(Gene %in% c("HNF1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+        filter(Gene %in% c("HNF1A", 
+                           "HNF4A", 
+                           "HNF1B", 
+                           "GCK", 
+                           "NeuroD1", 
+                           "KCNJ11", 
+                           "GATA6", 
+                           "ABCC8", 
+                           "INS", 
+                           "RFX6")) %>%
         
         ### select the correct variables
-        select(commonmody, sex, bmi, agedx = agediag, insoroha, hba1c = hba1cpc, 
-               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
+        select(commonmody, 
+               sex, 
+               bmi, 
+               agedx = agediag, 
+               insoroha, 
+               hba1c = hba1cpc, 
+               pardm, 
+               agerec, 
+               UCPCRPosNegFinal, 
+               AntibodyFINAL, 
+               DNAResult, 
+               Gene, 
+               id, 
+               tti) %>%
         
         ### change specific patient
         mutate(DNAResult = ifelse(id %in% c(8002013), 1, DNAResult)) %>%
@@ -496,10 +651,27 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         rename(M = mody) %>%
         
         ### select the variables we needed
-        select(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M", "Gene", "id")) %>%
+        select(c("sex", 
+                 "bmi", 
+                 "agedx", 
+                 "insoroha", 
+                 "hba1c", 
+                 "pardm", 
+                 "agerec", 
+                 "M", 
+                 "Gene", 
+                 "id", 
+                 "tti")) %>%
         
         ### drop patients with missing data in the variables we care about
-        drop_na(c("sex", "bmi", "agedx", "insoroha", "hba1c", "pardm", "agerec", "M")) %>%
+        drop_na(c("sex", 
+                  "bmi", 
+                  "agedx", 
+                  "insoroha", 
+                  "hba1c", 
+                  "pardm", 
+                  "agerec", 
+                  "M")) %>%
         
         ### make sure it is a data.frame() for use in R
         as.data.frame()
@@ -569,12 +741,34 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       dataset.UNITEDfull <- read_dta("data/UNITEDfull.dta") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       
       ## select the right patients
@@ -585,20 +779,40 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(swpaed != 0) %>%
 
         ### select the correct variables
-        select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, id, Gene) %>%
+        select(sex, 
+               bmi, 
+               agedx = agediag, 
+               hba1c = hba1cpc, 
+               pardm, 
+               agerec, 
+               UCPCRPosNegFinal, 
+               AntibodyFINAL, 
+               DNAResult, 
+               id, 
+               Gene,
+               tti) %>%
         
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
         
         ### generate the outcome variables
-        mutate(mody = ifelse(is.na(DNAResult), NA, ifelse(tolower(Gene) %in% c("hnf1a", "hnf4a", "gck") & DNAResult == 1, 1, 0))) %>%
+        mutate(mody = ifelse(is.na(DNAResult), 
+                             NA, 
+                             ifelse(tolower(Gene) %in% c("hnf1a", 
+                                                         "hnf4a", 
+                                                         "gck") & 
+                                      DNAResult == 1, 1, 0))) %>%
         
         ### drop not needed variables
         select(-DNAResult, -Gene) %>%
         
         ### drop patients with missing data in the variables we care about
-        drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+        drop_na(sex, 
+                bmi, 
+                agedx, 
+                hba1c, 
+                pardm, 
+                agerec) %>%
         
         ### rename variables for biomarkers
         rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
@@ -637,23 +851,48 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(swpaed != 0) %>%
           
           ### keep only patients with Genes
-          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+          filter(Gene %in% c("HN1A", 
+                             "HNF4A", 
+                             "HNF1B", 
+                             "GCK", 
+                             "NeuroD1", 
+                             "KCNJ11", 
+                             "GATA6", 
+                             "ABCC8", 
+                             "INS", 
+                             "RFX6")) %>%
           
           ### select the correct variables
-          select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-                 pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id) %>%
+          select(sex, 
+                 bmi, 
+                 agedx = agediag, 
+                 hba1c = hba1cpc, 
+                 pardm, 
+                 agerec, 
+                 UCPCRPosNegFinal, 
+                 AntibodyFINAL, 
+                 DNAResult, 
+                 Gene, 
+                 id,
+                 tti) %>%
           
           ### drop patients without patient history for diabetes
           drop_na(pardm) %>%
           
           ### generate the outcome variables
-          mutate(mody = ifelse(!is.na(Gene) & DNAResult == 1, 1, DNAResult)) %>%
+          mutate(mody = ifelse(!is.na(Gene) & 
+                                 DNAResult == 1, 1, DNAResult)) %>%
           
           ### drop not needed variables
           select(-DNAResult) %>%
           
           ### drop patients with missing data in the variables we care about
-          drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+          drop_na(sex, 
+                  bmi, 
+                  agedx, 
+                  hba1c, 
+                  pardm, 
+                  agerec) %>%
           
           ### rename variables for biomarkers
           rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
@@ -740,12 +979,34 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
       dataset.UNITEDfull <- read_dta("data/UNITEDfull.dta") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       dataset.UNITED <- read_csv("data/UNITEDfull.csv") %>%
         
         ### drop specific Genes that shouldn't be included: keep those without a Gene or those that aren't on this list
-        filter(is.na(Gene) | !(Gene %in% c("MIDD", "TRMT10A", "3243", "MDP", "MT-ND1", "Mitochondrial", "WFS1", "SLC19A2", "ZNF808", "INSR", "LMNA", "PPARG")))
+        filter(is.na(Gene) | !(Gene %in% c("MIDD", 
+                                           "TRMT10A", 
+                                           "3243", 
+                                           "MDP", 
+                                           "MT-ND1", 
+                                           "Mitochondrial", 
+                                           "WFS1", 
+                                           "SLC19A2", 
+                                           "ZNF808", 
+                                           "INSR", 
+                                           "LMNA", 
+                                           "PPARG")))
       
       
       ## select the right patients
@@ -756,9 +1017,21 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         filter(swpaed != 0) %>%
         
         ### select the correct variables
-        select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-               pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, id, Gene,
-               ZNT8pos, GADResult, IA2Result) %>%
+        select(sex, 
+               bmi, 
+               agedx = agediag, 
+               hba1c = hba1cpc, 
+               pardm, 
+               agerec, 
+               UCPCRPosNegFinal, 
+               AntibodyFINAL, 
+               DNAResult, 
+               id, 
+               Gene,
+               ZNT8pos, 
+               GADResult, 
+               IA2Result, 
+               tti) %>%
         
         ### rename Antibody variables
         rename(
@@ -774,13 +1047,24 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
         drop_na(pardm) %>%
         
         ### generate the outcome variables
-        mutate(mody = ifelse(is.na(DNAResult), NA, ifelse(tolower(Gene) %in% c("hnf1a", "hnf4a", "gck"), 1, 0))) %>%
+        mutate(mody = ifelse(is.na(DNAResult), 
+                             NA, 
+                             ifelse(tolower(Gene) %in% c("hnf1a", 
+                                                         "hnf4a", 
+                                                         "gck"), 
+                                    1, 
+                                    0))) %>%
         
         ### drop not needed variables
         select(-DNAResult, -Gene) %>%
         
         ### drop patients with missing data in the variables we care about
-        drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+        drop_na(sex, 
+                bmi, 
+                agedx, 
+                hba1c, 
+                pardm, 
+                agerec) %>%
         
         ### rename variables for biomarkers
         rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
@@ -820,12 +1104,33 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           filter(swpaed != 0) %>%
           
           ### keep only patients with Genes
-          filter(Gene %in% c("HN1A", "HNF4A", "HNF1B", "GCK", "NeuroD1", "KCNJ11", "GATA6", "ABCC8", "INS", "RFX6")) %>%
+          filter(Gene %in% c("HN1A", 
+                             "HNF4A", 
+                             "HNF1B", 
+                             "GCK", 
+                             "NeuroD1", 
+                             "KCNJ11", 
+                             "GATA6", 
+                             "ABCC8", 
+                             "INS", 
+                             "RFX6")) %>%
           
           ### select the correct variables
-          select(sex, bmi, agedx = agediag, hba1c = hba1cpc, 
-                 pardm, agerec, UCPCRPosNegFinal, AntibodyFINAL, DNAResult, Gene, id,
-                 ZNT8pos, GADResult, IA2Result) %>%
+          select(sex, 
+                 bmi, 
+                 agedx = agediag, 
+                 hba1c = hba1cpc, 
+                 pardm, 
+                 agerec, 
+                 UCPCRPosNegFinal, 
+                 AntibodyFINAL, 
+                 DNAResult, 
+                 Gene, 
+                 id,
+                 ZNT8pos, 
+                 GADResult, 
+                 IA2Result, 
+                 tti) %>%
           
           ### rename Antibody variables
           rename(
@@ -847,7 +1152,12 @@ create_data <- function(dataset = NULL, biomarkers = "reduced", commonmody = TRU
           select(-DNAResult) %>%
           
           ### drop patients with missing data in the variables we care about
-          drop_na(sex, bmi, agedx, hba1c, pardm, agerec) %>%
+          drop_na(sex, 
+                  bmi, 
+                  agedx, 
+                  hba1c, 
+                  pardm, 
+                  agerec) %>%
           
           ### rename variables for biomarkers
           rename(C = UCPCRPosNegFinal, A = AntibodyFINAL, M = mody) %>%
