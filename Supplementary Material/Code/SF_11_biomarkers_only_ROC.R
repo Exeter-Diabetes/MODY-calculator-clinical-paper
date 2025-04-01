@@ -24,7 +24,9 @@ dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody
 predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
 UNITED_type1 <- cbind(dataset.UNITED_type1_all_genes, predictions_dataset.UNITED_type1_all_genes_with_T)
 
-roc(UNITED_type1$M, UNITED_type1$T, plot = TRUE, print.thres = "best", print.auc = TRUE, ci = TRUE)
+roc(UNITED_type1$M, UNITED_type1$T, plot = TRUE, print.auc = TRUE, ci = TRUE)
+
+table(UNITED_type1$M, UNITED_type1$T)
 
 # Calculate AUROC with intervals
 calc_auroc <- function(data, predictions, thinning = 100) {
