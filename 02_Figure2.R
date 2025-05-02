@@ -21,29 +21,37 @@ source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
 
 # load files required
-predictions_dataset.UNITED_type1_all_genes_no_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type2_all_genes_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+predictions_UNITED_type1_no_T_full <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
+predictions_UNITED_type1_with_T_full  <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_UNITED_type2_full <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
 
-predictions_dataset.UNITED_type1_all_genes_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
+predictions_UNITED_type1_no_T <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
+predictions_UNITED_type1_with_T <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_UNITED_type2 <- 
+  readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
 
 # load datasets
 ## Load population representative dataset
-dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+dataset_UNITED_type1 <- create_data(dataset = "united t1d", 
+                                              commonmody = FALSE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
-dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
+dataset_UNITED_type2 <- create_data(dataset = "united t2d", 
+                                              commonmody = FALSE)
 
 #merge probs to datasets
-dataset.UNITED_type1_all_genes <- cbind(dataset.UNITED_type1_all_genes, predictions_dataset.UNITED_type1_all_genes_with_T)
-dataset.UNITED_type2_all_genes <- cbind(dataset.UNITED_type2_all_genes, predictions_dataset.UNITED_type2_all_genes_new)
+dataset_UNITED_type1 <- cbind(dataset_UNITED_type1, predictions_UNITED_type1_with_T)
+dataset_UNITED_type2 <- cbind(dataset_UNITED_type2, predictions_UNITED_type2)
 
 #merge to joint dataset
-UNITED_joint <- full_join(dataset.UNITED_type1_all_genes, dataset.UNITED_type2_all_genes)
+UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
 
 #Figure prep --------------------------------------------------------------------------------------
 
@@ -83,71 +91,77 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 ## Type 1 UNITED
 
 ### No biomarker models
-auc_T1D_no_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_no_T_full, thinning = 10)
-# quantile(auc_T1D_no_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+auc_UNITED_type1_no_T <- calc_auroc(dataset_UNITED_type1$M, 
+                                      predictions_UNITED_type1_no_T_full,
+                                      thinning = 10)
+# quantile(auc_UNITED_type1_no_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.7053243 0.7924399 0.8190743 
 
 ### Biomarker models
-auc_T1D_with_T_united_all_genes <- calc_auroc(dataset.UNITED_type1_all_genes$M, predictions_dataset.UNITED_type1_all_genes_with_T_full, thinning = 10)
-# quantile(auc_T1D_with_T_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+auc_UNITED_type1_with_T <- calc_auroc(dataset_UNITED_type1$M, 
+                                      predictions_UNITED_type1_with_T_full,
+                                      thinning = 10)
+# quantile(auc_UNITED_type1_with_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.9487113 0.9768041 0.9779210 
 
 ## Type 2 UNITED
-auc_T2D_new_united_all_genes <- calc_auroc(dataset.UNITED_type2_all_genes$M, predictions_dataset.UNITED_type2_all_genes_new_full, thinning = 10)
-# quantile(auc_T2D_new_united_all_genes, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+auc_UNITED_type2 <- calc_auroc(dataset_UNITED_type2$M,
+                               predictions_UNITED_type2_full,
+                               thinning = 10)
+# quantile(auc_UNITED_type2, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.8465473 0.8618926 0.8768116  
 
 #:------------------------------------------------------------
-roc_curves <- data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
-  cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+roc_curves <- data.frame(prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
+  cbind(Mody = dataset_UNITED_type1$M) %>%
   pROC::roc(response = Mody, predictor = prob) %>%
   magrittr::extract(2:3) %>%
   as.data.frame() %>%
   mutate(
-    auc =  unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full)) %>%
-                    cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+    auc =  unname(data.frame(prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
+                    cbind(Mody = dataset_UNITED_type1$M) %>%
                     pROC::roc(response = Mody, predictor = prob) %>%
                     magrittr::extract(c(9)) %>%
                     unlist()),
-    auc_low = quantile(auc_T1D_with_T_united_all_genes, probs = c(0.025)),
-    auc_high = quantile(auc_T1D_with_T_united_all_genes, probs= c(0.975)),
-    mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_with_T_full), na.rm = TRUE)
+    auc_low = quantile(auc_UNITED_type1_with_T, probs = c(0.025)),
+    auc_high = quantile(auc_UNITED_type1_with_T, probs= c(0.975)),
+    mean = mean(colMeans(predictions_UNITED_type1_with_T_full), na.rm = TRUE)
   ) %>%
   mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
   rbind(
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
-      cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+    data.frame(prob = colMeans(predictions_UNITED_type1_no_T_full)) %>%
+      cbind(Mody = dataset_UNITED_type1$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        auc = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full)) %>%
-                       cbind(Mody = dataset.UNITED_type1_all_genes$M) %>%
+        auc = unname(data.frame(prob = colMeans(predictions_UNITED_type1_no_T_full)) %>%
+                       cbind(Mody = dataset_UNITED_type1$M) %>%
                        pROC::roc(response = Mody, predictor = prob) %>%
                        magrittr::extract(c(9)) %>%
                        unlist()),
-        auc_low = quantile(auc_T1D_no_T_united_all_genes, probs = c(0.025)),
-        auc_high = quantile(auc_T1D_no_T_united_all_genes, probs= c(0.975)),
-        mean = mean(colMeans(predictions_dataset.UNITED_type1_all_genes_no_T_full), na.rm = TRUE)
+        auc_low = quantile(auc_UNITED_type1_no_T, probs = c(0.025)),
+        auc_high = quantile(auc_UNITED_type1_no_T, probs= c(0.975)),
+        mean = mean(colMeans(predictions_UNITED_type1_no_T_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
-    data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
-      cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
+    data.frame(prob = colMeans(predictions_UNITED_type2_full)) %>%
+      cbind(Mody = dataset_UNITED_type2$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        auc = unname(data.frame(prob = colMeans(predictions_dataset.UNITED_type2_all_genes_new_full)) %>%
-                       cbind(Mody = dataset.UNITED_type2_all_genes$M) %>%
+        auc = unname(data.frame(prob = colMeans(predictions_UNITED_type2_full)) %>%
+                       cbind(Mody = dataset_UNITED_type2$M) %>%
                        pROC::roc(response = Mody, predictor = prob) %>%
                        magrittr::extract(c(9)) %>%
                        unlist()),
-        auc_low = quantile(auc_T2D_new_united_all_genes, probs = c(0.025)),
-        auc_high = quantile(auc_T2D_new_united_all_genes, probs= c(0.975)),
-        mean = mean(colMeans(predictions_dataset.UNITED_type2_all_genes_new_full), na.rm = TRUE)
+        auc_low = quantile(auc_UNITED_type2, probs = c(0.025)),
+        auc_high = quantile(auc_UNITED_type2, probs= c(0.975)),
+        mean = mean(colMeans(predictions_UNITED_type2_full), na.rm = TRUE)
       ) %>%
       mutate(Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers")
   )
@@ -159,7 +173,11 @@ dat_text <- roc_curves %>%
   mutate(
     auc_full = paste0("AUC: ", signif(auc, 2), " [", signif(auc_low, 2), "-", signif(auc_high, 2), "]"),
     mean = paste0("Mean prob:", signif(mean, 2)*100, "%"),
-    Calculator = factor(Calculator, levels = c("Biomarkers", "No Biomarkers"), labels = c("Clinical features and biomarkers", "Clinical features"))
+    Calculator = factor(Calculator, 
+                        levels = c("Biomarkers", 
+                                   "No Biomarkers"), 
+                        labels = c("Clinical features and biomarkers", 
+                                   "Clinical features"))
   )
 
 
@@ -170,15 +188,20 @@ plot_prob_fig2 <- patchwork::wrap_plots(
   patchwork::wrap_plots(
     #A.1 - ROC of clinicial feautres & no biomarkers
     roc_curves %>%
-      filter(Dataset == "UNITED" & Model == "Type 1" & Calculator == "No Biomarkers") %>%
+      filter(Dataset == "UNITED" & 
+               Model == "Type 1" & 
+               Calculator == "No Biomarkers") %>%
       mutate(
-        Calculator = factor(Calculator, levels = c("No Biomarkers"), labels = c("Clinical features")),
+        Calculator = factor(Calculator, 
+                            levels = c("No Biomarkers"), 
+                            labels = c("Clinical features")),
         iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path() +
       theme_bw() +
-      facet_grid(~factor(Calculator, levels = c("Clinical features"), 
+      facet_grid(~factor(Calculator, 
+                         levels = c("Clinical features"), 
                          labels = c("Early-insulin-treated: clinical features, no biomarkers")), 
                  scales = "free",
                  labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
@@ -187,7 +210,9 @@ plot_prob_fig2 <- patchwork::wrap_plots(
       theme_bw() +
       geom_label(
         data = dat_text %>%
-          filter(Dataset == "UNITED" & Model == "Type 1" & Calculator == "Clinical features"),
+          filter(Dataset == "UNITED" & 
+                   Model == "Type 1" & 
+                   Calculator == "Clinical features"),
         mapping = aes(x = 0.55, y = 0.1, label = auc_full, hjust = "center"),
         size = 7,
         label.r = unit(0, "pt"),
@@ -196,17 +221,22 @@ plot_prob_fig2 <- patchwork::wrap_plots(
       theme(
         panel.spacing.x = unit(1.5, "lines")
       ),
-    #A.2 - ROC of clinicial feautres & biomarkers
+    #A.2 - ROC of clinical features & biomarkers
     roc_curves %>%
-      filter(Dataset == "UNITED" & Model == "Type 1" & Calculator == "Biomarkers") %>%
+      filter(Dataset == "UNITED" & 
+               Model == "Type 1" & 
+               Calculator == "Biomarkers") %>%
       mutate(
-        Calculator = factor(Calculator, levels = c("Biomarkers"), labels = c("Clinical features and biomarkers")),
+        Calculator = factor(Calculator, 
+                            levels = c("Biomarkers"), 
+                            labels = c("Clinical features and biomarkers")),
         iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path() +
       theme_bw() +
-      facet_grid(~factor(Calculator, levels = c("Clinical features and biomarkers"), 
+      facet_grid(~factor(Calculator, 
+                         levels = c("Clinical features and biomarkers"), 
                          labels = c("Early-insulin-treated: clinical features, with biomarkers")), 
                  scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
@@ -214,7 +244,9 @@ plot_prob_fig2 <- patchwork::wrap_plots(
       theme_bw() +
       geom_label(
         data = dat_text %>%
-          filter(Dataset == "UNITED" & Model == "Type 1" & Calculator == "Clinical features and biomarkers"),
+          filter(Dataset == "UNITED" & 
+                   Model == "Type 1" & 
+                   Calculator == "Clinical features and biomarkers"),
         mapping = aes(x = 0.55, y = 0.1, label = auc_full, hjust = "center"),
         size = 7,
         label.r = unit(0, "pt"),
@@ -230,13 +262,17 @@ plot_prob_fig2 <- patchwork::wrap_plots(
     #B - ROC of not-early-insulin-treated
     roc_curves %>%
       filter(Dataset == "UNITED" & Model == "Type 2") %>%
-      mutate(Calculator = factor(Calculator, levels = "No Biomarkers", labels = "Not-early-insulin-treated")) %>%
+      mutate(Calculator = factor(Calculator, 
+                                 levels = "No Biomarkers", 
+                                 labels = "Not-early-insulin-treated")) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path() +
       theme_bw() +
-      facet_grid(~factor(Calculator, levels = c("Not-early-insulin-treated"), 
+      facet_grid(~factor(Calculator, 
+                         levels = c("Not-early-insulin-treated"), 
                          labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), 
-                 scales = "free",labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+                 scales = "free",
+                 labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
@@ -244,7 +280,9 @@ plot_prob_fig2 <- patchwork::wrap_plots(
         data = dat_text %>%
           filter(Dataset == "UNITED" & Model == "Type 2") %>%
           mutate(
-            Calculator = factor(Calculator, levels = c("Clinical features"), labels = c("Not-early-insulin-treated"))
+            Calculator = factor(Calculator, 
+                                levels = c("Clinical features"), 
+                                labels = c("Not-early-insulin-treated"))
           ),
         mapping = aes(x = 0.55, y = 0.1, label = auc_full, hjust = "center"),
         size = 7,
@@ -313,12 +351,12 @@ patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B", "C"))) &
   )
 
 # Making plots
-pdf("figures/Figure2.pdf", width = 13, height = 9, res= 1200)
+pdf("figures/Figure2.pdf", width = 13, height = 9)
 plot_prob_fig2
 dev.off()
 
 
 # Making plots for presenting
-ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1200)
+ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1100)
 plot_prob_fig2
 dev.off()
