@@ -8,18 +8,18 @@ setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
 library(tidyverse)
 library(writexl)
 library(pROC)
-library(ggbeeswarm)
+#library(ggbeeswarm)
 
 #load functions
-source("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/var_characteristics.R")
-source("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/data/create_data.R")
+source("var_characteristics.R")
+source("data/create_data.R")
 
 #load data
 # MyDiabetes ------------------------------------------------------------------------------------
 #load T1D
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T1D.RData")
+load("data/MY_T1D.RData")
 #load T2D 
-load("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper/MY_T2D.RData")
+load("data/MY_T2D.RData")
 # LIMIT TO ONLY WHITE ETHNICITY
 MY_T1D <- MY_T1D %>%
   filter(ethnicity == "White")
@@ -50,7 +50,9 @@ MY_T2D <- MY_T2D %>%
   )
 
 # UNITED paediatric ---------------------------------------------------------------------
-dataset.UNITED_p <- create_data(dataset = "united t1d pediatrics", commonmody = FALSE)
+dataset.UNITED_p <- create_data(dataset = "united t1d pediatrics", 
+                                commonmody = FALSE, 
+                                id = TRUE)
 
 #need to change M=NA to M=0
 dataset.UNITED_p <- dataset.UNITED_p %>%
@@ -74,33 +76,104 @@ table(dataset.UNITED_type1p$M)
 # Early-insulin-treated
 dataset.MYDIABETES_type1 <- MY_T1D %>%
   mutate(study = "MYDIABETES") %>%
-  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene, biomark_status) 
+  select(MY_ID, 
+         study, 
+         agerec, 
+         agedx, 
+         sex, 
+         bmi, 
+         pardm, 
+         insoroha, 
+         hba1c, 
+         C, 
+         A, 
+         M, 
+         Gene, 
+         biomark_status) 
 
 dataset.UNITED_type1p <- dataset.UNITED_type1p %>%
   mutate(study = "UNITED paediatric") %>%
   filter(!is.na(T))
-dataset_type1 <- full_join(dataset.MYDIABETES_type1, dataset.UNITED_type1p, by = c("study","agerec", "agedx", "sex", "bmi", "pardm", "insoroha", "hba1c", "C", "A", "M", "Gene")) %>%
+dataset_type1 <- full_join(dataset.MYDIABETES_type1, 
+                           dataset.UNITED_type1p, 
+                           by = c("study",
+                                  "agerec", 
+                                  "agedx", 
+                                  "sex", 
+                                  "bmi", 
+                                  "pardm", "
+                                  insoroha", 
+                                  "hba1c", 
+                                  "C", 
+                                  "A", 
+                                  "M", 
+                                  "Gene")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
                                  ifelse(C == 1 & A == 0, 0, 1),
-                                 biomark_status)) 
+                                 biomark_status),
+         type = ifelse(M == 1,
+                       "Mody",
+                       "T1D")) 
 # Not-early-insulin-treated
 dataset.MYDIABETES_type2 <- MY_T2D %>%
   mutate(study = "MYDIABETES") %>%
-  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene, biomark_status) 
+  select(MY_ID, 
+         study, 
+         agerec, 
+         agedx, 
+         sex, 
+         bmi, 
+         pardm, 
+         insoroha, 
+         hba1c, 
+         C, 
+         A, 
+         M, 
+         Gene, 
+         biomark_status) 
 
 dataset.UNITED_type2p <- dataset.UNITED_type2p %>%
   mutate(study = "UNITED paediatric") %>%
-  select(id, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene) 
+  select(id, 
+         study, 
+         agerec, 
+         agedx, 
+         sex, 
+         bmi, 
+         pardm, 
+         insoroha, 
+         hba1c, 
+         C, 
+         A, 
+         M, 
+         Gene) 
 
-dataset_type2 <- full_join(dataset.MYDIABETES_type2, dataset.UNITED_type2p, by = c("study","agerec", "agedx", "sex", "bmi", "pardm", "insoroha", "hba1c", "C", "A", "M", "Gene")) %>%
+dataset_type2 <- full_join(dataset.MYDIABETES_type2, 
+                           dataset.UNITED_type2p, 
+                           by = c("study",
+                                  "agerec", 
+                                  "agedx", 
+                                  "sex", 
+                                  "bmi", 
+                                  "pardm", 
+                                  "insoroha", 
+                                  "hba1c", 
+                                  "C", 
+                                  "A", 
+                                  "M", 
+                                  "Gene")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
                                  ifelse(C == 1 & A == 0, 0, 1),
-                                 biomark_status)) 
+                                 biomark_status),
+         type = ifelse(M == 1,
+                       "Mody",
+                       "T2D")) 
 
+external_data <- full_join(dataset_type1, dataset_type2)
 
 ###########################################################################################
 #1. CHARACTERISTICS TABLES
@@ -110,16 +183,38 @@ varlist = c("agedx","agerec", "bmi", "hba1c")
 varlist_cat = c("Gene", "sex", "pardm", "insoroha", "C", "A", "biomark_status")
 
 # Early-insulin-treated ------------------------------------------------------------------------------------------
-#create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
-var_characteristics(varlist = varlist, varlist_cat = varlist_cat, dataset = dataset_type1, numeric_option = "medianIQR", group = "M")
+#create table for external data - early-insulin-treated by MODY status   
+#- chosen to have numeric variables displayed as median [IQR]
+var_characteristics(varlist = varlist, 
+                    varlist_cat = varlist_cat, 
+                    dataset = dataset_type1, 
+                    numeric_option = "medianIQR", 
+                    group = "M")
 #save as
 externalval_t1d_character_table <- as.data.frame(summaryTable_GROUP_missing)
-write_xlsx(externalval_t1d_character_table,"Supplementary Material/Outputs/ST_04_EARLY_INSULIN_TREATED_table.xlsx")
+write_xlsx(externalval_t1d_character_table,
+           "Supplementary Material/Outputs/ST_04_EARLY_INSULIN_TREATED_table.xlsx")
 
 # Not-early-insulin-treated  -----------------------------------------------------------------------------------------
-#create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
-var_characteristics(varlist = varlist, varlist_cat = varlist_cat, dataset = dataset_type2, numeric_option = "medianIQR", group = "M")
+#create table for external data - not-early-insulin-treated by MODY status 
+#- chosen to have numeric variables displayed as median [IQR]
+var_characteristics(varlist = varlist, 
+                    varlist_cat = varlist_cat, 
+                    dataset = dataset_type2, 
+                    numeric_option = "medianIQR", 
+                    group = "M")
 #save as
 externalval_t2d_character_table <- as.data.frame(summaryTable_GROUP_missing)
-write_xlsx(externalval_t2d_character_table,"Supplementary Material/Outputs/ST_04_NOT_EARLY_INSULIN_TREATED_table.xlsx")
+write_xlsx(externalval_t2d_character_table,
+           "Supplementary Material/Outputs/ST_04_NOT_EARLY_INSULIN_TREATED_table.xlsx")
 
+#Joint ---------------------------------------------------------------------------------
+#create table for UNITED T1D by MODY status - chosen to have numeric variables displayed as median [IQR]
+var_characteristics(varlist = varlist, 
+                    varlist_cat = varlist_cat, 
+                    dataset = external_data, 
+                    numeric_option = "medianIQR", 
+                    group = "type")
+#save as
+externalval_character_table <- as.data.frame(summaryTable_GROUP_missing)
+write_xlsx(externalval_character_table,"Supplementary Material/Outputs/ST_04_table.xlsx")
