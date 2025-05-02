@@ -478,6 +478,6 @@ plot_prob_external_fig3
 dev.off()
 
 
-ggsave("figures/Figure3.tif", width = 13, height = 9, dpi= 1200)
+ggsave("figures/Figure3.tif", width = 13, height = 9, dpi= 1100)
 plot_prob_external_fig3
 dev.off()
