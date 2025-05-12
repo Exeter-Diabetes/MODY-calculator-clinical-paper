@@ -357,6 +357,6 @@ dev.off()
 
 
 # Making plots for presenting
-ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1100)
+ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1000)
 plot_prob_fig2
 dev.off()
