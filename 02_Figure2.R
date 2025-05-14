@@ -17,23 +17,23 @@ library(PRROC)
 
 
 # load functions needed
-source("data/create_data.R")
-source("new_data_predictions/prediction_functions.R")
+source("Data/create_data.R")
+source("New_Data_Predictions/prediction_functions.R")
 
 # load files required
 predictions_UNITED_type1_no_T_full <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
 predictions_UNITED_type1_with_T_full  <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
 predictions_UNITED_type2_full <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
 
 predictions_UNITED_type1_no_T <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
 predictions_UNITED_type1_with_T <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
 predictions_UNITED_type2 <- 
-  readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
 
 # load datasets
 ## Load population representative dataset
@@ -351,12 +351,12 @@ patchwork::plot_annotation(tag_levels = list(c("A.1", "A.2", "B", "C"))) &
   )
 
 # Making plots
-pdf("figures/Figure2.pdf", width = 13, height = 9)
+pdf("Figures/Figure2.pdf", width = 13, height = 9)
 plot_prob_fig2
 dev.off()
 
 
 # Making plots for presenting
-ggsave("figures/Figure2.tif", width = 13, height = 9, dpi= 1000)
+ggsave("Figures/Figure2.tif", width = 13, height = 9, dpi= 1000)
 plot_prob_fig2
 dev.off()

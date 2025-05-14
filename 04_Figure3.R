@@ -11,17 +11,17 @@ library(pROC)
 library(PRROC)
 
 # load functions needed
-source("data/create_data.R")
-source("new_data_predictions/prediction_functions.R")
+source("Data/create_data.R")
+source("New_Data_Predictions/prediction_functions.R")
 
 #readin datasets --------------------------------------------------------------------------------------
 ##data preparation ----------------------------------------------------------------------------------------------------------------------
 ### read in data ------------------------------------------------------------------------------------------------------------------------
 #readin MYDIABETES
 #load T1D
-load("data/MY_T1D.RData")
+load("Data/MY_T1D.RData")
 #load T2D 
-load("data/MY_T2D.RData")
+load("Data/MY_T2D.RData")
 
 # MyDiabetes ------------------------------------------------------------------------------------
 # LIMIT TO ONLY WHITE ETHNICITY
@@ -114,7 +114,7 @@ dataset_type2 <- full_join(dataset.MYDIABETES_type2, dataset.UNITED_type2p, by =
 
 #run predictions ------------------------------------------------------------------------------
 ## In MYDIABETES
-setwd("new_data_predictions")
+setwd("New_Data_Predictions")
 # ## load posteriors
 rcs_parms <- readRDS("rcs_parms.rds")
 
@@ -473,11 +473,11 @@ nrow = 1, ncol = 2
   ) 
 
 
-pdf("figures/Figure3.pdf", width = 13, height = 9)
+pdf("Figures/Figure3.pdf", width = 13, height = 9)
 plot_prob_external_fig3
 dev.off()
 
 
-ggsave("figures/Figure3.tif", width = 13, height = 9, dpi= 1000)
+ggsave("Figures/Figure3.tif", width = 13, height = 9, dpi= 1000)
 plot_prob_external_fig3
 dev.off()

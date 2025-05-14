@@ -1,13 +1,18 @@
 #:----------------------------------------------------------------------------
 #
-#  This file contains a function that provides the needed data in the the right shape 
+#  create_data()
+#
+#  This file contains a function that engineers the datasets used in this paper
+#  into the the right shape 
 #
 #:----------------------------------------------------------------------------
 
 # ARGUMENTS
 # dataset - ("case-control t1d", 
 #            "case-control t2d",
-#           "united t1d pediatrics") 
+#            "united t1d",
+#            "united t2d",
+#            "united t1d pediatrics") 
 #           Which dataset to load and clean
 # biomarkers - ("reduced", )
 # commonmody - (TRUE (default)/ FALSE) Whether to define MODY genes based on 
@@ -55,7 +60,7 @@ create_data <- function(
       filter(t1t2rcgp == 1) %>%
       
       ### select the right variables
-      select(mody, sex, bmi, agedx, hba1c, pardm, agerec) %>%
+      select(mody, sex, bmi, agedx, hba1c, pardm, agerec, typedm) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
@@ -81,7 +86,7 @@ create_data <- function(
       filter(t1t2rcgp == 2) %>%
       
       ### select the right variables
-      select(mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex) %>%
+      select(mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex, typedm) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
