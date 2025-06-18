@@ -60,7 +60,7 @@ create_data <- function(
       filter(t1t2rcgp == 1) %>%
       
       ### select the right variables
-      select(mody, sex, bmi, agedx, hba1c, pardm, agerec, typedm) %>%
+      select(mody, sex, bmi, agedx, hba1c, pardm, agerec, typedm, duration) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
@@ -86,7 +86,7 @@ create_data <- function(
       filter(t1t2rcgp == 2) %>%
       
       ### select the right variables
-      select(mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex, typedm) %>%
+      select(mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex, typedm, duration) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
@@ -142,7 +142,8 @@ create_data <- function(
                DNAResult, 
                insoroha, 
                id,
-               tti) %>%
+               tti,
+               durationfinal) %>%
         
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
@@ -189,7 +190,7 @@ create_data <- function(
           filter(t1ort2 == 1) %>%
           
           ### keep only patients with Genes
-          filter(Gene %in% c("HN1A", 
+          filter(Gene %in% c("HNF1A", 
                              "HNF4A", 
                              "HNF1B", 
                              "GCK", 
@@ -214,7 +215,8 @@ create_data <- function(
                  insoroha, 
                  Gene, 
                  id,
-                 tti) %>%
+                 tti,
+                 durationfinal) %>%
           
           ### drop patients without patient history for diabetes
           drop_na(pardm) %>%
@@ -346,7 +348,8 @@ create_data <- function(
                GADResult, 
                IA2Result, 
                id,
-               tti) %>%
+               tti,
+               durationfinal) %>%
         
         ### rename Antibody variables
         rename(
@@ -436,7 +439,8 @@ create_data <- function(
                  IA2Result, 
                  Gene, 
                  id,
-                 tti) %>%
+                 tti,
+                 durationfinal) %>%
           
           ### rename Antibody variables
           rename(
@@ -585,7 +589,8 @@ create_data <- function(
              AntibodyFINAL, 
              DNAResult, 
              id,
-             tti) %>%
+             tti,
+             durationfinal) %>%
       
       ### generate the outcome variables
       mutate(mody = DNAResult) %>%
@@ -606,7 +611,8 @@ create_data <- function(
                "agerec", 
                "M", 
                "id", 
-               "tti")) %>%
+               "tti",
+               "durationfinal")) %>%
       
       ### drop patients with missing data in the variables we care about
       drop_na(c("sex", 
@@ -660,7 +666,8 @@ create_data <- function(
                DNAResult, 
                Gene, 
                id, 
-               tti) %>%
+               tti,
+               durationfinal) %>%
         
         ### change specific patient
         mutate(DNAResult = ifelse(id %in% c(8002013), 1, DNAResult)) %>%
@@ -684,7 +691,8 @@ create_data <- function(
                  "M", 
                  "Gene", 
                  "id", 
-                 "tti")) %>%
+                 "tti",
+                 "durationfinal")) %>%
         
         ### drop patients with missing data in the variables we care about
         drop_na(c("sex", 
@@ -814,7 +822,8 @@ create_data <- function(
                id, 
                Gene,
                tti,
-               insoroha) %>%
+               insoroha,
+               durationfinal) %>%
         
         ### drop patients without patient history for diabetes
         drop_na(pardm) %>%
@@ -899,7 +908,8 @@ create_data <- function(
                  Gene, 
                  id,
                  tti,
-                 insoroha) %>%
+                 insoroha,
+                 durationfinal) %>%
           
           ### drop patients without patient history for diabetes
           drop_na(pardm) %>%
@@ -1056,7 +1066,8 @@ create_data <- function(
                ZNT8pos, 
                GADResult, 
                IA2Result, 
-               tti) %>%
+               tti,
+               durationfinal) %>%
         
         ### rename Antibody variables
         rename(
@@ -1155,7 +1166,8 @@ create_data <- function(
                  ZNT8pos, 
                  GADResult, 
                  IA2Result, 
-                 tti) %>%
+                 tti,
+                 durationfinal) %>%
           
           ### rename Antibody variables
           rename(
