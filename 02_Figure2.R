@@ -53,6 +53,8 @@ dataset_UNITED_type2 <- cbind(dataset_UNITED_type2, predictions_UNITED_type2)
 #merge to joint dataset
 UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
 
+
+
 #Figure prep --------------------------------------------------------------------------------------
 
 # Calculate AUROC with intervals

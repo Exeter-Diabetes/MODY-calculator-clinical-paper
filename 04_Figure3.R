@@ -110,7 +110,7 @@ dataset_type2 <- full_join(dataset.MYDIABETES_type2, dataset.UNITED_type2p, by =
                                  ifelse(C == 1 & A == 0, 0, 1),
                                  biomark_status)) 
 
-
+  
 
 #run predictions ------------------------------------------------------------------------------
 ## In MYDIABETES
