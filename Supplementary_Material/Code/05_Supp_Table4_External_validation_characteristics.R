@@ -2,7 +2,7 @@
 #Supplementary Table 4 - Characteristics table of external validation dataset
 ##########################################################################################
 #SET WORKING DIRECTORY -----------------------------------------------------------------------------------
-setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
+setwd("~/PhD/CLINICAL MODY/MODY-calculator-clinical-paper")
 
 #load libraries
 library(tidyverse)
@@ -60,6 +60,7 @@ UNITED_p <- UNITED_p %>%
   filter(!is.na(T))
 #checked if worked: should have M=1 (n=7) & M=0 (n=1164)
 table(UNITED_p$M)
+table(UNITED_p$M, UNITED_p$Gene)
 
 #T2D
 UNITED_type2p <- UNITED_p %>%
@@ -74,7 +75,8 @@ table(UNITED_type1p$M)
 # External datasets -----------------------------------------------------------------------
 ## Early-insulin-treated
 MYDIABETES_type1 <- MY_T1D %>%
-  mutate(study = "MYDIABETES") %>%
+  mutate(study = "MYDIABETES",
+         durationfinal = agerec - agedx) %>%
   select(MY_ID, 
          study, 
          agerec, 
@@ -88,7 +90,8 @@ MYDIABETES_type1 <- MY_T1D %>%
          A, 
          M, 
          Gene, 
-         biomark_status) 
+         biomark_status,
+         durationfinal) 
 
 UNITED_type1p <- UNITED_type1p %>%
   mutate(study = "UNITED paediatric") %>%
@@ -100,13 +103,14 @@ dataset_type1 <- full_join(MYDIABETES_type1,
                                   "agedx", 
                                   "sex", 
                                   "bmi", 
-                                  "pardm", "
-                                  insoroha", 
+                                  "pardm", 
+                                  "insoroha", 
                                   "hba1c", 
                                   "C", 
                                   "A", 
                                   "M", 
-                                  "Gene")) %>%
+                                  "Gene", 
+                                  "durationfinal")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
@@ -117,7 +121,8 @@ dataset_type1 <- full_join(MYDIABETES_type1,
                        "T1D")) 
 # Not-early-insulin-treated
 MYDIABETES_type2 <- MY_T2D %>%
-  mutate(study = "MYDIABETES") %>%
+  mutate(study = "MYDIABETES",
+         durationfinal = agerec - agedx) %>%
   select(MY_ID, 
          study, 
          agerec, 
@@ -131,7 +136,8 @@ MYDIABETES_type2 <- MY_T2D %>%
          A, 
          M, 
          Gene, 
-         biomark_status) 
+         biomark_status, 
+         durationfinal) 
 
 UNITED_type2p <- UNITED_type2p %>%
   mutate(study = "UNITED paediatric") %>%
@@ -147,7 +153,8 @@ UNITED_type2p <- UNITED_type2p %>%
          C, 
          A, 
          M, 
-         Gene) 
+         Gene,
+         durationfinal) 
 
 dataset_type2 <- full_join(MYDIABETES_type2, 
                            UNITED_type2p, 
@@ -162,7 +169,8 @@ dataset_type2 <- full_join(MYDIABETES_type2,
                                   "C", 
                                   "A", 
                                   "M", 
-                                  "Gene")) %>%
+                                  "Gene",
+                                  "durationfinal")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
@@ -173,6 +181,7 @@ dataset_type2 <- full_join(MYDIABETES_type2,
                        "T2D")) 
 
 external_data <- full_join(dataset_type1, dataset_type2)
+mydiabetes <- full_join(MYDIABETES_type1, MYDIABETES_type2)
 
 ###########################################################################################
 #1. CHARACTERISTICS TABLES
@@ -180,7 +189,8 @@ external_data <- full_join(dataset_type1, dataset_type2)
 varlist = c("agedx",
             "agerec", 
             "bmi", 
-            "hba1c")
+            "hba1c",
+            "durationfinal")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat = c("Gene", 
                 "sex", 
@@ -224,3 +234,24 @@ var_characteristics(varlist = varlist,
                     p_value_testing = FALSE,
                     table_name = "Supplementary_Material/Outputs/Supp_Table4_table")
 
+external_data %>%
+  summarise(
+    median = median(durationfinal, na.rm = TRUE),
+    Q1 = quantile(durationfinal, probs = 0.25, na.rm = TRUE),
+    Q3 = quantile(durationfinal, probs = 0.75, na.rm = TRUE)
+  )
+
+table(external_data$type, external_data$Gene, useNA = "ifany")
+
+UNITED_p %>%
+  summarise(
+    median = round(median(durationfinal, na.rm = TRUE),2),
+    Q1 = round(quantile(durationfinal, probs = 0.25, na.rm = TRUE),2),
+    Q3 = round(quantile(durationfinal, probs = 0.75, na.rm = TRUE),2)
+  )
+mydiabetes %>%
+  summarise(
+    median = round(median(durationfinal, na.rm = TRUE),2),
+    Q1 = round(quantile(durationfinal, probs = 0.25, na.rm = TRUE),2),
+    Q3 = round(quantile(durationfinal, probs = 0.75, na.rm = TRUE),2)
+  )

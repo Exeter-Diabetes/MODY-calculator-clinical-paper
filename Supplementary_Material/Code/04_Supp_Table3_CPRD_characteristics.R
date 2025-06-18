@@ -8,7 +8,7 @@ library(writexl)
 #load functions -----------------------------------------------------------------------
 source("Functions/var_characteristics_1.R")
 #load data -----------------------------------------------------------------------------
-source("Data/pedro_mody_cohort.R")
+source("Data/pedro_mody_cohort_2024.R")
 
 #load in CPRD dataset
 #M = MODY status (NA = not tested for MODY (i.e. T=1), 1 = tested for MODY (T=0) and positive, 0 = tested for MODY (T=0) and negative)
@@ -18,7 +18,8 @@ source("Data/pedro_mody_cohort.R")
 #insoroha = currently treated with insulin or oha (tablets) (1= currently treated with either, 0 = not treated with either)
 #T = biomarker status (1 = cpeptide negative (UCPCR < 0.2) or antibody positive (A =1), 0 = cpeptide positive (UCPCR >=0.2) AND antibody negative (A=0))
 pedro_mody_cohort_local <- pedro_mody_cohort_local %>%
-  mutate(pardm = ifelse(is.na(pardm), 0, pardm))
+  mutate(pardm = ifelse(is.na(pardm), 0, pardm),
+         duration_diab = agerec - agedx)
 
 CPRD_type1 <- pedro_mody_cohort_local %>%
   filter(which_equation == "t1")
@@ -49,7 +50,8 @@ CPRD_type2_35 <- CPRD_type2 %>%
 varlist = c("agedx",
             "agerec", 
             "bmi", 
-            "hba1c")
+            "hba1c",
+            "duration_diab")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat = c("sex", 
                 "pardm", 

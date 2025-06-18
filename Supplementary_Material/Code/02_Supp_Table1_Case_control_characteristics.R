@@ -28,7 +28,8 @@ cc_type2 <- create_data(dataset = "case-control t2d")
 varlist = c("agedx",
             "agerec", 
             "bmi", 
-            "hba1c")
+            "hba1c",
+            "duration")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat_T1D = c("sex", 
                     "pardm")

@@ -27,14 +27,15 @@ UNITED_type1 <- create_data(dataset = "united t1d",
 UNITED_type2 <- create_data(dataset = "united t2d",
                             commonmody = FALSE)
 
-
+UNITED <- full_join(UNITED_type1, UNITED_type2)
 #Produce characteristics tables ------------------------------------------------------------
 ## for early-insulin-treated ----------------------------------------------------------------
 #create varlist (numeric variables of interest names)
 varlist_T1D = c("agedx",
                 "agerec", 
                 "bmi", 
-                "hba1c")
+                "hba1c",
+                "durationfinal")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat_T1D = c("sex", 
                     "pardm", 
@@ -57,7 +58,8 @@ var_characteristics(varlist = varlist_T1D,
 varlist_T2D = c("agedx",
                 "agerec", 
                 "bmi", 
-                "hba1c")
+                "hba1c",
+                "durationfinal")
 #create varlist_cat (categorical variables of interest names)
 varlist_cat_T2D = c("sex", 
                     "pardm", 
@@ -87,3 +89,9 @@ UNITED_type2 %>%
   filter(M==1) %>%
   summarise(mean = mean(prob))
 
+UNITED %>%
+  summarise(
+    median = round(median(durationfinal, na.rm = TRUE),2),
+    Q1 = round(quantile(durationfinal, probs = 0.25, na.rm = TRUE),2),
+    Q3 = round(quantile(durationfinal, probs = 0.75, na.rm = TRUE),2)
+  )
