@@ -3,6 +3,7 @@
 ######################################################################################
 
 rearrange_columns <- function(df, groups = NULL, num_option_name = num_option_name) {
+  #browser()
   if(is.null(groups)){
     new_order <- c("variable", "category")
     

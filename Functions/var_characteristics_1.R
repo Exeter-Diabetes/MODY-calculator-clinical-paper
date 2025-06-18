@@ -247,7 +247,7 @@ var_characteristics <- function(
         #reorder dataframe columns to be by group
         
         # Apply the function to rearrange the columns
-        summaryTable_count_num_miss <- rearrange_columns(summaryTable_count_num_miss)
+        summaryTable_count_num_miss <- rearrange_columns(df = summaryTable_count_num_miss)
         
         #Save to global environment
         #and as Excell table
@@ -281,10 +281,11 @@ var_characteristics <- function(
             select(-3, -4)
         #reorder dataframe columns to be by group
         # Apply the function to rearrange the columns
-        summaryTable_count_num_miss <- rearrange_columns(summaryTable_count_num_miss)
+        summaryTable_count_num_miss <- rearrange_columns(df = summaryTable_count_num_miss,
+                                                         num_option_name = num_option_name)
         
         #Save to global environment and Excell table 
-        write_xlsx( summaryTable_count_num_miss, paste0(name,".xlsx"))
+        write_xlsx(summaryTable_count_num_miss, paste0(name,".xlsx"))
         summaryTable_count_num_miss <<- as.data.frame(summaryTable_count_num_miss)
         mv(from= "summaryTable_count_num_miss", to = paste0(name), envir = globalenv())
         #write_xlsx(summaryTable_GROUP_missing, paste0(name,".xlsx"))
