@@ -34,10 +34,10 @@ UNITED_type2_all_genes <- create_data(dataset = "united t2d",
 #load predictions ------------------------------------------------------------------------------------
 #load T1D
 predictions_UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-UNITED_type1 <- cbind(dataset.UNITED_type1_all_genes, predictions_UNITED_type1_with_T)
+UNITED_type1 <- cbind(UNITED_type1_all_genes, predictions_UNITED_type1_with_T)
 #load T2D
 predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
-UNITED_type2 <- cbind(dataset.UNITED_type2_all_genes, predictions_UNITED_type2)
+UNITED_type2 <- cbind(UNITED_type2_all_genes, predictions_UNITED_type2)
 
 
 #Join datasets -----------------------------------------------------------------------
