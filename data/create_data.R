@@ -612,7 +612,9 @@ create_data <- function(
                "M", 
                "id", 
                "tti",
-               "durationfinal")) %>%
+               "durationfinal",
+               "UCPCRPosNegFinal", 
+               "AntibodyFINAL" )) %>%
       
       ### drop patients with missing data in the variables we care about
       drop_na(c("sex", 
@@ -692,7 +694,9 @@ create_data <- function(
                  "Gene", 
                  "id", 
                  "tti",
-                 "durationfinal")) %>%
+                 "durationfinal",
+                 "UCPCRPosNegFinal", 
+                 "AntibodyFINAL")) %>%
         
         ### drop patients with missing data in the variables we care about
         drop_na(c("sex", 
