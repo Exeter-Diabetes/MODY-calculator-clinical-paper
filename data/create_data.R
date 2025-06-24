@@ -60,13 +60,29 @@ create_data <- function(
       filter(t1t2rcgp == 1) %>%
       
       ### select the right variables
-      select(mody, sex, bmi, agedx, hba1c, pardm, agerec, typedm, duration) %>%
+      select(id, mody, sex, bmi, agedx, hba1c, pardm, agerec, typedm, duration) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
     
     ## return final dataset
-    return(dataset.case_control_type1)
+    return(
+      
+      if (isTRUE(id)) {
+        
+        dataset.case_control_type1
+        
+      } else {
+        
+        dataset.case_control_type1 %>%
+          
+          # remove id
+          select(-id)
+        
+      }
+      
+    )
+    
     
   } else if (tolower(dataset) == "case-control t2d") {
     
@@ -86,13 +102,29 @@ create_data <- function(
       filter(t1t2rcgp == 2) %>%
       
       ### select the right variables
-      select(mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex, typedm, duration) %>%
+      select(id, mody, agedx, bmi, hba1c, pardm, agerec, insoroha, sex, typedm, duration) %>%
       
       ### make sure it is a data.frame() for use in R
       as.data.frame()
     
     ## return final dataset
-    return(dataset.case_control_type2)
+    return(
+      
+      if (isTRUE(id)) {
+        
+        dataset.case_control_type2
+        
+      } else {
+        
+        dataset.case_control_type2 %>%
+          
+          # remove id
+          select(-id)
+        
+      }
+      
+    )
+    
     
   } else if (tolower(dataset) == "united t1d") {
     

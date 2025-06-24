@@ -25,7 +25,7 @@ UNITED_type1 <- create_data(dataset = "united t1d",
 
 #load in UNITED type 2 datasets ----------------------------------------------------------
 UNITED_type2 <- create_data(dataset = "united t2d",
-                            commonmody = FALSE)
+                            commonmody = FALSE, id = TRUE)
 
 UNITED <- full_join(UNITED_type1, UNITED_type2)
 #Produce characteristics tables ------------------------------------------------------------
@@ -77,7 +77,11 @@ var_characteristics(varlist = varlist_T2D,
 
 #Finding the mean MODY prob for M+ AND M- participants
 #load predictions
-predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
+predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>%
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type2 <- predictions_UNITED_type2[as.character(c(dataset_UNITED_type2$id)), ]
 #bind them
 UNITED_type2 <- cbind(UNITED_type2,predictions_UNITED_type2)
 

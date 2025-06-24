@@ -15,20 +15,28 @@ library(tidyverse)
 source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
 
-# load rds objects
-bootstrap_t1d <- readRDS("bootstrap_riley_simulation/output/simulation_t1d.rds")
-bootstrap_t2d <- readRDS("bootstrap_riley_simulation/output/simulation_t2d.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
-
 # load datasets
 ## Load population representative dataset
-dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE, id = TRUE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
-dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE)
+
+# load rds objects
+bootstrap_t1d <- readRDS("bootstrap_riley_simulation/output/simulation_t1d.rds")
+bootstrap_t2d <- readRDS("bootstrap_riley_simulation/output/simulation_t2d.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type2_all_genes_new <- predictions_dataset.UNITED_type2_all_genes_new[as.character(c(dataset.UNITED_type2_all_genes$id)), ]
 
 ############################################################
 

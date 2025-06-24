@@ -19,23 +19,39 @@ library(PRROC)
 source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
 
-# load files required
-predictions_dataset.UNITED_type1_all_genes_no_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type2_all_genes_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
-
-predictions_dataset.UNITED_type1_all_genes_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
-
 # load datasets
 ## Load population representative dataset
-dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE) %>%
+dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE, id = TRUE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
-dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE)
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE)
+
+# load files required
+predictions_dataset.UNITED_type1_all_genes_no_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_no_T_full <- predictions_dataset.UNITED_type1_all_genes_no_T_full[, as.character(c(dataset.UNITED_type1_all_genes$id))]
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- predictions_dataset.UNITED_type1_all_genes_with_T_full[, as.character(c(dataset.UNITED_type1_all_genes$id))]
+predictions_dataset.UNITED_type2_all_genes_new_full <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+predictions_dataset.UNITED_type2_all_genes_new_full <- predictions_dataset.UNITED_type2_all_genes_new_full[, as.character(c(dataset.UNITED_type2_all_genes$id))]
+
+predictions_dataset.UNITED_type1_all_genes_no_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_all_genes_no_T <- predictions_dataset.UNITED_type1_all_genes_no_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type2_all_genes_new <- readRDS("model_predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type2_all_genes_new <- predictions_dataset.UNITED_type2_all_genes_new[as.character(c(dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE)
+$id)), ]
 
 
 #:------------------------------------------------------------

@@ -21,7 +21,11 @@ dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody
   mutate(M = ifelse(is.na(M), 0, M))
 
 #load Early-insulin-treated predictions
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
 UNITED_type1 <- cbind(dataset.UNITED_type1_all_genes, predictions_dataset.UNITED_type1_all_genes_with_T)
 
 roc(UNITED_type1$M, UNITED_type1$T, plot = TRUE, print.auc = TRUE, ci = TRUE)

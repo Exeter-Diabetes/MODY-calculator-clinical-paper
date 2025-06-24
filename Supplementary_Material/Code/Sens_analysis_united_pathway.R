@@ -24,14 +24,16 @@ source("Data/create_data.R")
 UNITED_type1_all_genes <- create_data(dataset = "united t1d", 
                                       commonmody = FALSE, 
                                       id = TRUE, 
-                                      biomarkers = "full") %>%
+                                      biomarkers = "full",
+                                      id = TRUE) %>%
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M),
          MODEL = "type1")
 UNITED_type2_all_genes <- create_data(dataset = "united t2d", 
                                       commonmody = FALSE, 
                                       id = TRUE, 
-                                      biomarkers = "full") %>%
+                                      biomarkers = "full",
+                                      id = TRUE) %>%
   rename(C = UCPCRPosNegFinal, 
          A = AntibodyFINAL) %>%
   mutate(MODEL = "type2",
@@ -40,10 +42,18 @@ UNITED_type2_all_genes <- create_data(dataset = "united t2d",
 
 #load predictions ------------------------------------------------------------------------------------
 #load T1D
-predictions_UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
+predictions_UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type1_with_T <- predictions_UNITED_type1_with_T[as.character(c(UNITED_type1_all_genes$id)), ]
 UNITED_type1 <- cbind(UNITED_type1_all_genes, predictions_UNITED_type1_with_T)
 #load T2D
-predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
+predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type2 <- predictions_UNITED_type2[as.character(c(UNITED_type2_all_genes$id)), ]
 UNITED_type2 <- cbind(UNITED_type2_all_genes, predictions_UNITED_type2)
 
 

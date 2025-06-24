@@ -13,20 +13,28 @@ library(patchwork)
 # load functions needed
 source("data/create_data.R")
 
-# load files required
-predictions_UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
-
-
 ## Load population representative dataset
-UNITED_type1 <- create_data(dataset = "united t1d", commonmody = FALSE)
+UNITED_type1 <- create_data(dataset = "united t1d", commonmody = FALSE, id = TRUE)
 # we don't do this to make the plotting easier since these patients don't have the correct biomarker status for testing (cpeptide negative or antibody positive)
 # and hence their probabilities are all the same <0.001
 # ## if MODY testing missing, change to 0
 # mutate(M = ifelse(is.na(M), 0, M))    
-UNITED_type2 <- create_data(dataset = "united t2d", commonmody = FALSE) %>%
+UNITED_type2 <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE) %>%
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
+
+# load files required
+predictions_UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type1_with_T <- predictions_UNITED_type1_with_T[as.character(c(UNITED_type1$id)), ]
+predictions_UNITED_type2 <- readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type2 <- predictions_UNITED_type2[as.character(c(UNITED_type2$id)), ]
+
 
 #:--------------------------------------------
 

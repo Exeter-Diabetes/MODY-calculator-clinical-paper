@@ -119,31 +119,19 @@ calculate_thresholds_diagnostics <- function(response, prediction, unique = FALS
 }
 
 
-
-# Predictions
-predictions_dataset.UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_with_T.rds")
-predictions_dataset.UNITED_type1_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_with_T_full.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type1_gad_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T.rds")
-predictions_dataset.UNITED_type1_gad_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T.rds")
-predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T.rds")
-predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full.rds")
-predictions_dataset.UNITED_type1_no_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_no_T.rds")
-predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds")
-
-
 ## Load population representative dataset
+
+dataset.UNITED_type1 <- create_data(dataset = "united t1d", id = TRUE)
 
 dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", 
                                               biomarkers = "reduced", 
-                                              commonmody = FALSE)
+                                              commonmody = FALSE,
+                                              id = TRUE)
 
 dataset.UNITED_type1_gad_all_genes <- create_data(dataset = "united t1d", 
                                                   biomarkers = "full",
-                                                  commonmody = FALSE) %>%
+                                                  commonmody = FALSE,
+                                                  id = TRUE) %>%
   
   # check if the antibody variable in question is recorded
   mutate(A = GAD)
@@ -151,7 +139,8 @@ dataset.UNITED_type1_gad_all_genes <- create_data(dataset = "united t1d",
 
 dataset.UNITED_type1_gad_ia2_all_genes <- create_data(dataset = "united t1d", 
                                                       biomarkers = "full", 
-                                                      commonmody = FALSE) %>%
+                                                      commonmody = FALSE,
+                                                      id = TRUE) %>%
   
   # check if the antibody variable in question is recorded
   mutate(
@@ -165,7 +154,8 @@ dataset.UNITED_type1_gad_ia2_all_genes <- create_data(dataset = "united t1d",
 
 dataset.UNITED_type1_gad_ia2_znt8_all_genes <- create_data(dataset = "united t1d", 
                                                            biomarkers = "full", 
-                                                           commonmody = FALSE) %>%
+                                                           commonmody = FALSE,
+                                                           id = TRUE) %>%
   
   # check if the antibody variable in question is recorded
   mutate(
@@ -180,6 +170,53 @@ dataset.UNITED_type1_gad_ia2_znt8_all_genes <- create_data(dataset = "united t1d
   mutate(T = ifelse(C == 0 | A == 1, 1, 0)) # T is 1 if Cn or Ap
 
 
+
+
+
+# Predictions
+predictions_dataset.UNITED_type1_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_with_T <- predictions_dataset.UNITED_type1_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_all_genes_with_T_full <- predictions_dataset.UNITED_type1_all_genes_with_T_full[, as.character(c(dataset.UNITED_type1_all_genes$id))]
+predictions_dataset.UNITED_type1_gad_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_gad_all_genes_with_T <- predictions_dataset.UNITED_type1_gad_all_genes_with_T[as.character(c(dataset.UNITED_type1_gad_all_genes$id)), ]
+predictions_dataset.UNITED_type1_gad_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_gad_all_genes_with_T_full <- predictions_dataset.UNITED_type1_gad_all_genes_with_T_full[, as.character(c(dataset.UNITED_type1_gad_all_genes$id))]
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T <- predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T[as.character(c(dataset.UNITED_type1_gad_ia2_all_genes$id)), ]
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full <- predictions_dataset.UNITED_type1_gad_ia2_all_genes_with_T_full[, as.character(c(dataset.UNITED_type1_gad_ia2_all_genes$id))]
+predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T <- predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T[as.character(c(dataset.UNITED_type1_gad_ia2_znt8_all_genes$id)), ]
+predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full.rds")
+predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full <- predictions_dataset.UNITED_type1_gad_ia2_znt8_all_genes_with_T_full[, as.character(c(dataset.UNITED_type1_gad_ia2_znt8_all_genes$id))]
+predictions_dataset.UNITED_type1_no_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_no_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_no_T <- predictions_dataset.UNITED_type1_no_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
+predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- readRDS("Model_Predictions/predictions_dataset.UNITED_type1_sensitivity_analysis_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_dataset.UNITED_type1_sensitivity_analysis_with_T <- predictions_dataset.UNITED_type1_sensitivity_analysis_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
 
 
 

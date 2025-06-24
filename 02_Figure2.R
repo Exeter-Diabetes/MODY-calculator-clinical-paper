@@ -20,31 +20,16 @@ library(PRROC)
 source("Data/create_data.R")
 source("New_Data_Predictions/prediction_functions.R")
 
-# load files required
-predictions_UNITED_type1_no_T_full <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
-predictions_UNITED_type1_with_T_full  <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
-predictions_UNITED_type2_full <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
-
-predictions_UNITED_type1_no_T <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds")
-predictions_UNITED_type1_with_T <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds")
-predictions_UNITED_type2 <- 
-  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds")
-
 # load datasets
 ## Load population representative dataset
 dataset_UNITED_type1 <- create_data(dataset = "united t1d", 
-                                              commonmody = FALSE) %>%
+                                              commonmody = FALSE, id = TRUE) %>%
   
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
 dataset_UNITED_type2 <- create_data(dataset = "united t2d", 
-                                              commonmody = FALSE)
+                                              commonmody = FALSE, id = TRUE)
 
 #merge probs to datasets
 dataset_UNITED_type1 <- cbind(dataset_UNITED_type1, predictions_UNITED_type1_with_T)
@@ -53,6 +38,36 @@ dataset_UNITED_type2 <- cbind(dataset_UNITED_type2, predictions_UNITED_type2)
 #merge to joint dataset
 UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
 
+
+# load files required
+predictions_UNITED_type1_no_T_full <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T_full.rds")
+predictions_UNITED_type1_no_T_full <- predictions_UNITED_type1_no_T_full[, as.character(c(dataset_UNITED_type1$id))]
+predictions_UNITED_type1_with_T_full  <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T_full.rds")
+predictions_UNITED_type1_with_T_full <- predictions_UNITED_type1_with_T_full[, as.character(c(dataset_UNITED_type1$id))]
+predictions_UNITED_type2_full <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new_full.rds")
+predictions_UNITED_type2_full <- predictions_UNITED_type2_full[, as.character(c(dataset_UNITED_type2$id))]
+
+predictions_UNITED_type1_no_T <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_no_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type1_no_T <- predictions_UNITED_type1_no_T[as.character(c(dataset_UNITED_type1$id)), ]
+predictions_UNITED_type1_with_T <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type1_with_T <- predictions_UNITED_type1_with_T[as.character(c(dataset_UNITED_type1$id)), ]
+predictions_UNITED_type2 <- 
+  readRDS("Model_Predictions/predictions_dataset.UNITED_type2_all_genes_new.rds") %>% 
+  as.data.frame() %>%
+  { rownames(.) <- NULL; . } %>%
+  column_to_rownames(var = "id")
+predictions_UNITED_type2 <- predictions_UNITED_type2[as.character(c(dataset_UNITED_type2$id)), ]
 
 
 #Figure prep --------------------------------------------------------------------------------------
@@ -96,7 +111,7 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 auc_UNITED_type1_no_T <- calc_auroc(dataset_UNITED_type1$M, 
                                       predictions_UNITED_type1_no_T_full,
                                       thinning = 10)
-# quantile(auc_UNITED_type1_no_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+quantile(auc_UNITED_type1_no_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.7053243 0.7924399 0.8190743 
 
@@ -104,7 +119,7 @@ auc_UNITED_type1_no_T <- calc_auroc(dataset_UNITED_type1$M,
 auc_UNITED_type1_with_T <- calc_auroc(dataset_UNITED_type1$M, 
                                       predictions_UNITED_type1_with_T_full,
                                       thinning = 10)
-# quantile(auc_UNITED_type1_with_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+quantile(auc_UNITED_type1_with_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.9487113 0.9768041 0.9779210 
 
@@ -112,7 +127,7 @@ auc_UNITED_type1_with_T <- calc_auroc(dataset_UNITED_type1$M,
 auc_UNITED_type2 <- calc_auroc(dataset_UNITED_type2$M,
                                predictions_UNITED_type2_full,
                                thinning = 10)
-# quantile(auc_UNITED_type2, probs = c(0.025, 0.5, 0.975)) # thinning = 10
+quantile(auc_UNITED_type2, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.8465473 0.8618926 0.8768116  
 
