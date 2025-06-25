@@ -80,12 +80,17 @@ table(dataset.UNITED_type1p$M)
 # Early-insulin-treated
 dataset.MYDIABETES_type1 <- MY_T1D %>%
   mutate(study = "MYDIABETES") %>%
-  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene, biomark_status) 
+  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, 
+         insoroha, hba1c, C, A, M, Gene, biomark_status) 
 
 dataset.UNITED_type1p <- dataset.UNITED_type1p %>%
   mutate(study = "UNITED paediatric") %>%
   filter(!is.na(T))
-dataset_type1 <- full_join(dataset.MYDIABETES_type1, dataset.UNITED_type1p, by = c("study","agerec", "agedx", "sex", "bmi", "pardm", "insoroha", "hba1c", "C", "A", "M", "Gene")) %>%
+dataset_type1 <- full_join(dataset.MYDIABETES_type1, 
+                           dataset.UNITED_type1p, 
+                           by = c("study","agerec", "agedx", "sex", "bmi", 
+                                  "pardm", "insoroha", "hba1c", "C", "A", 
+                                  "M", "Gene")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
@@ -97,13 +102,19 @@ dataset_type1 <- dataset_type1 %>%
 # Not-early-insulin-treated
 dataset.MYDIABETES_type2 <- MY_T2D %>%
   mutate(study = "MYDIABETES") %>%
-  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene, biomark_status) 
+  select(MY_ID, study, agerec, agedx, sex, bmi, pardm, insoroha, 
+         hba1c, C, A, M, Gene, biomark_status) 
 
 dataset.UNITED_type2p <- dataset.UNITED_type2p %>%
   mutate(study = "UNITED paediatric") %>%
-  select(id, study, agerec, agedx, sex, bmi, pardm, insoroha, hba1c, C, A, M, Gene) 
+  select(id, study, agerec, agedx, sex, bmi, pardm, 
+         insoroha, hba1c, C, A, M, Gene) 
 
-dataset_type2 <- full_join(dataset.MYDIABETES_type2, dataset.UNITED_type2p, by = c("study","agerec", "agedx", "sex", "bmi", "pardm", "insoroha", "hba1c", "C", "A", "M", "Gene")) %>%
+dataset_type2 <- full_join(dataset.MYDIABETES_type2, 
+                           dataset.UNITED_type2p, 
+                           by = c("study","agerec", "agedx", "sex", "bmi", 
+                                  "pardm", "insoroha", "hba1c", "C", "A", 
+                                  "M", "Gene")) %>%
   mutate(M = ifelse(is.na(M), 0, M), 
          Gene = ifelse(Gene == "", NA, Gene), 
          biomark_status = ifelse(is.na(biomark_status), 
@@ -125,11 +136,17 @@ posterior_samples_T1D <- readRDS("type_1_model_posteriors_thin_100.rds")
 # ### create object to use for prediction
 posterior_samples_T1D_obj <- list(post = posterior_samples_T1D$samples)
 class(posterior_samples_T1D_obj) <- "T1D"
-predictions_dataset_type1_with_T <- predict(posterior_samples_T1D_obj, dataset_type1, rcs_parms)
+predictions_dataset_type1_with_T <- predict(posterior_samples_T1D_obj, 
+                                            dataset_type1, 
+                                            rcs_parms)
 
-predictions_dataset_type1_with_T_new <- predict(posterior_samples_T1D_obj, dataset_type1, rcs_parms) %>%
+predictions_dataset_type1_with_T_new <- predict(posterior_samples_T1D_obj, 
+                                                dataset_type1, 
+                                                rcs_parms) %>%
   apply(., 2, function(x) {
-    data.frame(prob = mean(x), LCI = quantile(x, prob = 0.025), UCI = quantile(x, prob = 0.975))
+    data.frame(prob = mean(x), 
+               LCI = quantile(x, prob = 0.025), 
+               UCI = quantile(x, prob = 0.975))
   }) %>%
   bind_rows()
 
@@ -146,9 +163,12 @@ class(posterior_samples_T2D_obj) <- "T2D"
 
 
 
-predictions_dataset.type2_new <- predict(posterior_samples_T2D_obj, dataset_type2) %>%
+predictions_dataset.type2_new <- predict(posterior_samples_T2D_obj, 
+                                         dataset_type2) %>%
   apply(., 2, function(x) {
-    data.frame(prob = mean(x), LCI = quantile(x, prob = 0.025), UCI = quantile(x, prob = 0.975))
+    data.frame(prob = mean(x), 
+               LCI = quantile(x, prob = 0.025), 
+               UCI = quantile(x, prob = 0.975))
   }) %>%
   bind_rows()
 
@@ -195,19 +215,24 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 }
 
 ###
-## This section is thinned to help run times but also does not make much difference to full posterior values
+## This section is thinned to help run times but also does not make much 
+#  difference to full posterior values
 ###
 
 ## Type 1 UNITED
 
 ### Biomarker models
-auc_T1D_with_T <- calc_auroc(dataset_type1$M, predictions_dataset_type1_with_T, thinning = 10)
+auc_T1D_with_T <- calc_auroc(dataset_type1$M, 
+                             predictions_dataset_type1_with_T, 
+                             thinning = 10)
 quantile(auc_T1D_with_T, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.9719786 0.9809626 0.9837487 
 
 ## Type 2 UNITED
-auc_T2D_new <- calc_auroc(dataset_type2$M, predictions_dataset_type2, thinning = 10)
+auc_T2D_new <- calc_auroc(dataset_type2$M, 
+                          predictions_dataset_type2, 
+                          thinning = 10)
 quantile(auc_T2D_new, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.8990476 0.9138095 0.9276190 
@@ -228,7 +253,10 @@ calc_roc <- function(data, predictions, thinning = 100) {
     }
     
     ## calculate ROC
-    interim <- pROC::roc(response = data, predictor = predictions[sequence_list[i],], levels = c(0,1), direction = "<") %>%
+    interim <- pROC::roc(response = data, 
+                         predictor = predictions[sequence_list[i],], 
+                         levels = c(0,1), 
+                         direction = "<") %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame() %>%
       mutate(iteration = paste0(sequence_list[i]))
@@ -244,36 +272,48 @@ calc_roc <- function(data, predictions, thinning = 100) {
 
 ## Type 1 UNITED
 ### Biomarker models
-roc_T1D_with_T <- calc_roc(dataset_type1$M, predictions_dataset_type1_with_T, thinning = 1000)
+roc_T1D_with_T <- calc_roc(dataset_type1$M, 
+                           predictions_dataset_type1_with_T, 
+                           thinning = 1000)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T1D_with_T <- ggplot() +
   ## all iterations
   geom_path(
     data = roc_T1D_with_T,
-    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+    aes(x = 1-specificities, 
+        y= sensitivities, 
+        group = iteration), 
+    colour = "grey"
   ) +
   ## average predictions
   geom_path(
-    data = pROC::roc(response = dataset_type1$M, predictor = colMeans(predictions_dataset_type1_with_T)) %>%
+    data = pROC::roc(response = dataset_type1$M, 
+                     predictor = colMeans(predictions_dataset_type1_with_T)) %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame(),
     aes(x = 1-specificities, y= sensitivities), colour = "black"
   )
 
 ## Type 2 UNITED
-roc_T2D <- calc_roc(dataset_type2$M, predictions_dataset_type2, thinning = 1000)
+roc_T2D <- calc_roc(dataset_type2$M, 
+                    predictions_dataset_type2, 
+                    thinning = 1000)
 
 # plot for ROC with grey being iterations, black being the ROC for average prediction
 plot_roc_T2D <- ggplot() +
   ## all iterations
   geom_path(
     data = roc_T2D,
-    aes(x = 1-specificities, y= sensitivities, group = iteration), colour = "grey"
+    aes(x = 1-specificities, 
+        y= sensitivities, 
+        group = iteration), 
+    colour = "grey"
   ) +
   ## average predictions
   geom_path(
-    data = pROC::roc(response = dataset_type2$M, predictor = colMeans(predictions_dataset_type2)) %>%
+    data = pROC::roc(response = dataset_type2$M, 
+                     predictor = colMeans(predictions_dataset_type2)) %>%
       magrittr::extract(c(2:3)) %>%
       as.data.frame(),
     aes(x = 1-specificities, y= sensitivities), colour = "black"
@@ -297,7 +337,9 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset_type1_with_T)) %>%
     auc_high = quantile(auc_T1D_with_T, probs= c(0.975)),
     mean = mean(colMeans(predictions_dataset_type1_with_T), na.rm = TRUE)
   ) %>%
-  mutate(Dataset = "External validation", Model = "Type 1", Calculator = "Biomarkers") %>%
+  mutate(Dataset = "External validation", 
+         Model = "Type 1", 
+         Calculator = "Biomarkers") %>%
   rbind( 
     data.frame(prob = colMeans(predictions_dataset_type2)) %>%
       cbind(Mody = dataset_type2$M) %>%
@@ -314,7 +356,9 @@ roc_curves <- data.frame(prob = colMeans(predictions_dataset_type1_with_T)) %>%
         auc_high = quantile(auc_T2D_new, probs= c(0.975)),
         mean = mean(colMeans(predictions_dataset_type2), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "External validation", Model = "Type 2", Calculator = "No Biomarkers")
+      mutate(Dataset = "External validation", 
+             Model = "Type 2", 
+             Calculator = "No Biomarkers")
   )
 
 
@@ -324,9 +368,12 @@ dat_text <- roc_curves %>%
   select(-sensitivities, -specificities) %>%
   distinct() %>%
   mutate(
-    auc_full = paste0("AUC: ", signif(auc, 2), " [", signif(auc_low, 2), "-", signif(auc_high, 2), "]"),
+    auc_full = paste0("AUC: ", signif(auc, 2), 
+                      " [", signif(auc_low, 2), "-", signif(auc_high, 2), "]"),
     mean = paste0("Mean prob:", signif(mean, 2)*100, "%"),
-    Calculator = factor(Calculator, levels = c("Biomarkers"), labels = c("Clinical features and biomarkers"))
+    Calculator = factor(Calculator, 
+                        levels = c("Biomarkers"), 
+                        labels = c("Clinical features and biomarkers"))
   )
 
 
@@ -340,18 +387,20 @@ plot_prob_external_fig3 <- patchwork::wrap_plots(
       filter(Dataset == "External validation" & Model == "Type 1") %>%
       mutate(
         Calculator = factor(Calculator, 
-                            levels = c("No Biomarkers", "Biomarkers"), 
-                            labels = c("Clinical features", "Clinical features and biomarkers")),
+                            levels = c("No Biomarkers", 
+                                       "Biomarkers"), 
+                            labels = c("Clinical features", 
+                                       "Clinical features and biomarkers")),
         iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path() +
       theme_bw() +
-      #facet_grid(~factor(Model, 
-                         #levels = c("Type 1", "Type 2"), 
-                         #labels = c("Early-insulin-treated", "Not-early-insulin-treated")), 
-                 #scales = "free",
-                 #labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+      facet_grid(~factor(Model, 
+                         levels = c("Type 1"), 
+                         labels = c("Early-insulin-treated: clinical features, with biomarkers")), 
+                 scales = "free",
+                 labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
@@ -374,18 +423,20 @@ plot_prob_external_fig3 <- patchwork::wrap_plots(
       filter(Dataset == "External validation" & Model == "Type 2") %>%
       mutate(
         Calculator = factor(Calculator, 
-                            levels = c("No Biomarkers", "Biomarkers"), 
-                            labels = c("Clinical features", "Clinical features and biomarkers")),
+                            levels = c("No Biomarkers", 
+                                       "Biomarkers"), 
+                            labels = c("Clinical features", 
+                                       "Clinical features and biomarkers")),
         iteration = 0
       ) %>%
       ggplot(aes(x = 1- specificities, y = sensitivities)) +
       geom_path() +
       theme_bw() +
-      #facet_grid(~factor(Model, 
-                         #levels = c("Type 1", "Type 2"), 
-                         #labels = c("Early-insulin-treated", "Not-early-insulin-treated")), 
-                 #scales = "free",
-                 #labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
+      facet_grid(~factor(Model, 
+                         levels = c("Type 2"), 
+                         labels = c("Not-early-insulin-treated: clinical features, no biomarkers")), 
+                 scales = "free",
+                 labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
       scale_y_continuous("Sensitivity", labels = scales::percent) +
       scale_x_continuous("1- Specificity", labels = scales::percent) +
       theme_bw() +
@@ -413,7 +464,9 @@ nrow = 1, ncol = 2
         select(M, prob) %>%
         rename("Mody" = "M") %>%
         mutate(
-          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+          Mody = factor(Mody, 
+                        levels = c(0, 1), 
+                        labels = c("Non-MODY", "MODY")),
         ) %>%
         ggplot() +
         geom_density(aes(x = prob), fill = "grey") +
@@ -428,17 +481,21 @@ nrow = 1, ncol = 2
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY \n (n=1005)"),
+        ylab("Non-MODY \n (n=1,005)"),
       #point
       External_joint %>%
         filter(M == 1) %>%
         select(M, prob) %>%
         rename("Mody" = "M") %>%
         mutate(
-          Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
+          Mody = factor(Mody, levels = c(0, 1), 
+                        labels = c("Non-MODY", "MODY")),
         ) %>%
         ggplot() +
-        geom_point(aes(x = prob, y=0), position = position_jitter(height = 0.13, width = 0.1, seed = 24)) +
+        geom_point(aes(x = prob, y=0), 
+                   position = position_jitter(height = 0.13, 
+                                              width = 0.1, 
+                                              seed = 24)) +
         geom_vline(xintercept = 0.05) +
         coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
         scale_x_continuous(labels = scales::percent) +
@@ -478,6 +535,6 @@ plot_prob_external_fig3
 dev.off()
 
 
-ggsave("Figures/Figure3.tif", width = 13, height = 9, dpi= 1000)
-plot_prob_external_fig3
-dev.off()
+# ggsave("Figures/Figure3.tif", width = 13, height = 9, dpi= 1000)
+# plot_prob_external_fig3
+# dev.off()
