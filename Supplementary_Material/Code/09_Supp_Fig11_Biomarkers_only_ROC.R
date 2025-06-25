@@ -6,7 +6,6 @@
 #for early-insulin-treated patients
 
 ######################################################################################
-setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
 #load libraries --------------------------------------------------------------------------------
 library(tidyverse)
 library(pROC)
@@ -28,7 +27,11 @@ predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/
 predictions_dataset.UNITED_type1_all_genes_with_T <- predictions_dataset.UNITED_type1_all_genes_with_T[as.character(c(dataset.UNITED_type1_all_genes$id)), ]
 UNITED_type1 <- cbind(dataset.UNITED_type1_all_genes, predictions_dataset.UNITED_type1_all_genes_with_T)
 
-roc(UNITED_type1$M, UNITED_type1$T, plot = TRUE, print.auc = TRUE, ci = TRUE)
+roc_bio_only <- roc(UNITED_type1$M, UNITED_type1$T, plot = TRUE, print.auc = TRUE, ci = TRUE)
+roc_both <- roc(UNITED_type1$M, UNITED_type1$prob, plot = TRUE, print.auc = TRUE, ci = TRUE)
+
+roc.test(roc_bio_only, roc_both)
+roc.test(UNITED_type1$M,UNITED_type1$T, UNITED_type1$prob)
 
 table(UNITED_type1$M, UNITED_type1$T)
 
