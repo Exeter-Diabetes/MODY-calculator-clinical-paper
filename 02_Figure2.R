@@ -22,22 +22,14 @@ source("New_Data_Predictions/prediction_functions.R")
 
 # load datasets
 ## Load population representative dataset
-dataset_UNITED_type1 <- create_data(dataset = "united t1d", 
-                                              commonmody = FALSE, id = TRUE) %>%
-  
+dataset_UNITED_type1 <- create_data(dataset = "united t1d",
+                                    commonmody = FALSE, 
+                                    id = TRUE) %>%
   ## if MODY testing missing, change to 0
   mutate(M = ifelse(is.na(M), 0, M))
 
-dataset_UNITED_type2 <- create_data(dataset = "united t2d", 
-                                              commonmody = FALSE, id = TRUE)
-
-#merge probs to datasets
-dataset_UNITED_type1 <- cbind(dataset_UNITED_type1, predictions_UNITED_type1_with_T)
-dataset_UNITED_type2 <- cbind(dataset_UNITED_type2, predictions_UNITED_type2)
-
-#merge to joint dataset
-UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
-
+dataset_UNITED_type2 <- create_data(dataset = "united t2d",
+                                    commonmody = FALSE, id = TRUE)
 
 # load files required
 predictions_UNITED_type1_no_T_full <- 
@@ -69,6 +61,14 @@ predictions_UNITED_type2 <-
   column_to_rownames(var = "id")
 predictions_UNITED_type2 <- predictions_UNITED_type2[as.character(c(dataset_UNITED_type2$id)), ]
 
+#merge probs to datasets
+dataset_UNITED_type1 <- cbind(dataset_UNITED_type1, 
+                              predictions_UNITED_type1_with_T)
+dataset_UNITED_type2 <- cbind(dataset_UNITED_type2, 
+                              predictions_UNITED_type2)
+
+#merge to joint dataset
+UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
 
 #Figure prep --------------------------------------------------------------------------------------
 
@@ -90,7 +90,10 @@ calc_auroc <- function(data, predictions, thinning = 100) {
     
     interim <- roc(data, 
                    predictions[sequence_list[i],],
-                   levels=c(0,1), direction = "<", plot=FALSE, print.auc=FALSE)
+                   levels=c(0,1), 
+                   direction = "<", 
+                   plot=FALSE, 
+                   print.auc=FALSE)
     
     ## append new value
     output <- c(output, as.numeric(interim$auc))
@@ -102,7 +105,8 @@ calc_auroc <- function(data, predictions, thinning = 100) {
 }
 
 ###
-## This section is thinned to help run times but also does not make much difference to full posterior values
+## This section is thinned to help run times but also does not 
+#  make much difference to full posterior values
 ###
 
 ## Type 1 UNITED
@@ -130,24 +134,32 @@ auc_UNITED_type2 <- calc_auroc(dataset_UNITED_type2$M,
 quantile(auc_UNITED_type2, probs = c(0.025, 0.5, 0.975)) # thinning = 10
 # 2.5%       50%     97.5% 
 # 0.8465473 0.8618926 0.8768116  
+#: ----------------------------------------------------------------------------------
+#Looking at missed cases
+UNITED_joint %>%
+  filter(prob < 0.05 & M ==1) 
 
 #:------------------------------------------------------------
-roc_curves <- data.frame(prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
+roc_curves <- data.frame(
+  prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
   cbind(Mody = dataset_UNITED_type1$M) %>%
   pROC::roc(response = Mody, predictor = prob) %>%
   magrittr::extract(2:3) %>%
   as.data.frame() %>%
   mutate(
-    auc =  unname(data.frame(prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
-                    cbind(Mody = dataset_UNITED_type1$M) %>%
-                    pROC::roc(response = Mody, predictor = prob) %>%
-                    magrittr::extract(c(9)) %>%
-                    unlist()),
+    auc =  unname(data.frame(
+      prob = colMeans(predictions_UNITED_type1_with_T_full)) %>%
+        cbind(Mody = dataset_UNITED_type1$M) %>%
+        pROC::roc(response = Mody, predictor = prob) %>%
+        magrittr::extract(c(9)) %>%
+        unlist()),
     auc_low = quantile(auc_UNITED_type1_with_T, probs = c(0.025)),
     auc_high = quantile(auc_UNITED_type1_with_T, probs= c(0.975)),
     mean = mean(colMeans(predictions_UNITED_type1_with_T_full), na.rm = TRUE)
   ) %>%
-  mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "Biomarkers") %>%
+  mutate(Dataset = "UNITED", 
+         Model = "Type 1", 
+         Calculator = "Biomarkers") %>%
   rbind(
     data.frame(prob = colMeans(predictions_UNITED_type1_no_T_full)) %>%
       cbind(Mody = dataset_UNITED_type1$M) %>%
@@ -155,32 +167,38 @@ roc_curves <- data.frame(prob = colMeans(predictions_UNITED_type1_with_T_full)) 
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        auc = unname(data.frame(prob = colMeans(predictions_UNITED_type1_no_T_full)) %>%
-                       cbind(Mody = dataset_UNITED_type1$M) %>%
-                       pROC::roc(response = Mody, predictor = prob) %>%
-                       magrittr::extract(c(9)) %>%
-                       unlist()),
+        auc = unname(data.frame(
+          prob = colMeans(predictions_UNITED_type1_no_T_full)) %>%
+            cbind(Mody = dataset_UNITED_type1$M) %>%
+            pROC::roc(response = Mody, predictor = prob) %>%
+            magrittr::extract(c(9)) %>%
+            unlist()),
         auc_low = quantile(auc_UNITED_type1_no_T, probs = c(0.025)),
         auc_high = quantile(auc_UNITED_type1_no_T, probs= c(0.975)),
         mean = mean(colMeans(predictions_UNITED_type1_no_T_full), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "UNITED", Model = "Type 1", Calculator = "No Biomarkers"), 
+      mutate(Dataset = "UNITED", 
+             Model = "Type 1", 
+             Calculator = "No Biomarkers"), 
     data.frame(prob = colMeans(predictions_UNITED_type2_full)) %>%
       cbind(Mody = dataset_UNITED_type2$M) %>%
       pROC::roc(response = Mody, predictor = prob) %>%
       magrittr::extract(2:3) %>%
       as.data.frame() %>%
       mutate(
-        auc = unname(data.frame(prob = colMeans(predictions_UNITED_type2_full)) %>%
-                       cbind(Mody = dataset_UNITED_type2$M) %>%
-                       pROC::roc(response = Mody, predictor = prob) %>%
-                       magrittr::extract(c(9)) %>%
-                       unlist()),
+        auc = unname(data.frame(
+          prob = colMeans(predictions_UNITED_type2_full)) %>%
+            cbind(Mody = dataset_UNITED_type2$M) %>%
+            pROC::roc(response = Mody, predictor = prob) %>%
+            magrittr::extract(c(9)) %>%
+            unlist()),
         auc_low = quantile(auc_UNITED_type2, probs = c(0.025)),
         auc_high = quantile(auc_UNITED_type2, probs= c(0.975)),
         mean = mean(colMeans(predictions_UNITED_type2_full), na.rm = TRUE)
       ) %>%
-      mutate(Dataset = "UNITED", Model = "Type 2", Calculator = "No Biomarkers")
+      mutate(Dataset = "UNITED", 
+             Model = "Type 2", 
+             Calculator = "No Biomarkers")
   )
 
 
@@ -188,7 +206,9 @@ dat_text <- roc_curves %>%
   select(-sensitivities, -specificities) %>%
   distinct() %>%
   mutate(
-    auc_full = paste0("AUC: ", signif(auc, 2), " [", signif(auc_low, 2), "-", signif(auc_high, 2), "]"),
+    auc_full = paste0("AUC: ", signif(auc, 2), 
+                      " [", signif(auc_low, 2), "-", 
+                      signif(auc_high, 2), "]"),
     mean = paste0("Mean prob:", signif(mean, 2)*100, "%"),
     Calculator = factor(Calculator, 
                         levels = c("Biomarkers", 
@@ -330,7 +350,7 @@ plot_prob_fig2 <- patchwork::wrap_plots(
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY (n=1266)"),
+        ylab("Non-MODY (n=1,299)"),
       #point
       UNITED_joint %>%
         mutate(prob = UNITED_joint$prob) %>%
@@ -341,7 +361,8 @@ plot_prob_fig2 <- patchwork::wrap_plots(
           Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
         ) %>%
         ggplot() +
-        geom_point(aes(x=prob, y=0), position = position_jitter(height = 0.1, seed = 20)) +
+        geom_point(aes(x=prob, y=0), 
+                   position = position_jitter(height = 0.1, seed = 20)) +
         geom_vline(xintercept = 0.05) +
         coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
         scale_x_continuous(labels = scales::percent) +
@@ -374,6 +395,6 @@ dev.off()
 
 
 # Making plots for presenting
-ggsave("Figures/Figure2.tif", width = 13, height = 9, dpi= 1000)
-plot_prob_fig2
-dev.off()
+# ggsave("Figures/Figure2.tif", width = 13, height = 9, dpi= 1000)
+# plot_prob_fig2
+# dev.off()
