@@ -6,7 +6,30 @@ The MODY calculator use a combination of two models to workout the probability o
 
 An explanation on how to do predictions can be found below or in the file `prediction_functions.R`
 
+
+Clinical information:
+
+
+| **Field**            | **Requirements / Notes**                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| **Current Age**      | - Must be between 1 and 120 years<br>- Must be equal to or greater than the Age of Diagnosis |
+| **BMI (kg/m²)**      | - Use the most recent BMI<br>- Range: 10–70 kg/m²                                            |
+| **HbA1c**            | - Use the most recent measurement<br>- 3–15% or 9–140 mmol/mol                               |
+| **Age of Diagnosis** | - Must be between 1 and 35 years                                                             |
+
+
+
+
 ## Patients insulin-treated with 6-months of diagnosis
+
+Note: If insulin was started within 6 months of diagnosis, C-peptide and autoantibody results are required to calculate MODY probability.
+
+| **Test**                       | **Requirements / Notes**                                                                                              |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| **C-peptide Testing**          | - Use the result closest to calculator usage<br>- Plasma: 5–5000 pmol/L or 0.1–15 ng/ml<br>- UCPCR: 0.01–20 nmol/mmol |
+| **Islet Autoantibody Testing** | - Use result closest to diagnosis<br>- If not tested near diagnosis, use first available result                       |
+
+
 
 <details>
 <summary>How to make predictions using R-software:</summary>
@@ -33,6 +56,13 @@ The dataset should be formatted in the following way:
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | C<br>numeric | A<br>numeric |
 |---------|---------|---------|---------|---------|---------|---------|---------|
 | 1 - positive<br>0 - negative | \>1 or \<35 | \>3% or \< 15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70 | 1 - positive<br>0 - negative | 1 - positive<br>0 - negative |
+
+Note: 
+
+- HbA1c - please include the most recent HbA1c measurement.
+- BMI - please include the most recent BMI measurement.
+- A - please include islet autoantibody results as close to diagnosis as possible. If not tested near to diagnosis, please use the first available islet autoantibody results as possible closest to diagnosis.
+
 
 3.  Load the necessary model parameters.
 
@@ -89,6 +119,12 @@ The dataset should be formatted in the following way:
 | pardm<br>numeric | agerec<br>numeric | hba1c<br>numeric | agedx<br>numeric | sex<br>numeric | bmi<br>numeric | insoroha<br>numeric |
 |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | 1 - positive<br>0 - negative | \>1 or \<35 | \>3% or \<15% | \>1 or \<120 | 1 - male<br>2 - female | \>14 or \<70   | 1 - positive<br>0 - negative |
+
+Note: 
+
+- HbA1c - please include the most recent HbA1c measurement.
+- BMI - please include the most recent BMI measurement.
+
 
 3.  Load the necessary model parameters.
 
