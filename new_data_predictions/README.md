@@ -22,8 +22,6 @@ Clinical information:
 
 ## Patients insulin-treated with 6-months of diagnosis
 
-Note: If insulin was started within 6 months of diagnosis, C-peptide and autoantibody results are required to calculate MODY probability.
-
 | **Test**                       | **Requirements / Notes**                                                                                              |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | **C-peptide Testing**          | - Use the result closest to calculator usage<br>- Plasma: 5–5000 pmol/L or 0.1–15 ng/ml<br>- UCPCR: 0.01–20 nmol/mmol |
