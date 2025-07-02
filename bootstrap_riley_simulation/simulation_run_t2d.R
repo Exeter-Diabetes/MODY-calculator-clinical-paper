@@ -57,7 +57,7 @@ source("data/create_data.R")
 mody <- create_data(dataset = "case-control t2d")
 
 ## Load population representative dataset
-united <- create_data(dataset = "united t2d", biomarkers = "reduced", commonmody = FALSE)
+united <- create_data(dataset = "united t2d", biomarkers = "reduced", commonmody = FALSE, id = TRUE)
 
 
 ### set up seeds for the draws
@@ -264,6 +264,9 @@ simulation <- foreach(iterations = 1:number_simulations) %dopar% {
 
 
 simulation <- list(
+  # original id order
+  id_order = united$id,
+  # iterations
   iterations = number_simulations,
   # number of iterations
   niter = niter,

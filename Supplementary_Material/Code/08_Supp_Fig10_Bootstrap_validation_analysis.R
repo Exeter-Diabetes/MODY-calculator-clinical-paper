@@ -15,18 +15,28 @@ library(tidyverse)
 source("data/create_data.R")
 source("new_data_predictions/prediction_functions.R")
 
+# load rds objects
+bootstrap_t1d <- readRDS("bootstrap_riley_simulation/output/simulation_t1d.rds")
+bootstrap_t2d <- readRDS("bootstrap_riley_simulation/output/simulation_t2d.rds")
+
 # load datasets
 ## Load population representative dataset
 dataset.UNITED_type1_all_genes <- create_data(dataset = "united t1d", commonmody = FALSE, id = TRUE) %>%
   
   ## if MODY testing missing, change to 0
-  mutate(M = ifelse(is.na(M), 0, M))
+  mutate(M = ifelse(is.na(M), 0, M)) %>%
+  mutate(rownames = id) %>%
+  column_to_rownames(var = "rownames")
+dataset.UNITED_type1_all_genes <- dataset.UNITED_type1_all_genes[as.character(bootstrap_t1d$id_order), ]
 
-dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE)
+
+
+dataset.UNITED_type2_all_genes <- create_data(dataset = "united t2d", commonmody = FALSE, id = TRUE) %>%
+  mutate(rownames = id) %>%
+  column_to_rownames(var = "rownames")
+dataset.UNITED_type2_all_genes <- dataset.UNITED_type2_all_genes[as.character(bootstrap_t2d$id_order), ]
 
 # load rds objects
-bootstrap_t1d <- readRDS("bootstrap_riley_simulation/output/simulation_t1d.rds")
-bootstrap_t2d <- readRDS("bootstrap_riley_simulation/output/simulation_t2d.rds")
 predictions_dataset.UNITED_type1_all_genes_with_T <- readRDS("model_predictions/predictions_dataset.UNITED_type1_all_genes_with_T.rds") %>% 
   as.data.frame() %>%
   { rownames(.) <- NULL; . } %>%
@@ -342,6 +352,6 @@ plot_simulation_riley_combined <- wrap_plots(
   )
 
 
-pdf("Supplementary Material/Outputs/supfig10.pdf", width = 11, height = 6)
+pdf("Supplementary_Material/Outputs/supfig10.pdf", width = 11, height = 6)
 plot_simulation_riley_combined
 dev.off()
