@@ -63,7 +63,7 @@ varlist_cat = c("sex",
 #create table for - chosen to have numeric variables displayed as medianIQR
 var_characteristics(varlist = varlist, 
                     varlist_cat = varlist_cat, 
-                    dataset = CPRD_type1_35, 
+                    dataset = CPRD_type1, 
                     numeric_option = "medianIQR",
                     p_value_testing = FALSE,
                     table_name = "Supplementary_Material/Outputs/CPRD_T1D_table")
@@ -72,7 +72,7 @@ var_characteristics(varlist = varlist,
 #create table for - chosen to have numeric variables displayed as medianIQR
 var_characteristics(varlist = varlist, 
                     varlist_cat = varlist_cat, 
-                    dataset = CPRD_type2_35, 
+                    dataset = CPRD_type2, 
                     numeric_option = "medianIQR",
                     p_value_testing = FALSE,
                     table_name = "Supplementary_Material/Outputs/CPRD_T2D_table")
