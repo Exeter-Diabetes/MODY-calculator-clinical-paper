@@ -14,10 +14,11 @@ library(patchwork)
 # load data
 probabilities_under_30 <- read.delim("data/mody_probabilities_under_30s.txt")
 probabilities_under_35 <- read.delim("data/mody_probabilities_under_35s.txt")
+probabilities_under_36 <- read.delim("data/mody_probabilities_under_36s.txt")
 
 
 ## formatted probabilities
-probabilities <- probabilities_under_30 %>%
+probabilities <- probabilities_under_36 %>%
   
   as.data.frame() %>%
   
@@ -177,7 +178,7 @@ plot_cprd_probabilities_boxplot <- patchwork::wrap_plots(
 
 #:-------------------------------------------------------------
 # Making plots
-pdf("Supplementary Material/Outputs/supfig14.pdf", width = 11, height = 3)
+pdf("Supplementary_Material/Outputs/supfig14.pdf", width = 11, height = 3)
 plot_cprd_probabilities_density
 dev.off()
 
