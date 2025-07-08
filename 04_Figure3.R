@@ -180,7 +180,8 @@ dataset_type2 <- cbind(dataset_type2, predictions_dataset.type2_new)
 
 
 #merge together --------------------------------------------------------------------------
-External_joint <- full_join(dataset_type1, dataset_type2)
+External_joint <- full_join(dataset_type1, dataset_type2) %>%
+  mutate(Label = "Label")
 
 #Plotting ------------------------------------------------------------------------------
 setwd("..")
@@ -380,7 +381,7 @@ dat_text <- roc_curves %>%
 
 plot_prob_external_fig3 <- patchwork::wrap_plots(
   patchwork::wrap_plots(
-  # ROC T1D
+  #A.1 - ROC of clinical features & biomarkers model in early-insulin-treated
   patchwork::free(
     
     roc_curves %>%
@@ -416,7 +417,7 @@ plot_prob_external_fig3 <- patchwork::wrap_plots(
         panel.spacing.x = unit(1.5, "lines")
       )
   ),
-  # ROC T2D
+  #A.2 - ROC of clinical features model in not-early-insulin-treated
   patchwork::free(
     
     roc_curves %>%
@@ -455,13 +456,13 @@ plot_prob_external_fig3 <- patchwork::wrap_plots(
 nrow = 1, ncol = 2
   ),
   patchwork::wrap_plots(
-    
+    #B - Distribution curves for joint dataset
     patchwork::wrap_plots(
       
       # Density
       External_joint %>%
         filter(M == 0) %>%
-        select(M, prob) %>%
+        select(M, prob, Label) %>%
         rename("Mody" = "M") %>%
         mutate(
           Mody = factor(Mody, 
@@ -474,6 +475,11 @@ nrow = 1, ncol = 2
         coord_cartesian(xlim =c(0, 1)) +
         scale_x_continuous(labels = scales::percent) +
         theme_bw() +
+        facet_grid(~factor(Label, 
+                           levels = c("Label"), 
+                           labels = c("Distribution of MODY probabilities across external \n validation data and both models")),  
+                   scales = "free",
+                   labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
         theme(
           panel.border = element_blank(),
           axis.line = element_line(),
