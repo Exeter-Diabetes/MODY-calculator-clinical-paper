@@ -10,7 +10,7 @@
 
 ###############################################################################################
 ##Clinical utility table UNITED -----------------------------------------------------------------
-setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
+#setwd("~/PhD/CLINICAL MODY/Code/MODY-calculator-clinical-paper")
 #load libraries --------------------------------------------------------------------------------
 library(tidyverse)
 library(pROC)
@@ -233,5 +233,10 @@ UNITED_THRESHOLDS_Table1 <- rbind(UNITED_5PERC,
                                   UNITED_30PERC)
 write_xlsx(UNITED_THRESHOLDS_Table1,"Table1.xlsx")
 
-
+UNITED_joint %>%
+  #filter(agedx < 18) %>%
+  summarise(
+    n = sum(agedx < 18),
+    perc = n/n()
+  )
 
