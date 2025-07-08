@@ -68,7 +68,8 @@ dataset_UNITED_type2 <- cbind(dataset_UNITED_type2,
                               predictions_UNITED_type2)
 
 #merge to joint dataset
-UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2)
+UNITED_joint <- full_join(dataset_UNITED_type1, dataset_UNITED_type2) %>%
+  mutate(Label = "Label")
 
 #Figure prep --------------------------------------------------------------------------------------
 
@@ -332,7 +333,7 @@ plot_prob_fig2 <- patchwork::wrap_plots(
       UNITED_joint %>%
         mutate(prob = UNITED_joint$prob) %>%
         filter(M == 0) %>%
-        select(M, prob) %>%
+        select(M, prob, Label) %>%
         rename("Mody" = "M") %>%
         mutate(
           Mody = factor(Mody, levels = c(0, 1), labels = c("Non-MODY", "MODY")),
@@ -343,6 +344,11 @@ plot_prob_fig2 <- patchwork::wrap_plots(
         coord_cartesian(xlim =c(0, 1)) +
         scale_x_continuous(labels = scales::percent) +
         theme_bw() +
+        facet_grid(~factor(Label, 
+                           levels = c("Label"), 
+                           labels = c("Distribution of MODY probabilities across UNITED \n recalibration data and both models")), 
+                   scales = "free",
+                   labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
         theme(
           panel.border = element_blank(),
           axis.line = element_line(),
@@ -350,7 +356,7 @@ plot_prob_fig2 <- patchwork::wrap_plots(
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY (n=1,299)"),
+        ylab("Non-MODY \n (n=1,299)"),
       #point
       UNITED_joint %>%
         mutate(prob = UNITED_joint$prob) %>%
@@ -362,7 +368,7 @@ plot_prob_fig2 <- patchwork::wrap_plots(
         ) %>%
         ggplot() +
         geom_point(aes(x=prob, y=0), 
-                   position = position_jitter(height = 0.1, seed = 20)) +
+                   position = position_jitter(height = 0.1, seed = 23)) +
         geom_vline(xintercept = 0.05) +
         coord_cartesian(xlim =c(0, 1), ylim = c(-0.15, 0.15)) +
         scale_x_continuous(labels = scales::percent) +
