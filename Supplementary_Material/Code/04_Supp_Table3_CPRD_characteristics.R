@@ -39,10 +39,16 @@ CPRD_type1 <- CPRD_type1 %>%
 CPRD_type2 <- CPRD_type2 %>%
   drop_na(agedx, agerec, hba1c, bmi, pardm, sex, insoroha)
 
-CPRD_type1_35 <- CPRD_type1 %>%
-  filter(agedx <= 35)
-CPRD_type2_35 <- CPRD_type2 %>%
-  filter(agedx <= 35)
+CPRD <- full_join(CPRD_type1, CPRD_type2)
+CPRD %>%
+  summarise(
+    n = sum(agedx < 18),
+    perc = n/n()
+  )
+# CPRD_type1_35 <- CPRD_type1 %>%
+#   filter(agedx <= 35)
+# CPRD_type2_35 <- CPRD_type2 %>%
+#   filter(agedx <= 35)
 
 
 #PRODUCE TABLES --------------------------------------------------------------------------
