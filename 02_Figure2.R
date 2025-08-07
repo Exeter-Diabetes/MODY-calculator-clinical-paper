@@ -346,7 +346,7 @@ plot_prob_fig2 <- patchwork::wrap_plots(
         theme_bw() +
         facet_grid(~factor(Label, 
                            levels = c("Label"), 
-                           labels = c("Distribution of MODY probabilities across UNITED \n recalibration data and both models")), 
+                           labels = c("Distribution of monogenic diabetes probabilities across UNITED \n recalibration data and both models")), 
                    scales = "free",
                    labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
         theme(
@@ -356,7 +356,9 @@ plot_prob_fig2 <- patchwork::wrap_plots(
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY \n (n=1,299)"),
+        #ylab("Non-MD \n (n=1,299)"),
+        #ylab("Non-Monogenic \n diabetes \n (n=1,299)"),
+        ylab("Non-monogenic \n diabetes (n=1,299)"),
       #point
       UNITED_joint %>%
         mutate(prob = UNITED_joint$prob) %>%
@@ -378,7 +380,8 @@ plot_prob_fig2 <- patchwork::wrap_plots(
           axis.text.y = element_blank(), 
           #axis.title.y = element_blank()
         ) +
-        ylab("MODY \n cases \n (n=33)") +
+        #ylab("MD \n cases \n (n=33)") +
+        ylab("Monogenic \n diabetes \n (n=33)") +
         xlab("Model probabilities"),
       ncol = 1, nrow = 2, heights = c(4,1)
   ),
