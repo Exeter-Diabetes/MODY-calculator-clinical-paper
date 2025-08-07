@@ -477,7 +477,7 @@ nrow = 1, ncol = 2
         theme_bw() +
         facet_grid(~factor(Label, 
                            levels = c("Label"), 
-                           labels = c("Distribution of MODY probabilities across external \n validation data and both models")),  
+                           labels = c("Distribution of monogenic diabetes probabilities across external \n validation data and both models")),  
                    scales = "free",
                    labeller = label_wrap_gen(width = 46, multi_line =  TRUE)) +
         theme(
@@ -487,7 +487,7 @@ nrow = 1, ncol = 2
           axis.text.x = element_blank(), 
           axis.title.x = element_blank()
         ) +
-        ylab("Non-MODY \n (n=1,005)"),
+        ylab("Non-monogenic \n diabetes (n=1,005)"),
       #point
       External_joint %>%
         filter(M == 1) %>%
@@ -511,7 +511,7 @@ nrow = 1, ncol = 2
           axis.text.y = element_blank(), 
           #axis.title.y = element_blank()
         ) +
-        ylab("MODY \n cases \n (n=20)") +
+        ylab("Monogenic \n diabetes \n (n=20)") +
         xlab("Model probabilities"),
       ncol = 1, nrow = 2, heights = c(3.5,1.5)
     )
