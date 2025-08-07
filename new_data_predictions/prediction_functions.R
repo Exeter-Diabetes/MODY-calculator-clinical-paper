@@ -107,7 +107,7 @@ predict.T1D <- function(object, newdata, parms, ...) {
     select(-bmi, -agedx, -agerec) %>%
     set_names(c("bmi_spline", "agedx_spline", "agerec_spline")) %>%
     as.matrix()
-  stopifnot(all(map_chr(x, class) == "numeric"))
+  stopifnot(all(map_chr(x, class) %in% c("numeric", "integer")))
   stopifnot(is.numeric(newdata$T) | all(is.na(newdata$T)))
   
   ## convert posterior samples to matrix
@@ -190,7 +190,7 @@ predict.T2D <- function(object, newdata, ...) {
   stopifnot(is.data.frame(newdata))
   stopifnot(c("agedx", "bmi", "hba1c", "pardm", "agerec", "insoroha", "sex") %in% colnames(newdata))
   x <- select(newdata, one_of(c("agedx", "bmi", "hba1c", "pardm", "agerec", "insoroha", "sex")))
-  stopifnot(all(map_chr(x, class) == "numeric"))
+  stopifnot(all(map_chr(x, class) %in% c("numeric", "integer")))
   
   ## convert posterior samples to matrix
   post <- as.matrix(do.call(rbind, object$post))
